@@ -1,0 +1,61 @@
+import React from 'react';
+import { Carousel, Button, Container } from 'react-bootstrap';
+import { motion } from 'motion/react';
+
+const slides = [
+  {
+    id: 1,
+    title: "თანამედროვე განათება",
+    desc: "აღმოაჩინეთ უნიკალური დიზაინის სანათები თქვენი ინტერიერისთვის",
+    image: "https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?auto=format&fit=crop&w=1920&q=80",
+    link: "/products/lighting"
+  },
+  {
+    id: 2,
+    title: "პრემიუმ ხარისხის ავეჯი",
+    desc: "კომფორტი და სტილი ერთ სივრცეში. შეარჩიეთ საუკეთესო",
+    image: "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1920&q=80",
+    link: "/products/furniture"
+  },
+  {
+    id: 3,
+    title: "ახალი კოლექცია 2026",
+    desc: "იყავით პირველი ვინც შეიძენს სეზონის ყველაზე ტრენდულ ნივთებს",
+    image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1920&q=80",
+    link: "/products"
+  }
+];
+
+const HeroSlider: React.FC = () => {
+  return (
+    <Carousel fade className="hero-slider" indicators={true} interval={5000}>
+      {slides.map(slide => (
+        <Carousel.Item key={slide.id}>
+          <img
+            className="d-block w-100"
+            src={slide.image}
+            alt={slide.title}
+            referrerPolicy="no-referrer"
+          />
+          <Carousel.Caption className="h-100 d-flex flex-column justify-content-center align-items-start text-start">
+            <Container>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+              >
+                <h1 className="display-3 fw-bold mb-3">{slide.title}</h1>
+                <p className="lead mb-4 fs-4 opacity-75">{slide.desc}</p>
+                <Button variant="primary" size="lg" className="px-5 py-3 rounded-pill">
+                  აღმოაჩინე მეტი
+                </Button>
+              </motion.div>
+            </Container>
+          </Carousel.Caption>
+        </Carousel.Item>
+      ))}
+    </Carousel>
+  );
+};
+
+export default HeroSlider;
