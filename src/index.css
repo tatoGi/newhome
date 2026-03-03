@@ -1,21 +1,176 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
-@import "bootstrap/dist/css/bootstrap.min.css";
 
 :root {
-  --primary-color: #2c3e50;
-  --accent-color: #e67e22;
+  --primary-color: #0F2E47;
+  /* Logo Dark Blue */
+  --accent-color: #CC7A50;
+  /* Logo Terracotta */
   --light-bg: #f8f9fa;
+  --white: #ffffff;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background-color: #ffffff;
+  background-color: var(--white);
   color: #333;
+  -webkit-font-smoothing: antialiased;
 }
 
-.navbar-brand {
-  font-weight: 700;
-  letter-spacing: -0.5px;
+.bg-primary {
+  background-color: var(--primary-color) !important;
+}
+
+.bg-accent {
+  background-color: var(--accent-color) !important;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.navbar-brand img {
+  max-width: 100%;
+  height: auto;
+  max-height: 70px;
+  object-fit: contain;
+  transition: var(--transition);
+}
+
+.navbar-brand:hover img {
+  transform: scale(1.05);
+}
+
+.nav-link {
+  display: flex !important;
+  align-items: center;
+  font-weight: 500;
+  color: var(--primary-color) !important;
+  transition: var(--transition);
+  position: relative;
+  padding: 0.5rem 0 !important;
+  margin: 0 1rem;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--accent-color);
+  transition: var(--transition);
+}
+
+.nav-link:hover {
+  color: var(--accent-color) !important;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+.dropdown-toggle {
+  display: flex !important;
+  align-items: center;
+}
+
+.navbar {
+  backdrop-filter: blur(10px);
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Custom Dropdown Styling */
+.icon-link {
+  padding: 0.5rem !important;
+  margin: 0 !important;
+  color: var(--primary-color) !important;
+  border-radius: 50%;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.icon-link:hover {
+  background-color: var(--light-bg);
+  color: var(--accent-color) !important;
+  transform: rotate(5deg) scale(1.1);
+}
+
+.icon-link::after {
+  display: none !important;
+  /* Remove underline for icons */
+}
+
+.dropdown-menu {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(5px);
+  animation: slideDown 0.3s ease-out;
+  margin-top: 10px !important;
+}
+
+.dropdown-item {
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-weight: 500;
+  color: var(--primary-color);
+  transition: var(--transition);
+}
+
+.dropdown-item:hover {
+  background-color: var(--light-bg);
+  color: var(--accent-color);
+  transform: translateX(5px);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Hover Dropdown for Desktop */
+@media (min-width: 992px) {
+  .nav-item.dropdown:hover>.dropdown-menu {
+    display: block;
+    margin-top: 0;
+  }
+
+  .nav-item.dropdown:hover>.nav-link::after {
+    width: 100%;
+  }
+}
+
+.dropdown-toggle::after {
+  transition: var(--transition);
+  border-top: 0.3em solid;
+  border-right: 0.3em solid transparent;
+  border-bottom: 0;
+  border-left: 0.3em solid transparent;
+  vertical-align: middle;
+  margin-left: 0.5rem;
+}
+
+.nav-item.dropdown:hover .dropdown-toggle::after {
+  transform: rotate(180deg);
+  color: var(--accent-color);
 }
 
 .mega-menu {
@@ -31,34 +186,70 @@ body {
 .hero-slider img {
   object-fit: cover;
   height: 100%;
-  filter: brightness(0.8);
+  filter: brightness(0.7);
+  transition: transform 10s linear;
+}
+
+.carousel-item.active img {
+  transform: scale(1.1);
 }
 
 .product-card {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border: none;
-  border-radius: 12px;
+  transition: var(--transition);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 20px;
+  background: var(--white);
 }
 
 .product-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+  box-shadow: 0 20px 40px rgba(15, 46, 71, 0.1);
+}
+
+.product-card .card-img-top {
+  transition: var(--transition);
+}
+
+.product-card:hover .card-img-top {
+  transform: scale(1.05);
+}
+
+.product-card .card-subtitle {
+  color: var(--accent-color) !important;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+.product-card .card-title {
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+.product-card .btn-outline-primary {
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.product-card .btn-outline-primary:hover {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+  color: var(--white);
 }
 
 .btn-primary {
   background-color: var(--primary-color);
   border-color: var(--primary-color);
+  transition: var(--transition);
 }
 
 .btn-primary:hover {
-  background-color: #1a252f;
-  border-color: #1a252f;
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(204, 122, 80, 0.3);
 }
 
 .footer {
   background-color: #f8f9fa;
   border-top: 1px solid #eee;
 }
-
-/* Custom Georgian Font Support if needed, but Inter is fine */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');

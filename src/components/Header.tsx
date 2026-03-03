@@ -3,41 +3,49 @@ import { Navbar, Nav, Container, NavDropdown, Badge, Offcanvas, Button } from 'r
 import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingCart, Heart, Search, Menu, User, X } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import logo from '../logo.jpeg';
 
 const Header: React.FC = () => {
   const { cart, wishlist } = useApp();
   const [showCart, setShowCart] = React.useState(false);
   const navigate = useNavigate();
 
+  const [showProducts, setShowProducts] = React.useState(false);
+
   return (
     <>
-      <Navbar bg="white" expand="lg" sticky="top" className="shadow-sm py-3">
+      <Navbar bg="white" expand="lg" sticky="top" className="shadow-sm py-2">
         <Container>
-          <Navbar.Brand as={Link} to="/" className="fs-3 text-dark">
-            New<span className="text-primary">Home</span>
+          <Navbar.Brand as={Link} to="/" className="p-0">
+            <img
+              src={logo}
+              alt="NewHome Logo"
+              style={{ height: '70px', width: 'auto' }}
+              className="d-inline-block align-top"
+            />
           </Navbar.Brand>
 
-          <div className="d-flex order-lg-3 align-items-center gap-3">
-            <Nav.Link as={Link} to="/search" className="d-none d-md-block">
+          <div className="d-flex order-lg-3 align-items-center gap-2 gap-md-3">
+            <Nav.Link as={Link} to="/search" className="d-none d-md-flex icon-link">
               <Search size={20} />
             </Nav.Link>
-            <Nav.Link as={Link} to="/wishlist" className="position-relative">
+            <Nav.Link as={Link} to="/wishlist" className="position-relative icon-link">
               <Heart size={20} />
               {wishlist.length > 0 && (
-                <Badge pill bg="danger" className="position-absolute top-0 start-100 translate-middle" style={{ fontSize: '0.6rem' }}>
+                <Badge pill bg="none" className="position-absolute top-0 start-100 translate-middle bg-accent text-white" style={{ fontSize: '0.6rem' }}>
                   {wishlist.length}
                 </Badge>
               )}
             </Nav.Link>
-            <Nav.Link onClick={() => setShowCart(true)} className="position-relative">
+            <Nav.Link onClick={() => setShowCart(true)} className="position-relative icon-link">
               <ShoppingCart size={20} />
               {cart.length > 0 && (
-                <Badge pill bg="primary" className="position-absolute top-0 start-100 translate-middle" style={{ fontSize: '0.6rem' }}>
+                <Badge pill bg="none" className="position-absolute top-0 start-100 translate-middle bg-primary text-white" style={{ fontSize: '0.6rem' }}>
                   {cart.reduce((acc, item) => acc + item.quantity, 0)}
                 </Badge>
               )}
             </Nav.Link>
-            <Nav.Link as={Link} to="/account">
+            <Nav.Link as={Link} to="/account" className="icon-link">
               <User size={20} />
             </Nav.Link>
             <Navbar.Toggle aria-controls="basic-navbar-nav" className="border-0 p-0 ms-2">
@@ -46,17 +54,27 @@ const Header: React.FC = () => {
           </div>
 
           <Navbar.Collapse id="basic-navbar-nav" className="order-lg-2">
-            <Nav className="mx-auto gap-lg-4">
-              <Nav.Link as={Link} to="/about">ჩვენს შესახებ</Nav.Link>
-              <NavDropdown title="პროდუქცია" id="products-dropdown">
-                <NavDropdown.Item as={Link} to="/products/lighting">განათება</NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/products/furniture">ავეჯი</NavDropdown.Item>
+            <Nav className="mx-auto gap-lg-4 align-items-center">
+              <Nav.Link as={Link} to="/about" className="text-nowrap">ჩვენს შესახებ</Nav.Link>
+              <NavDropdown
+                title="პროდუქცია"
+                id="products-dropdown"
+                show={showProducts}
+                onMouseEnter={() => setShowProducts(true)}
+                onMouseLeave={() => setShowProducts(false)}
+              >
+                <NavDropdown.Item as={Link} to="/products/lighting" className="d-flex align-items-center gap-2">
+                  <span className="dot bg-accent"></span> განათება
+                </NavDropdown.Item>
+                <NavDropdown.Item as={Link} to="/products/furniture" className="d-flex align-items-center gap-2">
+                  <span className="dot bg-primary"></span> ავეჯი
+                </NavDropdown.Item>
                 <NavDropdown.Divider />
                 <NavDropdown.Item as={Link} to="/products">ყველა პროდუქტი</NavDropdown.Item>
               </NavDropdown>
-              <Nav.Link as={Link} to="/services">სერვისები</Nav.Link>
-              <Nav.Link as={Link} to="/projects">პროექტები</Nav.Link>
-              <Nav.Link as={Link} to="/contact">კონტაქტი</Nav.Link>
+              <Nav.Link as={Link} to="/services" className="text-nowrap">სერვისები</Nav.Link>
+              <Nav.Link as={Link} to="/projects" className="text-nowrap">პროექტები</Nav.Link>
+              <Nav.Link as={Link} to="/contact" className="text-nowrap">კონტაქტი</Nav.Link>
             </Nav>
           </Navbar.Collapse>
         </Container>

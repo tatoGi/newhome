@@ -22,34 +22,59 @@ const Home: React.FC = () => {
         <Container>
           <Row className="text-center gy-4">
             <Col md={4}>
-              <div className="p-4 bg-white rounded shadow-sm h-100">
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="p-4 bg-white rounded shadow-sm h-100"
+              >
                 <Truck size={40} className="text-primary mb-3" />
                 <h5>სწრაფი მიწოდება</h5>
                 <p className="text-muted small mb-0">მიიღეთ თქვენი შეკვეთა უმოკლეს დროში მთელი საქართველოს მასშტაბით.</p>
-              </div>
+              </motion.div>
             </Col>
             <Col md={4}>
-              <div className="p-4 bg-white rounded shadow-sm h-100">
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="p-4 bg-white rounded shadow-sm h-100"
+              >
                 <ShieldCheck size={40} className="text-primary mb-3" />
                 <h5>ხარისხის გარანტია</h5>
                 <p className="text-muted small mb-0">ჩვენ გთავაზობთ მხოლოდ უმაღლესი ხარისხის სერტიფიცირებულ პროდუქციას.</p>
-              </div>
+              </motion.div>
             </Col>
             <Col md={4}>
-              <div className="p-4 bg-white rounded shadow-sm h-100">
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                className="p-4 bg-white rounded shadow-sm h-100"
+              >
                 <Clock size={40} className="text-primary mb-3" />
                 <h5>24/7 მხარდაჭერა</h5>
                 <p className="text-muted small mb-0">ჩვენი გუნდი მზად არის დაგეხმაროთ ნებისმიერ დროს.</p>
-              </div>
+              </motion.div>
             </Col>
           </Row>
         </Container>
+
       </section>
 
       {/* Featured Products */}
       <section className="py-5">
         <Container>
-          <div className="d-flex justify-content-between align-items-end mb-4">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="d-flex justify-content-between align-items-end mb-4"
+          >
             <div>
               <h2 className="fw-bold mb-2">რჩეული პროდუქცია</h2>
               <p className="text-muted mb-0">აღმოაჩინეთ ჩვენი ყველაზე პოპულარული მოდელები</p>
@@ -57,15 +82,24 @@ const Home: React.FC = () => {
             <Button variant="link" className="text-primary text-decoration-none d-flex align-items-center gap-2">
               ყველას ნახვა <ArrowRight size={18} />
             </Button>
-          </div>
+          </motion.div>
           <Row className="gy-4">
-            {featuredProducts.map(product => (
+            {featuredProducts.map((product, index) => (
               <Col key={product.id} sm={6} lg={3}>
-                <ProductCard product={product} />
+                <motion.div
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: index * 0.15 }}
+                  className="h-100"
+                >
+                  <ProductCard product={product} />
+                </motion.div>
               </Col>
             ))}
           </Row>
         </Container>
+
       </section>
 
       {/* About Preview */}
@@ -108,13 +142,23 @@ const Home: React.FC = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-5">
+      <section className="py-5 mb-5">
         <Container>
-          <div className="bg-primary text-white p-5 rounded-4 text-center">
-            <h2 className="display-6 fw-bold mb-3">გსურთ ინდივიდუალური შეკვეთა?</h2>
-            <p className="mb-4 opacity-75">დაგვიკავშირდით და ჩვენი დიზაინერები დაგეხმარებიან იდეალური სივრცის შექმნაში</p>
-            <Button variant="light" size="lg" className="px-5 text-primary fw-bold">კონსულტაცია</Button>
-          </div>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="bg-primary text-white p-5 rounded-4 text-center position-relative overflow-hidden shadow-lg"
+          >
+            <div className="position-relative z-1">
+              <h2 className="display-6 fw-bold mb-3">გსურთ ინდივიდუალური შეკვეთა?</h2>
+              <p className="mb-4 opacity-75 lead">დაგვიკავშირდით და ჩვენი დიზაინერები დაგეხმარებიან იდეალური სივრცის შექმნაში</p>
+              <Button variant="light" size="lg" className="px-5 text-primary fw-bold text-uppercase tracking-wider">კონსულტაცია</Button>
+            </div>
+            {/* Decorative background circle */}
+            <div className="position-absolute top-50 start-50 translate-middle bg-white opacity-10 rounded-circle" style={{ width: '800px', height: '800px', zIndex: 0, filter: 'blur(50px)' }}></div>
+          </motion.div>
         </Container>
       </section>
     </div>

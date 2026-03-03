@@ -2,6 +2,7 @@ import React from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { Facebook, Instagram, Linkedin, Mail, Phone, MapPin } from 'lucide-react';
+import logo from '../logo.jpeg';
 
 const Footer: React.FC = () => {
   return (
@@ -9,7 +10,7 @@ const Footer: React.FC = () => {
       <Container>
         <Row className="gy-4">
           <Col lg={4}>
-            <h4 className="mb-4 fw-bold">New<span className="text-primary">Home</span></h4>
+            <h4 className="mb-4 fw-bold"><img src={logo} alt="NewHome Logo" style={{ height: '100px', width: 'auto' }} />New<span className="text-primary">Home</span></h4>
             <p className="text-muted mb-4">
               თანამედროვე დიზაინის ავეჯი და განათება თქვენი კომფორტისთვის. ჩვენ ვქმნით გარემოს, სადაც თავს ბედნიერად იგრძნობთ.
             </p>
