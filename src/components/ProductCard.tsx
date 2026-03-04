@@ -1,21 +1,29 @@
-import React from 'react';
-import { Card, Button } from 'react-bootstrap';
-import { Heart, ShoppingCart } from 'lucide-react';
-import { useApp } from '../context/AppContext';
-import { motion } from 'motion/react';
+'use client';
 
-interface Product {
+import React, { useState } from 'react';
+import Link from 'next/link';
+import { Heart } from 'lucide-react';
+import { useApp } from '@/context/AppContext';
+
+export interface Product {
   id: number;
   name: string;
   price: number;
+  oldPrice?: number;
   image: string;
   category: string;
+  colors?: string[];
+  material?: string;
+  sale?: boolean;
 }
 
 const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
-  const { addToCart, addToWishlist, removeFromWishlist, isInWishlist } = useApp();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useApp();
+  const [isHovered, setIsHovered] = useState(false);
+  const [activeColor, setActiveColor] = useState(0);
 
-  const handleWishlist = () => {
+  const handleWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
     if (isInWishlist(product.id)) {
       removeFromWishlist(product.id);
     } else {
@@ -24,38 +32,71 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
   };
 
   return (
-    <motion.div
-      whileHover={{ y: -5 }}
-      transition={{ duration: 0.2 }}
+    <div
+      className="article-product-card d-flex flex-column h-100 position-relative"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      <Card className="product-card h-100 overflow-hidden">
-        <div className="position-relative">
-          <Card.Img
-            variant="top"
+      <div className="position-relative mb-2 overflow-hidden article-img-container" style={{ backgroundColor: '#f5f5f5' }}>
+        <Link href={`/product/${product.id}`} className="d-block w-100 h-100 position-relative z-1">
+          <img
             src={product.image}
-            style={{ height: '280px', objectFit: 'cover' }}
+            alt={product.name}
+            className="w-100 article-product-img"
+            style={{ height: '360px', objectFit: 'cover' }}
             referrerPolicy="no-referrer"
           />
-          <Button
-            variant="white"
-            className="position-absolute top-0 end-0 m-2 shadow-sm rounded-circle p-2"
-            onClick={handleWishlist}
-          >
-            <Heart size={18} fill={isInWishlist(product.id) ? "red" : "none"} color={isInWishlist(product.id) ? "red" : "currentColor"} />
-          </Button>
-        </div>
-        <Card.Body className="d-flex flex-column">
-          <Card.Subtitle className="text-muted small mb-2">{product.category}</Card.Subtitle>
-          <Card.Title className="fs-6 mb-2">{product.name}</Card.Title>
-          <div className="mt-auto d-flex justify-content-between align-items-center">
-            <span className="fw-bold fs-5">{product.price} ₾</span>
-            <Button variant="outline-primary" size="sm" className="rounded-circle p-2" onClick={() => addToCart(product)}>
-              <ShoppingCart size={18} />
-            </Button>
+        </Link>
+
+        {product.sale && (
+          <span className="position-absolute top-0 start-0 m-2 badge bg-danger text-white rounded-0 px-2 py-1 fs-6 z-2">
+            SALE
+          </span>
+        )}
+
+        <button
+          className="btn btn-light position-absolute top-0 end-0 m-2 rounded-circle border-0 d-flex align-items-center justify-content-center article-wishlist-btn"
+          onClick={handleWishlist}
+          style={{
+            width: '36px',
+            height: '36px',
+            opacity: isHovered || isInWishlist(product.id) ? 1 : 0,
+            transition: 'all 0.2s',
+            zIndex: 3,
+            backgroundColor: '#ffffff',
+          }}
+        >
+          <Heart size={18} fill={isInWishlist(product.id) ? '#D9534F' : 'none'} color={isInWishlist(product.id) ? '#D9534F' : '#333'} />
+        </button>
+      </div>
+
+      <div className="d-flex flex-column flex-grow-1 px-1 mt-1">
+        {product.colors && product.colors.length > 0 && (
+          <div className="d-flex gap-2 mb-2 align-items-center">
+            {product.colors.map((color, idx) => (
+              <button
+                key={idx}
+                className={`article-swatch rounded-circle p-0 ${activeColor === idx ? 'active' : ''}`}
+                style={{ width: '24px', height: '24px', backgroundColor: color }}
+                onClick={(e) => { e.preventDefault(); setActiveColor(idx); }}
+                aria-label={`ფერი ${idx + 1}`}
+              />
+            ))}
           </div>
-        </Card.Body>
-      </Card>
-    </motion.div>
+        )}
+
+        <Link href={`/product/${product.id}`} className="fw-bold text-dark article-title mb-1 text-decoration-none">
+          {product.name}
+        </Link>
+
+        <div className="mt-auto d-flex gap-2 align-items-center">
+          <span className="fw-bold" style={{ color: '#D9534F', fontSize: '1.05rem' }}>{product.price} ₾</span>
+          {product.oldPrice && (
+            <span className="text-muted text-decoration-line-through small">{product.oldPrice} ₾</span>
+          )}
+        </div>
+      </div>
+    </div>
   );
 };
 

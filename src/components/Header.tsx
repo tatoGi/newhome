@@ -1,84 +1,123 @@
+'use client';
+
 import React from 'react';
 import { Navbar, Nav, Container, NavDropdown, Badge, Offcanvas, Button } from 'react-bootstrap';
-import { Link, useNavigate } from 'react-router-dom';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ShoppingCart, Heart, Search, Menu, User, X } from 'lucide-react';
-import { useApp } from '../context/AppContext';
-import logo from '../logo.jpeg';
+import { useApp } from '@/context/AppContext';
 
 const Header: React.FC = () => {
   const { cart, wishlist } = useApp();
   const [showCart, setShowCart] = React.useState(false);
-  const navigate = useNavigate();
-
   const [showProducts, setShowProducts] = React.useState(false);
+  const timeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleMouseEnter = () => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    setShowProducts(true);
+  };
+
+  const handleMouseLeave = () => {
+    timeoutRef.current = setTimeout(() => setShowProducts(false), 300);
+  };
 
   return (
     <>
-      <Navbar bg="white" expand="lg" sticky="top" className="shadow-sm py-2">
-        <Container>
-          <Navbar.Brand as={Link} to="/" className="p-0">
-            <img
-              src={logo}
-              alt="NewHome Logo"
-              style={{ height: '70px', width: 'auto' }}
-              className="d-inline-block align-top"
-            />
-          </Navbar.Brand>
+      <header className="sticky-top shadow-sm bg-white">
+        {/* Top Header */}
+        <div className="border-bottom py-3">
+          <Container>
+            <div className="d-flex justify-content-between align-items-center">
+              {/* Logo */}
+              <Link href="/" className="text-decoration-none p-0">
+                <img
+                  src="/logo.png"
+                  alt="NewHome Logo"
+                  style={{ height: '60px', width: 'auto' }}
+                  className="d-inline-block align-top"
+                />
+              </Link>
 
-          <div className="d-flex order-lg-3 align-items-center gap-2 gap-md-3">
-            <Nav.Link as={Link} to="/search" className="d-none d-md-flex icon-link">
-              <Search size={20} />
-            </Nav.Link>
-            <Nav.Link as={Link} to="/wishlist" className="position-relative icon-link">
-              <Heart size={20} />
-              {wishlist.length > 0 && (
-                <Badge pill bg="none" className="position-absolute top-0 start-100 translate-middle bg-accent text-white" style={{ fontSize: '0.6rem' }}>
-                  {wishlist.length}
-                </Badge>
-              )}
-            </Nav.Link>
-            <Nav.Link onClick={() => setShowCart(true)} className="position-relative icon-link">
-              <ShoppingCart size={20} />
-              {cart.length > 0 && (
-                <Badge pill bg="none" className="position-absolute top-0 start-100 translate-middle bg-primary text-white" style={{ fontSize: '0.6rem' }}>
-                  {cart.reduce((acc, item) => acc + item.quantity, 0)}
-                </Badge>
-              )}
-            </Nav.Link>
-            <Nav.Link as={Link} to="/account" className="icon-link">
-              <User size={20} />
-            </Nav.Link>
-            <Navbar.Toggle aria-controls="basic-navbar-nav" className="border-0 p-0 ms-2">
-              <Menu size={24} />
-            </Navbar.Toggle>
-          </div>
+              {/* Search Bar (Desktop) */}
+              <div className="d-none d-md-flex mx-4 flex-grow-1" style={{ maxWidth: '500px' }}>
+                <div className="input-group">
+                  <input
+                    type="text"
+                    className="form-control bg-light border-0 shadow-none px-3 py-2"
+                    placeholder="ძიება თავის სახლში..."
+                    style={{ borderRadius: '8px 0 0 8px' }}
+                  />
+                  <button className="btn bg-light border-0 px-3" style={{ borderRadius: '0 8px 8px 0' }}>
+                    <Search size={20} className="text-muted" />
+                  </button>
+                </div>
+              </div>
 
-          <Navbar.Collapse id="basic-navbar-nav" className="order-lg-2">
-            <Nav className="mx-auto gap-lg-4 align-items-center">
-              <Nav.Link as={Link} to="/about" className="text-nowrap">ჩვენს შესახებ</Nav.Link>
-              <NavDropdown
-                title="პროდუქცია"
-                id="products-dropdown"
-                show={showProducts}
-                onMouseEnter={() => setShowProducts(true)}
-                onMouseLeave={() => setShowProducts(false)}
-              >
-                <NavDropdown.Item as={Link} to="/products/lighting" className="d-flex align-items-center gap-2">
-                  <span className="dot bg-accent"></span> განათება
-                </NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/products/furniture" className="d-flex align-items-center gap-2">
-                  <span className="dot bg-primary"></span> ავეჯი
-                </NavDropdown.Item>
-                <NavDropdown.Divider />
-                <NavDropdown.Item as={Link} to="/products">ყველა პროდუქტი</NavDropdown.Item>
-              </NavDropdown>
-              <Nav.Link as={Link} to="/services" className="text-nowrap">სერვისები</Nav.Link>
-              <Nav.Link as={Link} to="/projects" className="text-nowrap">პროექტები</Nav.Link>
-              <Nav.Link as={Link} to="/contact" className="text-nowrap">კონტაქტი</Nav.Link>
-            </Nav>
-          </Navbar.Collapse>
-        </Container>
-      </Navbar>
+              {/* Icons */}
+              <div className="d-flex align-items-center gap-2 gap-md-3">
+                <Link href="/wishlist" className="position-relative icon-link text-decoration-none">
+                  <Heart size={20} />
+                  {wishlist.length > 0 && (
+                    <Badge pill bg="none" className="position-absolute top-0 start-100 translate-middle bg-accent text-white" style={{ fontSize: '0.6rem' }}>
+                      {wishlist.length}
+                    </Badge>
+                  )}
+                </Link>
+
+                <button onClick={() => setShowCart(true)} className="btn btn-link position-relative icon-link border-0 text-decoration-none p-0">
+                  <ShoppingCart size={20} />
+                  {cart.length > 0 && (
+                    <Badge pill bg="none" className="position-absolute top-0 start-100 translate-middle bg-primary text-white" style={{ fontSize: '0.6rem' }}>
+                      {cart.reduce((acc, item) => acc + item.quantity, 0)}
+                    </Badge>
+                  )}
+                </button>
+
+                <Link href="/account" className="icon-link text-decoration-none">
+                  <User size={20} />
+                </Link>
+
+                <Navbar expand="lg" className="p-0 d-lg-none">
+                  <Navbar.Toggle aria-controls="basic-navbar-nav" className="border-0 p-0 ms-2">
+                    <Menu size={24} />
+                  </Navbar.Toggle>
+                </Navbar>
+              </div>
+            </div>
+          </Container>
+        </div>
+
+        {/* Bottom Navigation */}
+        <Navbar bg="white" expand="lg" className="py-2">
+          <Container>
+            <Navbar.Collapse id="basic-navbar-nav">
+              <Nav className="mx-auto gap-lg-4 align-items-center fw-medium">
+                <Nav.Link as={Link} href="/about" className="text-nowrap">ჩვენს შესახებ</Nav.Link>
+                <NavDropdown
+                  title="პროდუქცია"
+                  id="products-dropdown"
+                  show={showProducts}
+                  onMouseEnter={handleMouseEnter}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <NavDropdown.Item as={Link} href="/products/lighting" className="d-flex align-items-center gap-2">
+                    <span className="dot bg-accent"></span> განათება
+                  </NavDropdown.Item>
+                  <NavDropdown.Item as={Link} href="/products/furniture" className="d-flex align-items-center gap-2">
+                    <span className="dot bg-primary"></span> ავეჯი
+                  </NavDropdown.Item>
+                  <NavDropdown.Divider />
+                  <NavDropdown.Item as={Link} href="/products">ყველა პროდუქტი</NavDropdown.Item>
+                </NavDropdown>
+                <Nav.Link as={Link} href="/services" className="text-nowrap">სერვისები</Nav.Link>
+                <Nav.Link as={Link} href="/projects" className="text-nowrap">პროექტები</Nav.Link>
+                <Nav.Link as={Link} href="/contact" className="text-nowrap">კონტაქტი</Nav.Link>
+              </Nav>
+            </Navbar.Collapse>
+          </Container>
+        </Navbar>
+      </header>
 
       <CartDrawer show={showCart} onHide={() => setShowCart(false)} />
     </>
@@ -87,8 +126,7 @@ const Header: React.FC = () => {
 
 const CartDrawer: React.FC<{ show: boolean; onHide: () => void }> = ({ show, onHide }) => {
   const { cart, removeFromCart, updateQuantity } = useApp();
-  const navigate = useNavigate();
-
+  const router = useRouter();
   const total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   return (
@@ -129,10 +167,10 @@ const CartDrawer: React.FC<{ show: boolean; onHide: () => void }> = ({ show, onH
                 <span className="fw-bold">ჯამი:</span>
                 <span className="fw-bold">{total} ₾</span>
               </div>
-              <Button variant="primary" className="w-full py-2 mb-2" onClick={() => { onHide(); navigate('/checkout'); }}>
+              <Button variant="primary" className="w-100 py-2 mb-2" onClick={() => { onHide(); router.push('/checkout'); }}>
                 გაფორმება
               </Button>
-              <Button variant="outline-secondary" className="w-full py-2" onClick={() => { onHide(); navigate('/cart'); }}>
+              <Button variant="outline-secondary" className="w-100 py-2" onClick={() => { onHide(); router.push('/cart'); }}>
                 კალათის ნახვა
               </Button>
             </div>
