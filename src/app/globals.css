@@ -161,8 +161,8 @@ body {
 .hero-slider { overflow: hidden; }
 
 .hero-slider .carousel-item {
-  height: 80vh;
-  min-height: 500px;
+  height: 60vh;
+  min-height: 400px;
   overflow: hidden;
 }
 
@@ -182,8 +182,8 @@ body {
   display: flex !important;
   flex-direction: column;
   justify-content: center;
-  align-items: flex-start;
-  text-align: left;
+  align-items: center;
+  text-align: center;
   padding: 0 5%;
   bottom: unset;
 }
