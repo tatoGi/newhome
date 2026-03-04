@@ -4,6 +4,7 @@ import React from 'react';
 import { Carousel, Button, Container } from 'react-bootstrap';
 import { motion } from 'motion/react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const slides = [
   {
@@ -46,15 +47,19 @@ const slides = [
 const HeroSlider: React.FC = () => {
   return (
     <Carousel fade className="hero-slider" indicators={true} interval={5000}>
-      {slides.map(slide => (
+      {slides.map((slide, index) => (
         <Carousel.Item key={slide.id}>
-          <img
-            className="d-block w-100"
-            src={slide.image}
-            alt={slide.title}
-            referrerPolicy="no-referrer"
-            {...(slide.id === 1 ? { fetchPriority: 'high' } : { loading: 'lazy' })}
-          />
+          <div className="position-relative w-100 hero-slide-image-container">
+            <Image
+              src={slide.image}
+              alt={slide.title}
+              fill
+              className="object-fit-cover"
+              priority={index === 0}
+              quality={85}
+              sizes="100vw"
+            />
+          </div>
           <Carousel.Caption>
             <Container>
               <motion.div
@@ -74,6 +79,24 @@ const HeroSlider: React.FC = () => {
           </Carousel.Caption>
         </Carousel.Item>
       ))}
+      <style jsx>{`
+        .hero-slide-image-container {
+          height: 60vh;
+          min-height: 400px;
+        }
+        @media (max-width: 768px) {
+          .hero-slide-image-container {
+            height: 50vh;
+            min-height: 320px;
+          }
+        }
+        @media (max-width: 576px) {
+          .hero-slide-image-container {
+            height: 45vh;
+            min-height: 280px;
+          }
+        }
+      `}</style>
     </Carousel>
   );
 };

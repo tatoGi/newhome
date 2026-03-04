@@ -80,6 +80,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ka" className={notoSerifGeorgian.variable}>
       <head>
+        <link rel="preconnect" href="https://images.unsplash.com" />
+        <link rel="dns-prefetch" href="https://images.unsplash.com" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}

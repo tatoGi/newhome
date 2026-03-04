@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { motion } from 'motion/react';
 import { getHomeCategories } from '@/lib/data';
 
+import Image from 'next/image';
+
 const CategoryGrid: React.FC = () => {
     const categories = getHomeCategories();
 
@@ -33,12 +35,14 @@ const CategoryGrid: React.FC = () => {
                                 className="category-card"
                             >
                                 <Link href={cat.link} className="text-decoration-none">
-                                    <div className="position-relative overflow-hidden rounded-4 shadow-sm ratio ratio-1x1">
-                                        <img
+                                    <div className="position-relative overflow-hidden rounded-4 shadow-sm ratio ratio-1x1 h-100">
+                                        <Image
                                             src={cat.image}
                                             alt={cat.name}
+                                            fill
                                             className="object-fit-cover transition-transform"
-                                            style={{ transition: 'transform 0.5s ease' }}
+                                            sizes="(max-width: 768px) 50vw, 25vw"
+                                            quality={80}
                                         />
                                         <div className="position-absolute inset-0 bg-dark opacity-20 hover-opacity-40 transition-opacity" />
                                         <div className="position-absolute bottom-0 start-0 p-4 w-100 text-white">
