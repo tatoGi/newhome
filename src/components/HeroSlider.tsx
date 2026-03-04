@@ -53,6 +53,7 @@ const HeroSlider: React.FC = () => {
             src={slide.image}
             alt={slide.title}
             referrerPolicy="no-referrer"
+            {...(slide.id === 1 ? { fetchPriority: 'high' } : { loading: 'lazy' })}
           />
           <Carousel.Caption>
             <Container>
@@ -60,10 +61,12 @@ const HeroSlider: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
+                className="d-flex flex-column align-items-center text-center mx-auto"
+                style={{ maxWidth: '800px' }}
               >
-                <h1 className="display-3 fw-bold mb-3">{slide.title}</h1>
-                <p className="lead mb-4 fs-4 opacity-75">{slide.desc}</p>
-                <Button as={Link as any} href={slide.link} variant="primary" size="lg" className="px-5 py-3 rounded-pill">
+                <h2 className="display-6 fw-bold mb-3">{slide.title}</h2>
+                <p className="fs-5 mb-4 opacity-75">{slide.desc}</p>
+                <Button as={Link as any} href={slide.link} variant="primary" className="px-5 py-2 rounded-pill">
                   აღმოაჩინე მეტი
                 </Button>
               </motion.div>

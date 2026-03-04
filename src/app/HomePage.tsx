@@ -36,7 +36,7 @@ export default function HomePage() {
                   className="p-4 bg-white rounded shadow-sm h-100"
                 >
                   {item.icon}
-                  <h5>{item.title}</h5>
+                  <h3 className="h5">{item.title}</h3>
                   <p className="text-muted small mb-0">{item.desc}</p>
                 </motion.div>
               </Col>

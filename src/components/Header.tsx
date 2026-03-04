@@ -1,7 +1,7 @@
 'use client';
 
-import React from 'react';
-import { Navbar, Nav, Container, NavDropdown, Badge, Offcanvas, Button } from 'react-bootstrap';
+import React, { useState } from 'react';
+import { Nav, Container, NavDropdown, Badge, Offcanvas, Button } from 'react-bootstrap';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ShoppingCart, Heart, Search, Menu, User, X } from 'lucide-react';
@@ -9,115 +9,170 @@ import { useApp } from '@/context/AppContext';
 
 const Header: React.FC = () => {
   const { cart, wishlist } = useApp();
-  const [showCart, setShowCart] = React.useState(false);
-  const [showProducts, setShowProducts] = React.useState(false);
+  const [showCart, setShowCart] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
+  const [showProducts, setShowProducts] = useState(false);
   const timeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleMouseEnter = () => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     setShowProducts(true);
   };
-
   const handleMouseLeave = () => {
     timeoutRef.current = setTimeout(() => setShowProducts(false), 300);
   };
 
+  const closeMenu = () => setShowMenu(false);
+
   return (
     <>
       <header className="sticky-top shadow-sm bg-white">
-        {/* Top Header */}
-        <div className="border-bottom py-3">
+        {/* Top row */}
+        <div className="border-bottom py-2 py-md-3">
           <Container>
-            <div className="d-flex justify-content-between align-items-center">
+            <div className="d-flex justify-content-between align-items-center gap-2">
+
               {/* Logo */}
-              <Link href="/" className="text-decoration-none p-0">
-                <img
-                  src="/logo.png"
-                  alt="NewHome Logo"
-                  style={{ height: '60px', width: 'auto' }}
-                  className="d-inline-block align-top"
-                />
+              <Link href="/" className="text-decoration-none flex-shrink-0">
+                <img src="/logo.png" alt="NewHome" style={{ height: '50px', width: 'auto' }} />
               </Link>
 
-              {/* Search Bar (Desktop) */}
-              <div className="d-none d-md-flex mx-4 flex-grow-1" style={{ maxWidth: '500px' }}>
+              {/* Search — desktop only */}
+              <div className="d-none d-md-flex flex-grow-1 mx-3" style={{ maxWidth: 500 }}>
                 <div className="input-group">
                   <input
                     type="text"
                     className="form-control bg-light border-0 shadow-none px-3 py-2"
-                    placeholder="ძიება თავის სახლში..."
+                    placeholder="ძიება..."
                     style={{ borderRadius: '8px 0 0 8px' }}
                   />
-                  <button className="btn bg-light border-0 px-3" style={{ borderRadius: '0 8px 8px 0' }}>
-                    <Search size={20} className="text-muted" />
+                  <button className="btn bg-light border-0 px-3" style={{ borderRadius: '0 8px 8px 0' }} aria-label="ძიება">
+                    <Search size={18} className="text-muted" />
                   </button>
                 </div>
               </div>
 
               {/* Icons */}
-              <div className="d-flex align-items-center gap-2 gap-md-3">
-                <Link href="/wishlist" className="position-relative icon-link text-decoration-none">
+              <div className="d-flex align-items-center gap-2 gap-md-3 flex-shrink-0">
+                <Link href="/wishlist" className="position-relative icon-link text-decoration-none text-dark" aria-label="სურვილების სია">
                   <Heart size={20} />
                   {wishlist.length > 0 && (
-                    <Badge pill bg="none" className="position-absolute top-0 start-100 translate-middle bg-accent text-white" style={{ fontSize: '0.6rem' }}>
+                    <Badge pill className="position-absolute top-0 start-100 translate-middle bg-danger text-white" style={{ fontSize: '0.55rem' }}>
                       {wishlist.length}
                     </Badge>
                   )}
                 </Link>
 
-                <button onClick={() => setShowCart(true)} className="btn btn-link position-relative icon-link border-0 text-decoration-none p-0">
+                <button
+                  onClick={() => setShowCart(true)}
+                  className="btn btn-link position-relative icon-link border-0 text-dark text-decoration-none p-0"
+                  aria-label="კალათა"
+                >
                   <ShoppingCart size={20} />
                   {cart.length > 0 && (
-                    <Badge pill bg="none" className="position-absolute top-0 start-100 translate-middle bg-primary text-white" style={{ fontSize: '0.6rem' }}>
-                      {cart.reduce((acc, item) => acc + item.quantity, 0)}
+                    <Badge pill className="position-absolute top-0 start-100 translate-middle bg-primary text-white" style={{ fontSize: '0.55rem' }}>
+                      {cart.reduce((a, i) => a + i.quantity, 0)}
                     </Badge>
                   )}
                 </button>
 
-                <Link href="/account" className="icon-link text-decoration-none">
+                <Link href="/account" className="icon-link text-decoration-none text-dark d-none d-md-inline-flex" aria-label="ანგარიში">
                   <User size={20} />
                 </Link>
 
-                <Navbar expand="lg" className="p-0 d-lg-none">
-                  <Navbar.Toggle aria-controls="basic-navbar-nav" className="border-0 p-0 ms-2">
-                    <Menu size={24} />
-                  </Navbar.Toggle>
-                </Navbar>
+                {/* Burger — mobile only */}
+                <button
+                  className="btn btn-link border-0 p-0 text-dark d-lg-none"
+                  onClick={() => setShowMenu(true)}
+                  aria-label="მენიუ"
+                >
+                  <Menu size={24} />
+                </button>
               </div>
             </div>
           </Container>
         </div>
 
-        {/* Bottom Navigation */}
-        <Navbar bg="white" expand="lg" className="py-2">
+        {/* Desktop nav — hidden on mobile */}
+        <div className="d-none d-lg-block border-bottom py-1">
           <Container>
-            <Navbar.Collapse id="basic-navbar-nav">
-              <Nav className="mx-auto gap-lg-4 align-items-center fw-medium">
-                <Nav.Link as={Link} href="/about" className="text-nowrap">ჩვენს შესახებ</Nav.Link>
-                <NavDropdown
-                  title="პროდუქცია"
-                  id="products-dropdown"
-                  show={showProducts}
-                  onMouseEnter={handleMouseEnter}
-                  onMouseLeave={handleMouseLeave}
-                >
-                  <NavDropdown.Item as={Link} href="/products/lighting" className="d-flex align-items-center gap-2">
-                    <span className="dot bg-accent"></span> განათება
-                  </NavDropdown.Item>
-                  <NavDropdown.Item as={Link} href="/products/furniture" className="d-flex align-items-center gap-2">
-                    <span className="dot bg-primary"></span> ავეჯი
-                  </NavDropdown.Item>
-                  <NavDropdown.Divider />
-                  <NavDropdown.Item as={Link} href="/products">ყველა პროდუქტი</NavDropdown.Item>
-                </NavDropdown>
-                <Nav.Link as={Link} href="/services" className="text-nowrap">სერვისები</Nav.Link>
-                <Nav.Link as={Link} href="/projects" className="text-nowrap">პროექტები</Nav.Link>
-                <Nav.Link as={Link} href="/contact" className="text-nowrap">კონტაქტი</Nav.Link>
-              </Nav>
-            </Navbar.Collapse>
+            <Nav className="justify-content-center gap-4 fw-medium">
+              <Nav.Link as={Link} href="/about">ჩვენს შესახებ</Nav.Link>
+              <NavDropdown
+                title="პროდუქცია"
+                id="products-dd"
+                show={showProducts}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+              >
+                <NavDropdown.Item as={Link} href="/products/lighting" className="d-flex align-items-center gap-2">
+                  <span className="dot bg-accent" /> განათება
+                </NavDropdown.Item>
+                <NavDropdown.Item as={Link} href="/products/furniture" className="d-flex align-items-center gap-2">
+                  <span className="dot bg-primary" /> ავეჯი
+                </NavDropdown.Item>
+                <NavDropdown.Divider />
+                <NavDropdown.Item as={Link} href="/products">ყველა პროდუქტი</NavDropdown.Item>
+              </NavDropdown>
+              <Nav.Link as={Link} href="/services">სერვისები</Nav.Link>
+              <Nav.Link as={Link} href="/projects">პროექტები</Nav.Link>
+              <Nav.Link as={Link} href="/contact">კონტაქტი</Nav.Link>
+            </Nav>
           </Container>
-        </Navbar>
+        </div>
       </header>
+
+      {/* Mobile Offcanvas Menu */}
+      <Offcanvas show={showMenu} onHide={closeMenu} placement="start" style={{ width: 280 }}>
+        <Offcanvas.Header closeButton className="border-bottom">
+          <img src="/logo.png" alt="NewHome" style={{ height: 40 }} />
+        </Offcanvas.Header>
+        <Offcanvas.Body className="px-3 py-4">
+          {/* Mobile search */}
+          <div className="input-group mb-4">
+            <input
+              type="text"
+              className="form-control bg-light border-0 shadow-none"
+              placeholder="ძიება..."
+            />
+            <button className="btn bg-light border-0 px-3">
+              <Search size={16} className="text-muted" />
+            </button>
+          </div>
+
+          <Nav className="flex-column">
+            {[
+              { href: '/', label: 'მთავარი' },
+              { href: '/about', label: 'ჩვენს შესახებ' },
+              { href: '/products', label: 'პროდუქცია' },
+              { href: '/products/lighting', label: 'განათება', sub: true },
+              { href: '/products/furniture', label: 'ავეჯი', sub: true },
+              { href: '/services', label: 'სერვისები' },
+              { href: '/projects', label: 'პროექტები' },
+              { href: '/contact', label: 'კონტაქტი' },
+            ].map(({ href, label, sub }) => (
+              <Nav.Link
+                key={href}
+                as={Link}
+                href={href}
+                onClick={closeMenu}
+                className={`py-2 border-bottom text-dark ${sub ? 'ps-3 text-muted small' : 'fw-medium'}`}
+              >
+                {sub ? `— ${label}` : label}
+              </Nav.Link>
+            ))}
+          </Nav>
+
+          <div className="mt-4 d-flex gap-3 align-items-center">
+            <Link href="/wishlist" onClick={closeMenu} className="icon-link text-decoration-none text-dark">
+              <Heart size={22} />
+            </Link>
+            <Link href="/account" onClick={closeMenu} className="icon-link text-decoration-none text-dark">
+              <User size={22} />
+            </Link>
+          </div>
+        </Offcanvas.Body>
+      </Offcanvas>
 
       <CartDrawer show={showCart} onHide={() => setShowCart(false)} />
     </>
@@ -146,9 +201,9 @@ const CartDrawer: React.FC<{ show: boolean; onHide: () => void }> = ({ show, onH
             <div className="flex-grow-1 overflow-auto">
               {cart.map(item => (
                 <div key={item.id} className="d-flex gap-3 mb-4 border-bottom pb-3">
-                  <img src={item.image} alt={item.name} style={{ width: '80px', height: '80px', objectFit: 'cover' }} className="rounded" />
+                  <img src={item.image} alt={item.name} style={{ width: 80, height: 80, objectFit: 'cover' }} className="rounded" />
                   <div className="flex-grow-1">
-                    <h6 className="mb-1">{item.name}</h6>
+                    <h6 className="mb-1 small">{item.name}</h6>
                     <p className="text-muted small mb-2">{item.price} ₾</p>
                     <div className="d-flex align-items-center gap-2">
                       <Button size="sm" variant="outline-secondary" onClick={() => updateQuantity(item.id, -1)}>-</Button>

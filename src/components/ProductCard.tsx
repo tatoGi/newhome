@@ -57,6 +57,7 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
         <button
           className="btn btn-light position-absolute top-0 end-0 m-2 rounded-circle border-0 d-flex align-items-center justify-content-center article-wishlist-btn"
           onClick={handleWishlist}
+          aria-label={isInWishlist(product.id) ? 'სურვილებიდან წაშლა' : 'სურვილებში დამატება'}
           style={{
             width: '36px',
             height: '36px',
