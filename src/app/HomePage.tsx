@@ -5,6 +5,9 @@ import { Container, Row, Col, Button } from 'react-bootstrap';
 import Link from 'next/link';
 import HeroSlider from '@/components/HeroSlider';
 import Reels from '@/components/Reels';
+import CategoryGrid from '@/components/CategoryGrid';
+import FeaturedProjects from '@/components/FeaturedProjects';
+import BlogSection from '@/components/BlogSection';
 import ProductCard from '@/components/ProductCard';
 import { motion } from 'motion/react';
 import { ArrowRight, ShieldCheck, Truck, Clock } from 'lucide-react';
@@ -17,6 +20,8 @@ export default function HomePage() {
     <div>
       <HeroSlider />
       <Reels />
+      <CategoryGrid />
+      <FeaturedProjects />
 
       {/* Features */}
       <section className="py-5 bg-light">
@@ -138,6 +143,8 @@ export default function HomePage() {
           </motion.div>
         </Container>
       </section>
+
+      <BlogSection />
     </div>
   );
 }

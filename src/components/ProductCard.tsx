@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { Heart } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
@@ -37,14 +38,15 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="position-relative mb-2 overflow-hidden article-img-container" style={{ backgroundColor: '#f5f5f5' }}>
+      <div className="position-relative mb-2 overflow-hidden article-img-container" style={{ backgroundColor: '#f5f5f5', height: '360px' }}>
         <Link href={`/product/${product.id}`} className="d-block w-100 h-100 position-relative z-1">
-          <img
+          <Image
             src={product.image}
             alt={product.name}
-            className="w-100 article-product-img"
-            style={{ height: '360px', objectFit: 'cover' }}
-            referrerPolicy="no-referrer"
+            fill
+            sizes="(max-width: 576px) 100vw, (max-width: 992px) 50vw, 25vw"
+            className="article-product-img"
+            style={{ objectFit: 'cover' }}
           />
         </Link>
 

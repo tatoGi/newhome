@@ -102,10 +102,10 @@ export const allProducts: Product[] = [
     name: 'Leap შავი სანათი',
     price: 79,
     oldPrice: 99,
-    image: 'https://images.unsplash.com/photo-1543198126-a8ad8e47fb21?auto=format&fit=crop&w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=800&q=80',
     images: [
-      'https://images.unsplash.com/photo-1543198126-a8ad8e47fb21?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=1200&q=80',
     ],
     category: 'განათება',
@@ -350,10 +350,96 @@ export const allProjects: Project[] = [
   },
 ];
 
+// ─── Blogs ───────────────────────────────────────────────────
+
+export interface BlogPost {
+  id: number;
+  title: string;
+  excerpt: string;
+  date: string;
+  image: string;
+  author: string;
+  slug: string;
+}
+
+export const allBlogs: BlogPost[] = [
+  {
+    id: 1,
+    title: '2026 წლის ინტერიერის ტენდენციები',
+    excerpt: 'აღმოაჩინეთ ფერები, მასალები და ფორმები, რომლებიც წელს თქვენს სახლს განსაკუთრებულს გახდის.',
+    date: '24 თებერვალი, 2026',
+    image: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=800&q=80',
+    author: 'მარიამ ბერიძე',
+    slug: 'interior-trends-2026',
+  },
+  {
+    id: 2,
+    title: 'როგორ შევარჩიოთ სწორი განათება',
+    excerpt: 'განათება ინტერიერის სულია. შეიტყვეთ, როგორ შექმნათ იდეალური ატმოსფერო ყველა ოთახში.',
+    date: '15 თებერვალი, 2026',
+    image: 'https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?auto=format&fit=crop&w=800&q=80',
+    author: 'გიორგი კაპანაძე',
+    slug: 'how-to-choose-lighting',
+  },
+  {
+    id: 3,
+    title: 'მინიმალისტური დიზაინის უპირატესობები',
+    excerpt: 'ნაკლები მეტია — რატომ ირჩევენ თანამედროვე ადამიანები სიმარტივეს და ფუნქციურობას.',
+    date: '05 თებერვალი, 2026',
+    image: 'https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?auto=format&fit=crop&w=800&q=80',
+    author: 'ელენე გაბუნია',
+    slug: 'minimalist-design-benefits',
+  },
+];
+
+// ─── Categories ──────────────────────────────────────────────
+
+export interface Category {
+  id: number;
+  name: string;
+  image: string;
+  link: string;
+}
+
+export const homeCategories: Category[] = [
+  {
+    id: 1,
+    name: 'მისაღები ოთახი',
+    image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=800&q=80',
+    link: '/products/living-room',
+  },
+  {
+    id: 2,
+    name: 'განათება',
+    image: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=800&q=80',
+    link: '/products/lighting',
+  },
+  {
+    id: 3,
+    name: 'სასადილო ოთახი',
+    image: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?auto=format&fit=crop&w=800&q=80',
+    link: '/products/dining-room',
+  },
+  {
+    id: 4,
+    name: 'საძინებელი',
+    image: 'https://images.unsplash.com/photo-1505691938895-1758d7eaa511?auto=format&fit=crop&w=800&q=80',
+    link: '/products/bedroom',
+  },
+];
+
 export function getAllProjects(): Project[] {
   return allProjects;
 }
 
 export function getProjectById(id: string | number): Project {
   return allProjects.find((p) => p.id === Number(id)) ?? allProjects[0];
+}
+
+export function getAllBlogs(): BlogPost[] {
+  return allBlogs;
+}
+
+export function getHomeCategories(): Category[] {
+  return homeCategories;
 }

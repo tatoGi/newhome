@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Nav, Container, NavDropdown, Badge, Offcanvas, Button } from 'react-bootstrap';
+import { Nav, Container, Badge, Offcanvas, Button } from 'react-bootstrap';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ShoppingCart, Heart, Search, Menu, User, X } from 'lucide-react';
+import { ShoppingCart, Heart, Search, Menu, User, X, ChevronDown } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 
 const Header: React.FC = () => {
@@ -12,15 +12,17 @@ const Header: React.FC = () => {
   const [showCart, setShowCart] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [showProducts, setShowProducts] = useState(false);
-  const timeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const dropdownRef = React.useRef<HTMLDivElement>(null);
 
-  const handleMouseEnter = () => {
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    setShowProducts(true);
-  };
-  const handleMouseLeave = () => {
-    timeoutRef.current = setTimeout(() => setShowProducts(false), 300);
-  };
+  React.useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setShowProducts(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
 
   const closeMenu = () => setShowMenu(false);
 
@@ -98,24 +100,68 @@ const Header: React.FC = () => {
           <Container>
             <Nav className="justify-content-center gap-4 fw-medium">
               <Nav.Link as={Link} href="/about">ჩვენს შესახებ</Nav.Link>
-              <NavDropdown
-                title="პროდუქცია"
-                id="products-dd"
-                show={showProducts}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
-              >
-                <NavDropdown.Item as={Link} href="/products/lighting" className="d-flex align-items-center gap-2">
-                  <span className="dot bg-accent" /> განათება
-                </NavDropdown.Item>
-                <NavDropdown.Item as={Link} href="/products/furniture" className="d-flex align-items-center gap-2">
-                  <span className="dot bg-primary" /> ავეჯი
-                </NavDropdown.Item>
-                <NavDropdown.Divider />
-                <NavDropdown.Item as={Link} href="/products">ყველა პროდუქტი</NavDropdown.Item>
-              </NavDropdown>
+              <div ref={dropdownRef} style={{ position: 'relative' }}>
+                <button
+                  onClick={() => setShowProducts(v => !v)}
+                  className="nav-link fw-medium d-flex align-items-center gap-1 bg-transparent border-0 px-0"
+                  style={{ cursor: 'pointer' }}
+                >
+                  პროდუქცია
+                  <ChevronDown
+                    size={14}
+                    style={{ transition: 'transform 0.2s', transform: showProducts ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                  />
+                </button>
+
+                {showProducts && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '100%',
+                      left: 0,
+                      background: '#fff',
+                      border: '1px solid #dee2e6',
+                      borderRadius: 8,
+                      boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
+                      minWidth: 180,
+                      zIndex: 1000,
+                      overflow: 'hidden',
+                    }}
+                  >
+                    {[
+                      { href: '/products/lighting', label: 'განათება', dot: '#CC7A50' },
+                      { href: '/products/furniture', label: 'ავეჯი', dot: '#0d6efd' },
+                    ].map(item => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={() => setShowProducts(false)}
+                        className="d-flex align-items-center gap-2 px-3 py-2 text-dark text-decoration-none"
+                        style={{ fontSize: 14 }}
+                        onMouseEnter={e => (e.currentTarget.style.background = '#f8f9fa')}
+                        onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                      >
+                        <span style={{ width: 8, height: 8, borderRadius: '50%', background: item.dot, flexShrink: 0 }} />
+                        {item.label}
+                      </Link>
+                    ))}
+                    <hr className="my-1" />
+                    <Link
+                      href="/products"
+                      onClick={() => setShowProducts(false)}
+                      className="d-block px-3 py-2 text-dark text-decoration-none"
+                      style={{ fontSize: 14 }}
+                      onMouseEnter={e => (e.currentTarget.style.background = '#f8f9fa')}
+                      onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                    >
+                      ყველა პროდუქტი
+                    </Link>
+                  </div>
+                )}
+              </div>
               <Nav.Link as={Link} href="/services">სერვისები</Nav.Link>
               <Nav.Link as={Link} href="/projects">პროექტები</Nav.Link>
+              <Nav.Link as={Link} href="/blog">ბლოგი</Nav.Link>
               <Nav.Link as={Link} href="/contact">კონტაქტი</Nav.Link>
             </Nav>
           </Container>
@@ -149,6 +195,7 @@ const Header: React.FC = () => {
               { href: '/products/furniture', label: 'ავეჯი', sub: true },
               { href: '/services', label: 'სერვისები' },
               { href: '/projects', label: 'პროექტები' },
+              { href: '/blog', label: 'ბლოგი' },
               { href: '/contact', label: 'კონტაქტი' },
             ].map(({ href, label, sub }) => (
               <Nav.Link
