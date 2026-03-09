@@ -5,25 +5,59 @@ import { Container, Row, Col, Button } from 'react-bootstrap';
 import Link from 'next/link';
 import HeroSlider from '@/components/HeroSlider';
 import Reels from '@/components/Reels';
-import CategoryGrid from '@/components/CategoryGrid';
 import FeaturedProjects from '@/components/FeaturedProjects';
 import BlogSection from '@/components/BlogSection';
 import ProductCard from '@/components/ProductCard';
 import { motion } from 'motion/react';
 import { ArrowRight, ShieldCheck, Truck, Clock } from 'lucide-react';
 import { allProducts } from '@/lib/data';
+import { PageResponse, Block } from '@/lib/api/types';
+import { toBackendAssetUrl } from '@/lib/api/assets';
 
-const featuredProducts = allProducts.slice(0, 4);
+interface HomePageProps {
+  data: PageResponse | null;
+}
 
-export default function HomePage() {
+const buildHeroSlides = (blocks: Block[]) =>
+  blocks
+    .filter((block) => block.type === 'main_banner' || block.type === 'page_hero' || block.type === 'banner')
+    .map((block, index) => ({
+      id: `${block.type}-${index}`,
+      title: String(block.data.banner_title ?? block.data.title ?? block.label ?? ''),
+      desc: String(block.data.banner_desc ?? block.data.banner_description ?? block.data.description ?? block.description ?? ''),
+      image: toBackendAssetUrl(String(block.data.banner_image ?? block.data.image ?? '')),
+      link: String(block.data.banner_link ?? block.data.link ?? '/products'),
+    }));
+
+export default function HomePage({ data }: HomePageProps) {
+  const sortedBlocks = [...(data?.page?.blocks ?? [])].sort(
+    (a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0)
+  );
+  const heroSlides = buildHeroSlides(sortedBlocks);
+  const productsFromApi = data?.relations?.products;
+  const featuredProducts = (productsFromApi && productsFromApi.length > 0)
+    ? productsFromApi.map((p: any) => ({
+      id: p.id,
+      name: p.title,
+      price: p.price,
+      image: p.feature_image || '/placeholder.jpg',
+      category: 'მისაღები ოთახი',
+      slug: p.slug
+    }))
+    : allProducts.slice(0, 4);
+
   return (
     <div>
-      <HeroSlider />
-      <Reels />
-      <CategoryGrid />
-      <FeaturedProjects />
+      {heroSlides.length > 0 ? <HeroSlider data={{ slides: heroSlides }} /> : null}
 
-      {/* Features */}
+      <Reels data={{ reels: data?.relations?.reels || [] }} />
+
+      {data?.relations?.posts && data.relations.posts.some((p) => p.category === 'project') ? (
+        <FeaturedProjects projects={data.relations.posts.filter((p) => p.category === 'project')} />
+      ) : (
+        <FeaturedProjects />
+      )}
+
       <section className="py-5 bg-light">
         <Container>
           <Row className="text-center gy-4">
@@ -50,7 +84,6 @@ export default function HomePage() {
         </Container>
       </section>
 
-      {/* Featured Products */}
       <section className="py-5">
         <Container>
           <motion.div
@@ -78,7 +111,7 @@ export default function HomePage() {
                   transition={{ duration: 0.6, delay: index * 0.15 }}
                   className="h-100"
                 >
-                  <ProductCard product={product} />
+                  <ProductCard product={product as any} />
                 </motion.div>
               </Col>
             ))}
@@ -86,7 +119,6 @@ export default function HomePage() {
         </Container>
       </section>
 
-      {/* About Preview */}
       <section className="py-5 bg-light overflow-hidden">
         <Container>
           <Row className="align-items-center gy-5">
@@ -96,9 +128,9 @@ export default function HomePage() {
                 whileInView={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8 }}
               >
-                <h2 className="display-5 fw-bold mb-4">NewHome - თქვენი სახლის დიზაინის პარტნიორი</h2>
+                <h2 className="display-5 fw-bold mb-4">{data?.page?.title || 'NewHome - თქვენი სახლის დიზაინის პარტნიორი'}</h2>
                 <p className="lead text-muted mb-4">
-                  ჩვენი მისიაა შევქმნათ გარემო, რომელიც ასახავს თქვენს ინდივიდუალურობას. 10 წლიანი გამოცდილება ინტერიერის დიზაინსა და ავეჯის წარმოებაში.
+                  {data?.page?.description || 'ჩვენი მისიაა შევქმნათ გარემო, რომელიც ასახავს თქვენს ინდივიდუალურობას. 10 წლიანი გამოცდილება ინტერიერის დიზაინსა და ავეჯის წარმოებაში.'}
                 </p>
                 <div className="d-flex gap-3">
                   <Button as={Link as any} href="/about" variant="primary" size="lg" className="px-4">ჩვენს შესახებ</Button>
@@ -124,7 +156,6 @@ export default function HomePage() {
         </Container>
       </section>
 
-      {/* CTA */}
       <section className="py-5 mb-5">
         <Container>
           <motion.div
@@ -144,7 +175,7 @@ export default function HomePage() {
         </Container>
       </section>
 
-      <BlogSection />
+      <BlogSection blogs={data?.relations?.posts.filter((p) => p.category === 'blog') || []} />
     </div>
   );
 }

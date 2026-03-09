@@ -6,9 +6,19 @@ import Link from 'next/link';
 import { motion } from 'motion/react';
 import { getAllBlogs } from '@/lib/data';
 import { Calendar, User, ArrowRight } from 'lucide-react';
+import { slugify } from '@/lib/slugify';
 
-const BlogSection: React.FC = () => {
-    const blogs = getAllBlogs();
+const BlogSection: React.FC<{ blogs?: any[] }> = ({ blogs: propBlogs }) => {
+    const blogs = propBlogs && propBlogs.length > 0
+        ? propBlogs.map(p => ({
+            id: p.id,
+            title: p.title,
+            excerpt: p.excerpt,
+            image: p.feature_image || '/placeholder-blog.jpg',
+            date: new Date(p.published_at).toLocaleDateString('ka-GE'),
+            author: 'NewHome',
+            slug: p.slug
+        })) : getAllBlogs();
 
     return (
         <section className="py-5 bg-light">
@@ -63,14 +73,14 @@ const BlogSection: React.FC = () => {
                                             </span>
                                         </div>
                                         <Card.Title className="fw-bold h5 mb-3 line-clamp-2">
-                                            <Link href={`/blog/${blog.slug}`} className="text-dark text-decoration-none">
+                                            <Link href={`/blog/${slugify(blog.slug)}`} className="text-dark text-decoration-none">
                                                 {blog.title}
                                             </Link>
                                         </Card.Title>
                                         <Card.Text className="text-muted small line-clamp-3 mb-4">
                                             {blog.excerpt}
                                         </Card.Text>
-                                        <Link href={`/blog/${blog.slug}`} className="fw-bold text-primary text-decoration-none small d-inline-flex align-items-center gap-1">
+                                        <Link href={`/blog/${slugify(blog.slug)}`} className="fw-bold text-primary text-decoration-none small d-inline-flex align-items-center gap-1">
                                             სრულად ნახვა <ArrowRight size={14} />
                                         </Link>
                                     </Card.Body>

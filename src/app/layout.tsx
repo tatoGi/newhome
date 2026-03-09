@@ -2,10 +2,12 @@ import type { Metadata } from 'next';
 import { Noto_Serif_Georgian } from 'next/font/google';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './globals.css';
+import '../components/header/header.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Providers from '@/components/Providers';
 import ChatBot from '@/components/ChatBot';
+import { api } from '@/lib/api/client';
 
 const notoSerifGeorgian = Noto_Serif_Georgian({
   subsets: ['georgian'],
@@ -13,6 +15,16 @@ const notoSerifGeorgian = Noto_Serif_Georgian({
   variable: '--font-georgian',
   display: 'swap',
 });
+
+// Default fallback data in case API is down
+const defaultBootstrap = {
+  locale: 'ka',
+  defaultLocale: 'ka',
+  languages: [{ code: 'ka', name: 'ქართული', flag: 'ka', is_default: true }],
+  navigation: { header: [], footer: [] },
+  settings: { headerLogo: null, footerLogo: null, footerContactText: null, footerContactByLocale: null },
+  routeMap: []
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://newhome.ge'),
@@ -76,9 +88,17 @@ const orgSchema = {
   sameAs: ['https://www.facebook.com/newhomege', 'https://www.instagram.com/newhomege'],
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  let bootstrapData;
+  try {
+    bootstrapData = await api.getBootstrap();
+  } catch (error) {
+    console.error('Failed to fetch bootstrap data:', error);
+    bootstrapData = defaultBootstrap;
+  }
+
   return (
-    <html lang="ka" className={notoSerifGeorgian.variable}>
+    <html lang={bootstrapData.locale} className={notoSerifGeorgian.variable}>
       <head>
         <link rel="preconnect" href="https://images.unsplash.com" />
         <link rel="dns-prefetch" href="https://images.unsplash.com" />
@@ -88,7 +108,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body>
-        <Providers>
+        <Providers bootstrapData={bootstrapData as any}>
           <div className="d-flex flex-column min-vh-100">
             <Header />
             <main className="flex-grow-1">{children}</main>

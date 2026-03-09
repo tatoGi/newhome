@@ -1,103 +1,80 @@
 'use client';
 
 import React from 'react';
-import { Carousel, Button, Container } from 'react-bootstrap';
+import { Button, Carousel, Container } from 'react-bootstrap';
 import { motion } from 'motion/react';
 import Link from 'next/link';
-import Image from 'next/image';
+import { useBootstrap } from '@/context/BootstrapContext';
+import { getUiText } from '@/lib/i18n/ui';
 
-const slides = [
-  {
-    id: 1,
-    title: 'თანამედროვე განათება',
-    desc: 'აღმოაჩინეთ უნიკალური დიზაინის სანათები თქვენი ინტერიერისთვის',
-    image: 'https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?auto=format&fit=crop&w=1400&q=75',
-    link: '/products/lighting',
-  },
-  {
-    id: 2,
-    title: 'პრემიუმ ხარისხის ავეჯი',
-    desc: 'კომფორტი და სტილი ერთ სივრცეში. შეარჩიეთ საუკეთესო',
-    image: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1400&q=75',
-    link: '/products/furniture',
-  },
-  {
-    id: 3,
-    title: 'ახალი კოლექცია 2026',
-    desc: 'იყავით პირველი ვინც შეიძენს სეზონის ყველაზე ტრენდულ ნივთებს',
-    image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1400&q=75',
-    link: '/products',
-  },
-  {
-    id: 4,
-    title: 'ინტერიერის დიზაინი',
-    desc: '3D ვიზუალიზაციიდან გასაღების ჩაბარებამდე — ჩვენ ყველაფერს ვაკეთებთ',
-    image: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1400&q=75',
-    link: '/services',
-  },
-  {
-    id: 5,
-    title: 'სასადილო ოთახი — სიმფონია',
-    desc: 'ელეგანტური სასადილო კომპლექტები ოჯახური სადილებისთვის',
-    image: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1400&q=75',
-    link: '/products/furniture',
-  },
-];
+type HeroSlide = {
+  id?: string | number;
+  title?: string;
+  desc?: string;
+  image?: string | null;
+  link?: string;
+};
 
-const HeroSlider: React.FC = () => {
+const HeroSlider: React.FC<{ data?: { slides?: HeroSlide[] } }> = ({ data }) => {
+
+  const { locale } = useBootstrap();
+  const displaySlides = Array.isArray(data?.slides) ? data.slides.filter(Boolean) : [];
+  const hasMultipleSlides = displaySlides.length > 1;
+
+  if (displaySlides.length === 0) {
+    return null;
+  }
+
   return (
-    <Carousel fade className="hero-slider" indicators={true} interval={5000}>
-      {slides.map((slide, index) => (
-        <Carousel.Item key={slide.id}>
-          <div className="position-relative w-100 hero-slide-image-container">
-            <Image
-              src={slide.image}
-              alt={slide.title}
-              fill
-              className="object-fit-cover"
-              priority={index === 0}
-              quality={85}
-              sizes="100vw"
-            />
-          </div>
-          <Carousel.Caption>
-            <Container>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8 }}
-                className="d-flex flex-column align-items-center text-center mx-auto"
-                style={{ maxWidth: '800px' }}
-              >
-                <h2 className="display-6 fw-bold mb-3">{slide.title}</h2>
-                <p className="fs-5 mb-4 opacity-75">{slide.desc}</p>
-                <Button as={Link as any} href={slide.link} variant="primary" className="px-5 py-2 rounded-pill">
-                  აღმოაჩინე მეტი
-                </Button>
-              </motion.div>
-            </Container>
-          </Carousel.Caption>
-        </Carousel.Item>
-      ))}
-      <style jsx>{`
-        .hero-slide-image-container {
-          height: 60vh;
-          min-height: 400px;
-        }
-        @media (max-width: 768px) {
-          .hero-slide-image-container {
-            height: 50vh;
-            min-height: 320px;
-          }
-        }
-        @media (max-width: 576px) {
-          .hero-slide-image-container {
-            height: 45vh;
-            min-height: 280px;
-          }
-        }
-      `}</style>
-    </Carousel>
+    <section className="hero-slider" aria-label="Hero slider">
+      <Carousel
+        controls={hasMultipleSlides}
+        indicators={hasMultipleSlides}
+        interval={hasMultipleSlides ? 5000 : undefined}
+        touch={hasMultipleSlides}
+        pause={hasMultipleSlides ? 'hover' : false}
+        wrap={hasMultipleSlides}
+        slide={hasMultipleSlides}
+        prevIcon={<span className="hero-slider-arrow" aria-hidden="true">{'<'}</span>}
+        nextIcon={<span className="hero-slider-arrow" aria-hidden="true">{'>'}</span>}
+        prevLabel={getUiText(locale, 'hero.previous_slide')}
+        nextLabel={getUiText(locale, 'hero.next_slide')}
+      >
+        {displaySlides.map((slide, index) => (
+          <Carousel.Item key={slide.id ?? index}>
+            <div className="hero-slide-image-container">
+              {slide.image ? (
+                <img
+                  src={slide.image}
+                  alt={slide.title || 'Banner'}
+                  className="hero-slide-image"
+                />
+              ) : (
+                <div className="hero-slide-fallback" />
+              )}
+            </div>
+
+            <Carousel.Caption className="hero-slide-overlay">
+              <Container>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6 }}
+                  className="hero-slide-content d-flex flex-column align-items-center text-center mx-auto"
+                >
+                  {slide.title ? <h2 className="display-6 fw-bold mb-3">{slide.title}</h2> : null}
+                  {slide.desc ? <p className="fs-5 mb-4 opacity-75">{slide.desc}</p> : null}
+                  <Button as={Link as any} href={slide.link || '/products'} variant="primary" className="px-5 py-2 rounded-pill">
+                    {getUiText(locale, 'hero.discover_more')}
+                  </Button>
+                </motion.div>
+              </Container>
+            </Carousel.Caption>
+          </Carousel.Item>
+        ))}
+      </Carousel>
+    </section>
   );
 };
 

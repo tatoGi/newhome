@@ -2,26 +2,34 @@
 
 import React from 'react';
 import { Container, Row, Col, Card, Breadcrumb } from 'react-bootstrap';
+import Link from 'next/link';
 import { Target, Users, Award, History } from 'lucide-react';
 
-export default function AboutPage() {
+export default function AboutPage({ data }: { data?: any }) {
+  const page = data?.page;
+  const title = page?.title || 'NewHome - ჩვენ ვქმნით თქვენს კომფორტს';
+  const description = page?.description || 'ჩვენი კომპანია დაარსდა 2015 წელს და მას შემდეგ ვეხმარებით ადამიანებს თავიანთი საოცნებო სახლის მოწყობაში.';
+
   return (
     <div>
       <section className="py-5 bg-light">
         <Container>
           <Breadcrumb>
-            <Breadcrumb.Item href="/">მთავარი</Breadcrumb.Item>
-            <Breadcrumb.Item active>ჩვენს შესახებ</Breadcrumb.Item>
+            <Breadcrumb.Item linkAs={Link} href="/">მთავარი</Breadcrumb.Item>
+            <Breadcrumb.Item active>{page?.title || 'ჩვენს შესახებ'}</Breadcrumb.Item>
           </Breadcrumb>
           <Row className="align-items-center gy-5">
             <Col lg={6}>
-              <h1 className="display-4 fw-bold mb-4">NewHome - ჩვენ ვქმნით თქვენს კომფორტს</h1>
-              <p className="lead text-muted mb-4">
-                ჩვენი კომპანია დაარსდა 2015 წელს და მას შემდეგ ვეხმარებით ადამიანებს თავიანთი საოცნებო სახლის მოწყობაში.
-              </p>
-              <p className="text-muted">
-                ჩვენი გუნდი შედგება პროფესიონალი დიზაინერებისგან და ხელოსნებისგან, რომლებიც ორიენტირებულნი არიან ხარისხსა და ინოვაციაზე. ჩვენ გვჯერა, რომ ყველა დეტალს აქვს მნიშვნელობა.
-              </p>
+              <h1 className="display-4 fw-bold mb-4">{title}</h1>
+              <div
+                className="lead text-muted mb-4"
+                dangerouslySetInnerHTML={{ __html: description }}
+              />
+              {!page && (
+                <p className="text-muted">
+                  ჩვენი გუნდი შედგება პროფესიონალი დიზაინერებისგან და ხელოსნებისგან, რომლებიც ორიენტირებულნი არიან ხარისხსა და ინოვაციაზე. ჩვენ გვჯერა, რომ ყველა დეტალს აქვს მნიშვნელობა.
+                </p>
+              )}
             </Col>
             <Col lg={6}>
               <img

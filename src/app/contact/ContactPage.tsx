@@ -3,19 +3,54 @@
 import React from 'react';
 import { Container, Row, Col, Form, Button, Breadcrumb, Card } from 'react-bootstrap';
 import { Mail, Phone, MapPin, Clock } from 'lucide-react';
+import { Block } from '@/lib/api/types';
+import { toBackendAssetUrl } from '@/lib/api/assets';
 
-export default function ContactPage() {
+interface ContactPageProps {
+  pageTitle?: string;
+  pageDescription?: string;
+  blocks?: Block[];
+}
+
+export default function ContactPage({ pageTitle, pageDescription, blocks }: ContactPageProps) {
+  const heroBlock = [...(blocks ?? [])]
+    .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
+    .find((block) => block.type === 'page_hero' || block.type === 'main_banner' || block.type === 'banner');
+
+  const heroTitle = String(heroBlock?.data?.banner_title ?? heroBlock?.data?.title ?? pageTitle ?? 'კონტაქტი');
+  const heroDescription = String(
+    heroBlock?.data?.banner_desc ??
+    heroBlock?.data?.banner_description ??
+    heroBlock?.data?.description ??
+    pageDescription ??
+    ''
+  );
+  const heroImage = toBackendAssetUrl(heroBlock?.data?.banner_image ?? heroBlock?.data?.image ?? '');
+
   return (
     <Container className="py-5">
       <Breadcrumb>
         <Breadcrumb.Item href="/">მთავარი</Breadcrumb.Item>
-        <Breadcrumb.Item active>კონტაქტი</Breadcrumb.Item>
+        <Breadcrumb.Item active>{heroTitle}</Breadcrumb.Item>
       </Breadcrumb>
+
+      {heroImage ? (
+        <div
+          className="position-relative overflow-hidden rounded-4 mb-5"
+          style={{ minHeight: '260px', backgroundImage: `url(${heroImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+        >
+          <div className="position-absolute top-0 start-0 w-100 h-100" style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0.42), rgba(0,0,0,0.18))' }} />
+          <div className="position-relative text-white d-flex flex-column justify-content-end h-100 p-4 p-md-5">
+            <h1 className="fw-bold display-5 mb-2">{heroTitle}</h1>
+            {heroDescription ? <p className="mb-0 opacity-75" style={{ maxWidth: '720px' }}>{heroDescription}</p> : null}
+          </div>
+        </div>
+      ) : null}
 
       <Row className="gy-5">
         <Col lg={5}>
-          <h1 className="fw-bold mb-4">დაგვიკავშირდით</h1>
-          <p className="text-muted mb-5">გაქვთ კითხვები ან გსურთ კონსულტაცია? მოგვწერეთ და ჩვენი გუნდი მალე დაგიკავშირდებათ.</p>
+          <h1 className="fw-bold mb-4">{heroTitle}</h1>
+          {heroDescription ? <p className="text-muted mb-5">{heroDescription}</p> : null}
 
           {[
             { icon: <MapPin size={24} />, title: 'მისამართი', text: 'თბილისი, ი. ჭავჭავაძის გამზირი 37' },
@@ -76,9 +111,11 @@ export default function ContactPage() {
       <div className="mt-5 pt-5">
         <iframe
           src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m13!1m2!1m1!1s0x40440cd7e64f6241%3A0x400cc4259978273!2sTbilisi!5e0!3m2!1sen!2sge!4v1710000000000!5m2!1sen!2sge"
-          width="100%" height="450"
+          width="100%"
+          height="450"
           style={{ border: 0, borderRadius: '16px' }}
-          allowFullScreen loading="lazy"
+          allowFullScreen
+          loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
         />
       </div>

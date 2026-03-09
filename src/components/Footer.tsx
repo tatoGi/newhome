@@ -3,16 +3,22 @@
 import React from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import Link from 'next/link';
-import { Facebook, Instagram, Linkedin, Mail, Phone, MapPin } from 'lucide-react';
+import { Facebook, Instagram, Linkedin, MapPin } from 'lucide-react';
+import { useBootstrap } from '@/context/BootstrapContext';
+import { toBackendAssetUrl } from '@/lib/api/assets';
 
 const Footer: React.FC = () => {
+  const { navigation, settings } = useBootstrap();
+  const footerLogo = toBackendAssetUrl(settings.footerLogo) || '/logo.png';
+  const contactText = settings.footerContactText?.trim() || '';
+
   return (
     <footer className="footer pt-5 pb-3">
       <Container>
         <Row className="gy-4">
           <Col lg={4}>
             <div className="mb-4">
-              <img src="/logo.png" alt="NewHome Logo" style={{ height: '100px', width: 'auto' }} />
+              <img src={footerLogo} alt="NewHome Logo" style={{ height: '100%', width: '100%', maxWidth: '220px' }} />
             </div>
             <p className="text-muted mb-4">
               თანამედროვე დიზაინის ავეჯი და განათება თქვენი კომფორტისთვის. ჩვენ ვქმნით გარემოს, სადაც თავს ბედნიერად იგრძნობთ.
@@ -24,42 +30,27 @@ const Footer: React.FC = () => {
             </div>
           </Col>
 
-          <Col lg={2} md={4}>
+          <Col lg={4} md={8}>
             <h3 className="fw-bold mb-4 fs-6">ნავიგაცია</h3>
-            <ul className="list-unstyled">
-              <li className="mb-2"><Link href="/about" className="text-muted text-decoration-none">ჩვენს შესახებ</Link></li>
-              <li className="mb-2"><Link href="/products" className="text-muted text-decoration-none">პროდუქცია</Link></li>
-              <li className="mb-2"><Link href="/services" className="text-muted text-decoration-none">სერვისები</Link></li>
-              <li className="mb-2"><Link href="/projects" className="text-muted text-decoration-none">პროექტები</Link></li>
-            </ul>
-          </Col>
-
-          <Col lg={2} md={4}>
-            <h3 className="fw-bold mb-4 fs-6">კატეგორიები</h3>
-            <ul className="list-unstyled">
-              <li className="mb-2"><Link href="/products/lighting" className="text-muted text-decoration-none">განათება</Link></li>
-              <li className="mb-2"><Link href="/products/furniture" className="text-muted text-decoration-none">ავეჯი</Link></li>
-              <li className="mb-2"><Link href="/products/new" className="text-muted text-decoration-none">სიახლეები</Link></li>
-              <li className="mb-2"><Link href="/products/sale" className="text-muted text-decoration-none">ფასდაკლებები</Link></li>
+            <ul className="list-unstyled row g-2">
+              {navigation.footer.map((item) => (
+                <li key={item.url} className="col-6 mb-2">
+                  <Link href={item.url} className="text-muted text-decoration-none">
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </Col>
 
           <Col lg={4} md={4}>
             <h3 className="fw-bold mb-4 fs-6">კონტაქტი</h3>
-            <ul className="list-unstyled">
-              <li className="mb-3 d-flex gap-2 text-muted">
-                <MapPin size={18} className="text-primary flex-shrink-0" />
-                თბილისი, ი. ჭავჭავაძის გამზირი 37
-              </li>
-              <li className="mb-3 d-flex gap-2 text-muted">
-                <Phone size={18} className="text-primary flex-shrink-0" />
-                +995 555 12 34 56
-              </li>
-              <li className="mb-3 d-flex gap-2 text-muted">
-                <Mail size={18} className="text-primary flex-shrink-0" />
-                info@newhome.ge
-              </li>
-            </ul>
+            {contactText !== '' ? (
+              <div className="d-flex gap-2 text-muted" style={{ whiteSpace: 'pre-line' }}>
+                <MapPin size={18} className="text-primary flex-shrink-0 mt-1" />
+                <span>{contactText}</span>
+              </div>
+            ) : null}
           </Col>
         </Row>
 

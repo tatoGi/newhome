@@ -6,6 +6,7 @@
 
 export interface Product {
   id: number;
+  slug: string;
   name: string;
   price: number;
   oldPrice?: number;
@@ -13,6 +14,7 @@ export interface Product {
   images: string[];
   category: string;
   colors?: string[];
+  featured?: boolean;
   material?: string;
   sale?: boolean;
   description?: string;
@@ -22,6 +24,7 @@ export interface Product {
 export const allProducts: Product[] = [
   {
     id: 1,
+    slug: 'heidi-extendable-table',
     name: 'Heidi 48" გაშლადი მაგიდა - კაკლის ხე',
     price: 699,
     image: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?auto=format&fit=crop&w=800&q=80',
@@ -47,6 +50,7 @@ export const allProducts: Product[] = [
   },
   {
     id: 2,
+    slug: 'nosh-chair-green',
     name: 'Nosh სკამი - მწვანე',
     price: 149,
     oldPrice: 199,
@@ -73,6 +77,7 @@ export const allProducts: Product[] = [
   },
   {
     id: 3,
+    slug: 'timber-leather-sofa',
     name: 'Timber ტყავის დივანი',
     price: 1499,
     image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=800&q=80',
@@ -99,6 +104,7 @@ export const allProducts: Product[] = [
   },
   {
     id: 4,
+    slug: 'leap-black-lamp',
     name: 'Leap შავი სანათი',
     price: 79,
     oldPrice: 99,
@@ -124,6 +130,7 @@ export const allProducts: Product[] = [
   },
   {
     id: 5,
+    slug: 'oscuro-72-dresser',
     name: 'Oscuro 72" კომოდი',
     price: 1199,
     image: 'https://images.unsplash.com/photo-1530018607912-eff2df114fbe?auto=format&fit=crop&w=800&q=80',
@@ -148,6 +155,7 @@ export const allProducts: Product[] = [
   },
   {
     id: 6,
+    slug: 'ceni-gray-armchair',
     name: 'Ceni ნაცრისფერი სავარძელი',
     price: 449,
     image: 'https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?auto=format&fit=crop&w=800&q=80',
@@ -185,6 +193,7 @@ export function getProductById(id: string | number): Product {
 
 export interface Service {
   id: number;
+  slug: string;
   title: string;
   desc: string;
   fullDesc: string;
@@ -195,6 +204,7 @@ export interface Service {
 export const allServices: Service[] = [
   {
     id: 1,
+    slug: 'interior-design',
     title: 'ინტერიერის დიზაინი',
     desc: 'პროფესიონალური დიზაინ-პროექტის მომზადება თქვენი სახლისთვის ან ოფისისთვის.',
     fullDesc:
@@ -210,6 +220,7 @@ export const allServices: Service[] = [
   },
   {
     id: 2,
+    slug: 'custom-furniture',
     title: 'ავეჯის დამზადება',
     desc: 'ინდივიდუალური შეკვეთით ავეჯის დამზადება უმაღლესი ხარისხის მასალებით.',
     fullDesc:
@@ -225,6 +236,7 @@ export const allServices: Service[] = [
   },
   {
     id: 3,
+    slug: 'lighting-planning',
     title: 'განათების დაგეგმარება',
     desc: 'სწორი განათების შერჩევა და მონტაჟი იდეალური ატმოსფეროს შესაქმნელად.',
     fullDesc:
@@ -240,6 +252,7 @@ export const allServices: Service[] = [
   },
   {
     id: 4,
+    slug: 'renovation-supervision',
     title: 'რემონტი და ზედამხედველობა',
     desc: 'სრული სარემონტო სამუშაოების მართვა და ხარისხის კონტროლი.',
     fullDesc:
@@ -267,6 +280,7 @@ export function getServiceById(id: string | number): Service {
 
 export interface Project {
   id: number;
+  slug: string;
   title: string;
   location: string;
   year: string;
@@ -282,6 +296,7 @@ export interface Project {
 export const allProjects: Project[] = [
   {
     id: 1,
+    slug: 'modern-vake-apartment',
     title: 'თანამედროვე აპარტამენტი ვაკეში',
     location: 'თბილისი, ვაკე',
     year: '2025',
@@ -299,6 +314,7 @@ export const allProjects: Project[] = [
   },
   {
     id: 2,
+    slug: 'tech-hub-office',
     title: "ოფისი 'Tech Hub'",
     location: 'ბათუმი, ცენტრი',
     year: '2024',
@@ -316,6 +332,7 @@ export const allProjects: Project[] = [
   },
   {
     id: 3,
+    slug: 'saguramo-villa',
     title: 'ვილა საგურამოში',
     location: 'მცხეთა, საგურამო',
     year: '2025',
@@ -333,6 +350,7 @@ export const allProjects: Project[] = [
   },
   {
     id: 4,
+    slug: 'gusto-restaurant',
     title: "რესტორანი 'Gusto'",
     location: 'თბილისი, ძველი თბილისი',
     year: '2024',
@@ -340,7 +358,7 @@ export const allProjects: Project[] = [
     area: '280 კვ.მ',
     duration: '5 თვე',
     client: 'HoReCa Group',
-    desc: "Gusto არის იტალიური რესტორანი ძველ თბილისში, რომლის ინტერიერიც აერთიანებს რეტრო და თანამედროვე ელემენტებს. დაცული იქნა ისტორიული შენობის ავთენტურობა, აღდგა ძველი აგურის კედლები.",
+    desc: "Gusto არის იტალიური რესტორანი ძველ თბილისში, რომლის ინტერიერიც აერთიანებს რეტრო and თანამედროვე ელემენტებს. დაცული იქნა ისტორიული შენობის ავთენტურობა, აღდგა ძველი აგურის კედლები.",
     image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80',
     images: [
       'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1920&q=80',

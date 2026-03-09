@@ -1,0 +1,169 @@
+.site-header-search-shell {
+  max-width: 500px;
+}
+
+.site-header-logo {
+  height: 100%;
+  width: 100%;
+  max-width: 220px;
+  object-fit: contain;
+  max-height: 120px;
+}
+
+.site-header-search-input {
+  border-radius: 8px 0 0 8px;
+}
+
+.site-header-search-button {
+  border-radius: 0 8px 8px 0;
+}
+
+.dropdown-menu-custom {
+  display: block;
+  z-index: 1000;
+  max-width: min(92vw, 760px);
+}
+
+.dropdown-menu-simple {
+  min-width: 220px;
+}
+
+.dropdown-menu-mega {
+  min-width: min(720px, 82vw);
+}
+
+.desktop-nav-trigger {
+  gap: 0.35rem;
+}
+
+.language-toggle {
+  min-width: 88px;
+}
+
+.language-flag {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.language-dropdown-menu {
+  min-width: 210px;
+  z-index: 1100;
+}
+
+.language-dropdown-menu-mobile {
+  min-width: 230px;
+}
+
+.language-dropdown-item:hover,
+.language-dropdown-item.is-active {
+  background: #f8f9fa;
+}
+
+.account-dropdown-menu {
+  min-width: 220px;
+  z-index: 1100;
+}
+
+.account-dropdown-menu-mobile {
+  min-width: 210px;
+}
+
+.account-dropdown-item:hover {
+  background: #f8f9fa;
+  color: #000 !important;
+}
+
+.desktop-nav-link {
+  padding-right: 0 !important;
+}
+
+.desktop-nav-toggle {
+  min-width: 18px;
+}
+
+.mega-menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+}
+
+.mega-menu-column {
+  min-width: 0;
+  padding: 0.35rem;
+}
+
+.mega-menu-parent {
+  padding: 0.4rem 0.75rem;
+}
+
+.mega-menu-child {
+  font-size: 0.95rem;
+}
+
+.dropdown-item-custom:hover {
+  background-color: #f8f9fa;
+  color: #000 !important;
+}
+
+.transition-transform {
+  transition: transform 0.3s ease;
+}
+
+.transition-transform.is-rotated {
+  transform: rotate(180deg);
+}
+
+.desktop-nav-link:hover,
+.desktop-nav-toggle:hover {
+  color: var(--bs-primary) !important;
+}
+
+.mobile-dropdown-children {
+  overflow: hidden;
+}
+
+.mobile-submenu-toggle {
+  transition: transform 0.2s ease;
+}
+
+.mobile-submenu-toggle.is-open {
+  transform: rotate(180deg);
+}
+
+.account-avatar-link {
+  padding: 0 !important;
+}
+
+.account-avatar-badge {
+  width: 2.35rem;
+  height: 2.35rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--primary-color) 0%, #1f4f74 100%);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  box-shadow: 0 10px 24px rgba(15, 46, 71, 0.16);
+}
+
+.account-avatar-badge-mobile {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.header-badge-count {
+  font-size: 0.55rem;
+}
+
+.mobile-header-offcanvas {
+  --bs-offcanvas-width: 280px;
+}
+
+.mobile-header-logo {
+  height: 100%;
+  width: 100%;
+  max-width: 170px;
+  object-fit: contain;
+}

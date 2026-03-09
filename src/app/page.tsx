@@ -1,12 +1,40 @@
-import type { Metadata } from 'next';
+import { Metadata } from 'next';
 import HomePage from './HomePage';
+import { api } from '@/lib/api/client';
 
-export const metadata: Metadata = {
-  title: 'NewHome — ავეჯი და განათება საქართველოში',
-  description: 'თანამედროვე ავეჯის და განათების ონლაინ მაღაზია. სწრაფი მიწოდება, ხარისხის გარანტია, 24/7 მხარდაჭერა.',
-  alternates: { canonical: 'https://newhome.ge' },
-};
+interface PageProps {
+  searchParams: Promise<{ locale?: string }>;
+}
 
-export default function Page() {
-  return <HomePage />;
+export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
+  const { locale } = await searchParams;
+  try {
+    const data = await api.getPage('home', locale);
+    return {
+      title: data.seo.meta_title || 'NewHome',
+      description: data.seo.meta_description,
+      keywords: data.seo.keywords,
+      alternates: {
+        canonical: data.seo.canonical_url || 'https://newhome.ge',
+      },
+    };
+  } catch {
+    return {
+      title: 'NewHome — ავეჯი და განათება საქართველოში',
+      description: 'თანამედროვე ავეჯის და განათების ონლაინ მაღაზია.',
+    };
+  }
+}
+
+export default async function Page({ searchParams }: PageProps) {
+  const { locale } = await searchParams;
+  let homeData = null;
+
+  try {
+    homeData = await api.getPage('home', locale);
+  } catch (error) {
+    console.error('Failed to fetch home page data:', error);
+  }
+
+  return <HomePage data={homeData} />;
 }

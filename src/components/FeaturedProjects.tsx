@@ -6,10 +6,20 @@ import Link from 'next/link';
 import { motion } from 'motion/react';
 import { allProjects } from '@/lib/data';
 import { ArrowRight, MapPin } from 'lucide-react';
+import { slugify } from '@/lib/slugify';
 
-const FeaturedProjects: React.FC = () => {
+const FeaturedProjects: React.FC<{ projects?: any[] }> = ({ projects: propProjects }) => {
     // Take first 3 projects for the home page
-    const projects = allProjects.slice(0, 3);
+    const projects = propProjects && propProjects.length > 0
+        ? propProjects.map(p => ({
+            id: p.id,
+            title: p.title,
+            desc: p.excerpt,
+            image: p.feature_image || '/placeholder-project.jpg',
+            location: 'თბილისი', // Fallback
+            slug: p.slug
+        })).slice(0, 3)
+        : allProjects.slice(0, 3);
 
     return (
         <section className="py-5 overflow-hidden">
@@ -44,7 +54,7 @@ const FeaturedProjects: React.FC = () => {
                                 transition={{ duration: 0.7, delay: index * 0.1 }}
                                 className="project-highlight-card"
                             >
-                                <Link href={`/projects/${project.id}`} className="text-decoration-none group">
+                                <Link href={`/project/${slugify(project.slug)}`} className="text-decoration-none group">
                                     <div className={`position-relative overflow-hidden rounded-4 shadow-lg ${index === 0 ? 'ratio ratio-21x9' : 'ratio ratio-16x9'}`}>
                                         <img
                                             src={project.image}
