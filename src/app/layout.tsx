@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Noto_Serif_Georgian } from 'next/font/google';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'leaflet/dist/leaflet.css';
 import './globals.css';
 import '../components/header/header.css';
 import Header from '@/components/Header';
@@ -8,6 +9,7 @@ import Footer from '@/components/Footer';
 import Providers from '@/components/Providers';
 import ChatBot from '@/components/ChatBot';
 import { api } from '@/lib/api/client';
+import { getServerLocale } from '@/lib/locale';
 
 const notoSerifGeorgian = Noto_Serif_Georgian({
   subsets: ['georgian'],
@@ -89,9 +91,10 @@ const orgSchema = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const serverLocale = await getServerLocale();
   let bootstrapData;
   try {
-    bootstrapData = await api.getBootstrap();
+    bootstrapData = await api.getBootstrap(serverLocale || undefined);
   } catch (error) {
     console.error('Failed to fetch bootstrap data:', error);
     bootstrapData = defaultBootstrap;

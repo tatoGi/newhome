@@ -9,6 +9,8 @@ import ServicesPage from '../services/ServicesPage';
 import { notFound, redirect } from 'next/navigation';
 import Link from 'next/link';
 import { toBackendAssetUrl } from '@/lib/api/assets';
+import BlogListPage from '../blog/BlogListPage';
+import { getServerLocale } from '@/lib/locale';
 
 interface PageProps {
     params: Promise<{ slug: string }>;
@@ -17,7 +19,8 @@ interface PageProps {
 
 export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
     const { slug } = await params;
-    const { locale } = await searchParams;
+    const { locale: queryLocale } = await searchParams;
+    const locale = queryLocale || await getServerLocale() || undefined;
 
     // If slug is 'home', we might want to redirect to root or just handle it
     if (slug === 'home') {
@@ -43,7 +46,8 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
 
 export default async function Page({ params, searchParams }: PageProps) {
     const { slug } = await params;
-    const { locale } = await searchParams;
+    const { locale: queryLocale } = await searchParams;
+    const locale = queryLocale || await getServerLocale() || undefined;
 
     // Handle 'home' slug by redirecting to root or rendering HomePage
     if (slug === 'home') {
@@ -98,6 +102,10 @@ export default async function Page({ params, searchParams }: PageProps) {
                     blocks={data.page.blocks}
                 />
             );
+        }
+
+        if (template === 'blog' || template === 'news') {
+            return <BlogListPage data={data} />;
         }
 
         if (template === 'project' || template === 'projects') {

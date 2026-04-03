@@ -7,19 +7,48 @@ import { motion } from 'motion/react';
 import { allProjects } from '@/lib/data';
 import { ArrowRight, MapPin } from 'lucide-react';
 import { slugify } from '@/lib/slugify';
+import { ProjectSection } from '@/lib/api/types';
+import { toBackendAssetUrl } from '@/lib/api/assets';
 
-const FeaturedProjects: React.FC<{ projects?: any[] }> = ({ projects: propProjects }) => {
-    // Take first 3 projects for the home page
-    const projects = propProjects && propProjects.length > 0
-        ? propProjects.map(p => ({
-            id: p.id,
-            title: p.title,
-            desc: p.excerpt,
-            image: p.feature_image || '/placeholder-project.jpg',
-            location: 'თბილისი', // Fallback
-            slug: p.slug
-        })).slice(0, 3)
-        : allProjects.slice(0, 3);
+interface FeaturedProjectsProps {
+    projects?: any[];
+    projectSection?: ProjectSection | null;
+}
+
+/** Extracts image/title/desc/location from a post's blocks (post_intro) with fallbacks. */
+function resolvePostDisplay(post: any): { title: string; desc: string; image: string; location: string } {
+    const introBlock = post.blocks?.find((b: any) => b.type === 'post_intro');
+
+    const title = introBlock?.data?.title || post.title || '';
+    const desc = introBlock?.data?.post_text || post.excerpt || '';
+    const rawImage = introBlock?.data?.post_image || post.feature_image || '';
+    const location = introBlock?.data?.location || introBlock?.data?.post_location || 'თბილისი';
+    return { title, desc, image: toBackendAssetUrl(rawImage) || '/placeholder-project.jpg', location };
+}
+
+const FeaturedProjects: React.FC<FeaturedProjectsProps> = ({ projects: propProjects, projectSection }) => {
+    const sectionTitle = projectSection?.title || 'რჩეული პროექტები';
+    const sectionSubtitle = projectSection?.subtitle || 'ჩვენი დასრულებული სამუშაოები და შთაგონება';
+
+    const apiPosts = projectSection?.posts;
+
+    let projects: { id: any; title: string; desc: string; image: string; location: string; slug: string }[];
+
+    const sortByNewest = (arr: any[]) => [...arr].sort((a, b) => (b.id ?? 0) - (a.id ?? 0));
+
+    if (apiPosts && apiPosts.length > 0) {
+        projects = sortByNewest(apiPosts).slice(0, 3).map((p: any) => {
+            const d = resolvePostDisplay(p);
+            return { id: p.id, title: d.title, desc: d.desc, image: d.image, location: d.location, slug: p.slug as string };
+        });
+    } else if (propProjects && propProjects.length > 0) {
+        projects = sortByNewest(propProjects).slice(0, 3).map((p: any) => {
+            const d = resolvePostDisplay(p);
+            return { id: p.id, title: d.title, desc: d.desc, image: d.image, location: d.location, slug: p.slug as string };
+        });
+    } else {
+        projects = sortByNewest(allProjects as any[]).slice(0, 3);
+    }
 
     return (
         <section className="py-5 overflow-hidden">
@@ -30,8 +59,8 @@ const FeaturedProjects: React.FC<{ projects?: any[] }> = ({ projects: propProjec
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                     >
-                        <h2 className="fw-bold display-6 mb-2">რჩეული პროექტები</h2>
-                        <p className="text-muted mb-0">ჩვენი დასრულებული სამუშაოები და შთაგონება</p>
+                        <h2 className="fw-bold display-6 mb-2">{sectionTitle}</h2>
+                        <p className="text-muted mb-0">{sectionSubtitle}</p>
                     </motion.div>
                     <motion.div
                         initial={{ opacity: 0, x: 20 }}

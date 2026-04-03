@@ -7,18 +7,34 @@ import { motion } from 'motion/react';
 import { getAllBlogs } from '@/lib/data';
 import { Calendar, User, ArrowRight } from 'lucide-react';
 import { slugify } from '@/lib/slugify';
+import { BlogSection as BlogSectionType } from '@/lib/api/types';
+import { toBackendAssetUrl } from '@/lib/api/assets';
 
-const BlogSection: React.FC<{ blogs?: any[] }> = ({ blogs: propBlogs }) => {
-    const blogs = propBlogs && propBlogs.length > 0
-        ? propBlogs.map(p => ({
-            id: p.id,
-            title: p.title,
-            excerpt: p.excerpt,
-            image: p.feature_image || '/placeholder-blog.jpg',
-            date: new Date(p.published_at).toLocaleDateString('ka-GE'),
-            author: 'NewHome',
-            slug: p.slug
-        })) : getAllBlogs();
+interface BlogSectionProps {
+    blogSection?: BlogSectionType | null;
+}
+
+const BlogSection: React.FC<BlogSectionProps> = ({ blogSection }) => {
+    const allHref = blogSection?.page_slug ? `/${blogSection.page_slug}` : '/blog';
+    const sectionTitle = blogSection?.title || 'სიახლეები და ბლოგი';
+    const sectionSubtitle = blogSection?.subtitle || 'მიიღეთ რჩევები ინტერიერის გასაუმჯობესებლად';
+
+    const blogs = blogSection?.posts && blogSection.posts.length > 0
+
+        ? blogSection.posts.map(p => {
+
+            const intro = (p as any).blocks?.find((b: any) => b.type === 'post_intro');
+            return {
+                id: p.id,
+                title: intro?.data?.title || p.title,
+                excerpt: intro?.data?.post_text || p.excerpt,
+                image: toBackendAssetUrl(intro?.data?.post_image || p.feature_image || '') || '/placeholder-blog.jpg',
+                date: p.published_at,
+                author: 'NewHome',
+                slug: p.slug,
+            };
+        })
+        : getAllBlogs();
 
     return (
         <section className="py-5 bg-light">
@@ -29,15 +45,15 @@ const BlogSection: React.FC<{ blogs?: any[] }> = ({ blogs: propBlogs }) => {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                     >
-                        <h2 className="fw-bold display-6 mb-2">სიახლეები და ბლოგი</h2>
-                        <p className="text-muted mb-0">მიიღეთ რჩევები ინტერიერის გასაუმჯობესებლად</p>
+                        <h2 className="fw-bold display-6 mb-2">{sectionTitle}</h2>
+                        <p className="text-muted mb-0">{sectionSubtitle}</p>
                     </motion.div>
                     <motion.div
                         initial={{ opacity: 0, x: 20 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                     >
-                        <Button as={Link as any} href="/blog" variant="link" className="text-primary text-decoration-none d-flex align-items-center gap-2 px-0">
+                        <Button as={Link as any} href={allHref} variant="link" className="text-primary text-decoration-none d-flex align-items-center gap-2 px-0">
                             ყველა პოსტი <ArrowRight size={18} />
                         </Button>
                     </motion.div>
@@ -73,14 +89,14 @@ const BlogSection: React.FC<{ blogs?: any[] }> = ({ blogs: propBlogs }) => {
                                             </span>
                                         </div>
                                         <Card.Title className="fw-bold h5 mb-3 line-clamp-2">
-                                            <Link href={`/blog/${slugify(blog.slug)}`} className="text-dark text-decoration-none">
+                                            <Link href={`${allHref}/${slugify(blog.slug)}`} className="text-dark text-decoration-none">
                                                 {blog.title}
                                             </Link>
                                         </Card.Title>
                                         <Card.Text className="text-muted small line-clamp-3 mb-4">
                                             {blog.excerpt}
                                         </Card.Text>
-                                        <Link href={`/blog/${slugify(blog.slug)}`} className="fw-bold text-primary text-decoration-none small d-inline-flex align-items-center gap-1">
+                                        <Link href={`${allHref}/${slugify(blog.slug)}`} className="fw-bold text-primary text-decoration-none small d-inline-flex align-items-center gap-1">
                                             სრულად ნახვა <ArrowRight size={14} />
                                         </Link>
                                     </Card.Body>

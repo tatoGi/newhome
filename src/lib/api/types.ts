@@ -143,6 +143,7 @@ export interface PostRelation {
     feature_image: string | null;
     category: string;
     published_at: string;
+    blocks?: Block[];
 }
 
 export interface ProductRelation {
@@ -172,6 +173,19 @@ export interface ReelRelation {
     category_label?: string;
 }
 
+export interface ProjectSection {
+    title: string;
+    subtitle: string;
+    posts: (PostRelation & { blocks: Block[] })[];
+}
+
+export interface BlogSection {
+    title: string;
+    subtitle: string;
+    page_slug: string;
+    posts: (PostRelation & { blocks: Block[] })[];
+}
+
 export interface PageResponse {
     page: {
         id: number;
@@ -187,6 +201,8 @@ export interface PageResponse {
         products: ProductRelation[];
         reels: ReelRelation[];
     };
+    project_section?: ProjectSection | null;
+    blog_section?: BlogSection | null;
     seo: SEO;
 }
 
@@ -228,4 +244,20 @@ export interface ProductResponse {
         blocks: Block[];
     };
     seo: SEO;
+}
+
+export interface ContactSubmissionPayload {
+    name: string;
+    email: string;
+    phone?: string;
+    message: string;
+    locale?: string;
+    form_name?: string;
+    page_slug?: string;
+    page_url?: string;
+}
+
+export interface ContactSubmissionResponse {
+    success: boolean;
+    message: string;
 }

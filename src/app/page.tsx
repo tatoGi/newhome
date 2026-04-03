@@ -1,15 +1,12 @@
 import { Metadata } from 'next';
 import HomePage from './HomePage';
 import { api } from '@/lib/api/client';
+import { getServerLocale } from '@/lib/locale';
 
-interface PageProps {
-  searchParams: Promise<{ locale?: string }>;
-}
-
-export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
-  const { locale } = await searchParams;
+export async function generateMetadata(): Promise<Metadata> {
   try {
-    const data = await api.getPage('home', locale);
+    const locale = await getServerLocale();
+    const data = await api.getPage('home', locale || undefined);
     return {
       title: data.seo.meta_title || 'NewHome',
       description: data.seo.meta_description,
@@ -26,12 +23,12 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
   }
 }
 
-export default async function Page({ searchParams }: PageProps) {
-  const { locale } = await searchParams;
+export default async function Page() {
+  const locale = await getServerLocale();
   let homeData = null;
 
   try {
-    homeData = await api.getPage('home', locale);
+    homeData = await api.getPage('home', locale || undefined);
   } catch (error) {
     console.error('Failed to fetch home page data:', error);
   }

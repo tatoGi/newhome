@@ -5,6 +5,8 @@
 import {
     AuthResponse,
     BootstrapResponse,
+    ContactSubmissionPayload,
+    ContactSubmissionResponse,
     CheckoutResultResponse,
     CheckoutStartResponse,
     CheckoutSummaryResponse,
@@ -309,5 +311,28 @@ export const api = {
         return fetchAuthApi<{ cards: SavedCard[] }>(`/checkout/cards/${cardId}`, {
             method: 'DELETE',
         }, authToken);
+    },
+
+    async submitContact(payload: ContactSubmissionPayload): Promise<ContactSubmissionResponse> {
+        const response = await fetch(`${BASE_URL}/contact-submissions`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        });
+
+        const data = await response.json().catch(() => null);
+
+        if (!response.ok) {
+            const validationMessage = Array.isArray(data?.errors)
+                ? data.errors[0]
+                : Object.values(data?.errors ?? {}).flat()[0];
+
+            throw new Error(data?.message || validationMessage || 'Failed to send message.');
+        }
+
+        return data as ContactSubmissionResponse;
     },
 };

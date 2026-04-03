@@ -1,16 +1,14 @@
 'use client';
 
 import React from 'react';
-import { Container, Row, Col, Button } from 'react-bootstrap';
-import Link from 'next/link';
 import HeroSlider from '@/components/HeroSlider';
 import Reels from '@/components/Reels';
 import FeaturedProjects from '@/components/FeaturedProjects';
+import FeaturesSection from '@/components/FeaturesSection';
+import FeaturedProductsSection from '@/components/FeaturedProductsSection';
+import ImageTextSection from '@/components/ImageTextSection';
+import CtaBanner from '@/components/CtaBanner';
 import BlogSection from '@/components/BlogSection';
-import ProductCard from '@/components/ProductCard';
-import { motion } from 'motion/react';
-import { ArrowRight, ShieldCheck, Truck, Clock } from 'lucide-react';
-import { allProducts } from '@/lib/data';
 import { PageResponse, Block } from '@/lib/api/types';
 import { toBackendAssetUrl } from '@/lib/api/assets';
 
@@ -18,164 +16,42 @@ interface HomePageProps {
   data: PageResponse | null;
 }
 
-const buildHeroSlides = (blocks: Block[]) =>
-  blocks
-    .filter((block) => block.type === 'main_banner' || block.type === 'page_hero' || block.type === 'banner')
-    .map((block, index) => ({
-      id: `${block.type}-${index}`,
-      title: String(block.data.banner_title ?? block.data.title ?? block.label ?? ''),
-      desc: String(block.data.banner_desc ?? block.data.banner_description ?? block.data.description ?? block.description ?? ''),
-      image: toBackendAssetUrl(String(block.data.banner_image ?? block.data.image ?? '')),
-      link: String(block.data.banner_link ?? block.data.link ?? '/products'),
+function buildHeroSlides(blocks: Block[]) {
+  return blocks
+    .filter((b) => b.type === 'main_banner' || b.type === 'page_hero' || b.type === 'banner')
+    .map((b, i) => ({
+      id: `${b.type}-${i}`,
+      title: String(b.data.banner_title ?? b.data.title ?? b.label ?? ''),
+      desc: String(b.data.banner_desc ?? b.data.banner_description ?? b.data.description ?? b.description ?? ''),
+      image: toBackendAssetUrl(String(b.data.banner_image ?? b.data.image ?? '')),
+      link: String(b.data.banner_link ?? b.data.link ?? '/products'),
     }));
+}
 
 export default function HomePage({ data }: HomePageProps) {
-  const sortedBlocks = [...(data?.page?.blocks ?? [])].sort(
-    (a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0)
-  );
-  const heroSlides = buildHeroSlides(sortedBlocks);
-  const productsFromApi = data?.relations?.products;
-  const featuredProducts = (productsFromApi && productsFromApi.length > 0)
-    ? productsFromApi.map((p: any) => ({
-      id: p.id,
-      name: p.title,
-      price: p.price,
-      image: p.feature_image || '/placeholder.jpg',
-      category: 'მისაღები ოთახი',
-      slug: p.slug
-    }))
-    : allProducts.slice(0, 4);
+  const blocks = [...(data?.page?.blocks ?? [])].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+  const heroSlides = buildHeroSlides(blocks);
 
   return (
     <div>
-      {heroSlides.length > 0 ? <HeroSlider data={{ slides: heroSlides }} /> : null}
+      {heroSlides.length > 0 && <HeroSlider data={{ slides: heroSlides }} />}
 
       <Reels data={{ reels: data?.relations?.reels || [] }} />
 
-      {data?.relations?.posts && data.relations.posts.some((p) => p.category === 'project') ? (
-        <FeaturedProjects projects={data.relations.posts.filter((p) => p.category === 'project')} />
-      ) : (
-        <FeaturedProjects />
-      )}
+      <FeaturedProjects
+        projects={data?.relations?.posts?.filter((p) => p.category === 'project')}
+        projectSection={data?.project_section}
+      />
 
-      <section className="py-5 bg-light">
-        <Container>
-          <Row className="text-center gy-4">
-            {[
-              { icon: <Truck size={40} className="text-primary mb-3" />, title: 'სწრაფი მიწოდება', desc: 'მიიღეთ თქვენი შეკვეთა უმოკლეს დროში მთელი საქართველოს მასშტაბით.' },
-              { icon: <ShieldCheck size={40} className="text-primary mb-3" />, title: 'ხარისხის გარანტია', desc: 'ჩვენ გთავაზობთ მხოლოდ უმაღლესი ხარისხის სერტიფიცირებულ პროდუქციას.' },
-              { icon: <Clock size={40} className="text-primary mb-3" />, title: '24/7 მხარდაჭერა', desc: 'ჩვენი გუნდი მზად არის დაგეხმაროთ ნებისმიერ დროს.' },
-            ].map((item, i) => (
-              <Col md={4} key={i}>
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: i * 0.1 }}
-                  className="p-4 bg-white rounded shadow-sm h-100"
-                >
-                  {item.icon}
-                  <h3 className="h5">{item.title}</h3>
-                  <p className="text-muted small mb-0">{item.desc}</p>
-                </motion.div>
-              </Col>
-            ))}
-          </Row>
-        </Container>
-      </section>
+      <FeaturesSection blocks={blocks} />
 
-      <section className="py-5">
-        <Container>
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="d-flex justify-content-between align-items-end mb-4"
-          >
-            <div>
-              <h2 className="fw-bold mb-2">რჩეული პროდუქცია</h2>
-              <p className="text-muted mb-0">აღმოაჩინეთ ჩვენი ყველაზე პოპულარული მოდელები</p>
-            </div>
-            <Button as={Link as any} href="/products" variant="link" className="text-primary text-decoration-none d-flex align-items-center gap-2">
-              ყველას ნახვა <ArrowRight size={18} />
-            </Button>
-          </motion.div>
-          <Row className="gy-4">
-            {featuredProducts.map((product, index) => (
-              <Col key={product.id} sm={6} lg={3}>
-                <motion.div
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: index * 0.15 }}
-                  className="h-100"
-                >
-                  <ProductCard product={product as any} />
-                </motion.div>
-              </Col>
-            ))}
-          </Row>
-        </Container>
-      </section>
+      <FeaturedProductsSection products={data?.relations?.products} />
 
-      <section className="py-5 bg-light overflow-hidden">
-        <Container>
-          <Row className="align-items-center gy-5">
-            <Col lg={6}>
-              <motion.div
-                initial={{ opacity: 0, x: -50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8 }}
-              >
-                <h2 className="display-5 fw-bold mb-4">{data?.page?.title || 'NewHome - თქვენი სახლის დიზაინის პარტნიორი'}</h2>
-                <p className="lead text-muted mb-4">
-                  {data?.page?.description || 'ჩვენი მისიაა შევქმნათ გარემო, რომელიც ასახავს თქვენს ინდივიდუალურობას. 10 წლიანი გამოცდილება ინტერიერის დიზაინსა და ავეჯის წარმოებაში.'}
-                </p>
-                <div className="d-flex gap-3">
-                  <Button as={Link as any} href="/about" variant="primary" size="lg" className="px-4">ჩვენს შესახებ</Button>
-                  <Button as={Link as any} href="/projects" variant="outline-primary" size="lg" className="px-4">პროექტები</Button>
-                </div>
-              </motion.div>
-            </Col>
-            <Col lg={6}>
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8 }}
-              >
-                <img
-                  src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1000&q=80"
-                  alt="Interior Design"
-                  className="img-fluid rounded shadow-lg"
-                  referrerPolicy="no-referrer"
-                />
-              </motion.div>
-            </Col>
-          </Row>
-        </Container>
-      </section>
+      <ImageTextSection blocks={blocks} pageTitle={data?.page?.title} pageDescription={data?.page?.description} />
 
-      <section className="py-5 mb-5">
-        <Container>
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="bg-primary text-white p-5 rounded-4 text-center position-relative overflow-hidden shadow-lg"
-          >
-            <div className="position-relative z-1">
-              <h2 className="display-6 fw-bold mb-3">გსურთ ინდივიდუალური შეკვეთა?</h2>
-              <p className="mb-4 opacity-75 lead">დაგვიკავშირდით და ჩვენი დიზაინერები დაგეხმარებიან იდეალური სივრცის შექმნაში</p>
-              <Button as={Link as any} href="/contact" variant="light" size="lg" className="px-5 text-primary fw-bold text-uppercase">კონსულტაცია</Button>
-            </div>
-            <div className="position-absolute top-50 start-50 translate-middle bg-white opacity-10 rounded-circle" style={{ width: '800px', height: '800px', zIndex: 0, filter: 'blur(50px)' }} />
-          </motion.div>
-        </Container>
-      </section>
+      <CtaBanner blocks={blocks} />
 
-      <BlogSection blogs={data?.relations?.posts.filter((p) => p.category === 'blog') || []} />
+      <BlogSection blogSection={data?.blog_section} />
     </div>
   );
 }

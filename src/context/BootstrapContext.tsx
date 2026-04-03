@@ -22,6 +22,10 @@ export const BootstrapProvider: React.FC<{
     const refreshBootstrap = async (locale?: string): Promise<void> => {
         setIsLoading(true);
 
+        if (locale) {
+            document.cookie = `newhome_locale=${locale}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
+        }
+
         try {
             const nextData = await api.getBootstrap(locale);
             React.startTransition(() => {
