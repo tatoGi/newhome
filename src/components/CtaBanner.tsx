@@ -19,8 +19,8 @@ const DEFAULTS = {
 export default function CtaBanner({ blocks }: CtaBannerProps) {
   const block = blocks.find((b) => b.type === 'cta_banner');
   const title = String(block?.data?.title ?? DEFAULTS.title);
-  const desc = String(block?.data?.banner_desc ?? DEFAULTS.desc);
-  const href = String(block?.data?.redairect_link ?? DEFAULTS.link);
+  const desc = String(block?.data?.description ?? block?.data?.banner_desc ?? DEFAULTS.desc);
+  const href = String(block?.data?.cta_url ?? block?.data?.redairect_link ?? DEFAULTS.link);
 
   return (
     <section className="py-5 mb-5">

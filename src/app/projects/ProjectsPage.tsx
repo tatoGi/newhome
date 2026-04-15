@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Block, PostRelation } from '@/lib/api/types';
 import { toBackendAssetUrl } from '@/lib/api/assets';
 import { slugify } from '@/lib/slugify';
+import PageBlockRenderer from '@/components/PageBlockRenderer';
 
 interface ProjectsPageProps {
   posts?: PostRelation[];
@@ -22,8 +23,8 @@ export default function ProjectsPage({ posts, pageTitle, pageDescription, blocks
 
   const heroTitle = String(heroBlock?.data?.banner_title ?? heroBlock?.data?.title ?? pageTitle ?? 'პროექტები');
   const heroDescription = String(
-    heroBlock?.data?.banner_desc ??
     heroBlock?.data?.banner_description ??
+    heroBlock?.data?.banner_desc ??
     heroBlock?.data?.description ??
     pageDescription ??
     ''
@@ -75,6 +76,12 @@ export default function ProjectsPage({ posts, pageTitle, pageDescription, blocks
           {heroDescription ? <div className="text-muted mb-0" dangerouslySetInnerHTML={{ __html: heroDescription }} /> : null}
         </div>
       )}
+
+      <PageBlockRenderer
+        blocks={(blocks ?? []).filter((b) => b.type !== 'main_banner' && b.type !== 'page_hero' && b.type !== 'banner')}
+        pageTitle={pageTitle}
+        pageDescription={pageDescription}
+      />
 
       {categories.length > 1 && (
         <div className="d-flex flex-wrap gap-2 mb-5">

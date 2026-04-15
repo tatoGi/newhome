@@ -5,6 +5,7 @@ import { Container, Row, Col, Form, Accordion, Breadcrumb } from 'react-bootstra
 import { Check } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
 import { Block, ProductRelation } from '@/lib/api/types';
+import PageBlockRenderer from '@/components/PageBlockRenderer';
 
 
 interface ProductsPageProps {
@@ -148,6 +149,12 @@ export default function ProductsPage({
     });
 
   return (
+    <>
+    <PageBlockRenderer
+      blocks={(blocks ?? []).filter((b) => b.type !== 'main_banner' && b.type !== 'page_hero' && b.type !== 'banner')}
+      pageTitle={pageTitle}
+      pageDescription={pageDescription}
+    />
     <Container fluid className="px-lg-4 px-xl-5 py-4">
       <Breadcrumb className="mb-4 d-none d-md-flex small">
         <Breadcrumb.Item href="/">მთავარი</Breadcrumb.Item>
@@ -284,5 +291,6 @@ export default function ProductsPage({
         </Col>
       </Row>
     </Container>
+    </>
   );
 }

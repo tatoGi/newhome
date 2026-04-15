@@ -22,11 +22,11 @@ const DEFAULTS = {
 
 export default function ImageTextSection({ blocks, pageTitle, pageDescription }: ImageTextSectionProps) {
   const block = blocks.find((b) => b.type === 'image_text');
-  const title = String(block?.data?.title ?? pageTitle ?? DEFAULTS.title);
-  const desc = String(block?.data?.textarea ?? pageDescription ?? DEFAULTS.desc);
+  const title = String(block?.data?.content_title ?? block?.data?.section_title ?? block?.data?.title ?? pageTitle ?? DEFAULTS.title);
+  const desc = String(block?.data?.content_text ?? block?.data?.textarea ?? pageDescription ?? DEFAULTS.desc);
   const image = block?.data?.image ? toBackendAssetUrl(String(block.data.image)) : DEFAULTS.image;
-  const linkFirst = String(block?.data?.redairect_link_first ?? DEFAULTS.linkFirst);
-  const linkSecond = String(block?.data?.redairect_link_second ?? DEFAULTS.linkSecond);
+  const linkFirst = String(block?.data?.cta_primary_url ?? block?.data?.redairect_link_first ?? DEFAULTS.linkFirst);
+  const linkSecond = String(block?.data?.cta_secondary_url ?? block?.data?.redairect_link_second ?? DEFAULTS.linkSecond);
 
   return (
     <section className="py-5 bg-light overflow-hidden">

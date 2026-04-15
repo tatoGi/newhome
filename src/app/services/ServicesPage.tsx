@@ -7,6 +7,7 @@ import { ArrowRight } from 'lucide-react';
 import { Block, PostRelation } from '@/lib/api/types';
 import { toBackendAssetUrl } from '@/lib/api/assets';
 import { slugify } from '@/lib/slugify';
+import PageBlockRenderer from '@/components/PageBlockRenderer';
 
 interface ServicesPageProps {
   posts?: PostRelation[];
@@ -22,8 +23,8 @@ export default function ServicesPage({ posts, pageTitle, pageDescription, blocks
 
   const heroTitle = String(heroBlock?.data?.banner_title ?? heroBlock?.data?.title ?? pageTitle ?? 'სერვისები');
   const heroDescription = String(
-    heroBlock?.data?.banner_desc ??
     heroBlock?.data?.banner_description ??
+    heroBlock?.data?.banner_desc ??
     heroBlock?.data?.description ??
     pageDescription ??
     ''
@@ -72,6 +73,12 @@ export default function ServicesPage({ posts, pageTitle, pageDescription, blocks
           სერვისები ჯერ არ არის დამატებული.
         </div>
       )}
+
+      <PageBlockRenderer
+        blocks={(blocks ?? []).filter((b) => b.type !== 'main_banner' && b.type !== 'page_hero' && b.type !== 'banner')}
+        pageTitle={pageTitle}
+        pageDescription={pageDescription}
+      />
 
       <Row className="gy-4">
         {services.map((service, index) => (

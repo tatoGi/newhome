@@ -22,9 +22,9 @@ function buildHeroSlides(blocks: Block[]) {
     .map((b, i) => ({
       id: `${b.type}-${i}`,
       title: String(b.data.banner_title ?? b.data.title ?? b.label ?? ''),
-      desc: String(b.data.banner_desc ?? b.data.banner_description ?? b.data.description ?? b.description ?? ''),
+      desc: String(b.data.banner_description ?? b.data.banner_desc ?? b.data.description ?? b.description ?? ''),
       image: toBackendAssetUrl(String(b.data.banner_image ?? b.data.image ?? '')),
-      link: String(b.data.banner_link ?? b.data.link ?? '/products'),
+      link: String(b.data.redirect_link ?? b.data.cta_primary_url ?? b.data.banner_link ?? b.data.link ?? '/products'),
     }));
 }
 

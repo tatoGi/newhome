@@ -25,8 +25,24 @@ interface FeaturesSectionProps {
 export default function FeaturesSection({ blocks }: FeaturesSectionProps) {
   const gridBlocks = blocks.filter((b) => b.type === 'items_grid');
 
-  const items = gridBlocks.length > 0
-    ? gridBlocks.map((b, i) => ({ icon: ICONS[i % ICONS.length], title: String(b.data.title ?? ''), desc: String(b.data.subtitle ?? '') }))
+  // page_services block has a repeater field 'items' with {title, description}
+  const repeaterItems: Array<{ title: string; desc: string }> = gridBlocks.flatMap((b) => {
+    const raw = b.data.items;
+    if (Array.isArray(raw) && raw.length > 0) {
+      return raw.map((item: any) => ({
+        title: String(item?.title ?? ''),
+        desc: String(item?.description ?? item?.subtitle ?? ''),
+      }));
+    }
+    // fallback: single block with title/subtitle directly
+    const title = String(b.data.section_title ?? b.data.title ?? '');
+    const desc = String(b.data.section_subtitle ?? b.data.subtitle ?? '');
+    if (title) return [{ title, desc }];
+    return [];
+  });
+
+  const items = repeaterItems.length > 0
+    ? repeaterItems.map((item, i) => ({ icon: ICONS[i % ICONS.length], ...item }))
     : FALLBACK.map((f, i) => ({ icon: ICONS[i], ...f }));
 
   return (
