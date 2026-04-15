@@ -1,10 +1,11 @@
 'use client';
 
+import Image from 'next/image';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import Link from 'next/link';
 import { motion } from 'motion/react';
 import { Block } from '@/lib/api/types';
-import { toBackendAssetUrl } from '@/lib/api/assets';
+import { isBackendAssetUrl, toBackendAssetUrl } from '@/lib/api/assets';
 
 interface ImageTextSectionProps {
   blocks: Block[];
@@ -44,10 +45,15 @@ export default function ImageTextSection({ blocks, pageTitle, pageDescription }:
           </Col>
           <Col lg={6}>
             <motion.div initial={{ opacity: 0, scale: 0.8 }} whileInView={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8 }}>
-              <img
+              <Image
                 src={image}
                 alt={title}
+                width={1200}
+                height={800}
+                sizes="(max-width: 992px) 100vw, 50vw"
                 className="img-fluid rounded shadow-lg"
+                style={{ objectFit: 'cover' }}
+                unoptimized={isBackendAssetUrl(image)}
                 referrerPolicy="no-referrer"
               />
             </motion.div>

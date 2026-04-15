@@ -1,12 +1,13 @@
 'use client';
 
+import Image from 'next/image';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import Link from 'next/link';
 import { motion } from 'motion/react';
 import { ArrowRight, MapPin } from 'lucide-react';
 import { slugify } from '@/lib/slugify';
 import { ProjectSection } from '@/lib/api/types';
-import { toBackendAssetUrl } from '@/lib/api/assets';
+import { isBackendAssetUrl, toBackendAssetUrl } from '@/lib/api/assets';
 
 interface FeaturedProjectsProps {
     projects?: any[];
@@ -90,10 +91,12 @@ const FeaturedProjects: React.FC<FeaturedProjectsProps> = ({ projects: propProje
                                         style={!project.image ? { background: 'linear-gradient(135deg, #0F2E47 0%, #1a4a6e 100%)' } : undefined}
                                     >
                                         {project.image && (
-                                            <img
+                                            <Image
                                                 src={project.image}
                                                 alt={project.title}
+                                                fill
                                                 className="object-fit-cover transition-transform duration-700 hover-scale-110"
+                                                unoptimized={isBackendAssetUrl(project.image)}
                                             />
                                         )}
                                         <div className="position-absolute inset-0 bg-gradient-to-t from-black opacity-60" />

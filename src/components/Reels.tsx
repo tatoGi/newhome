@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { Modal, Carousel } from 'react-bootstrap';
 import { motion } from 'motion/react';
 import { Play } from 'lucide-react';
-import { toBackendAssetUrl } from '@/lib/api/assets';
+import { isBackendAssetUrl, toBackendAssetUrl } from '@/lib/api/assets';
 
 interface Reel {
     id: number;
@@ -84,7 +85,15 @@ const Reels: React.FC<{ data?: any }> = ({ data }) => {
                         >
                             <div className={`reel-circle-wrapper ${reel.category}`}>
                                 <div className="reel-circle shadow-sm">
-                                    <img src={toBackendAssetUrl(reel.image)} alt={reel.title} className="reel-img" referrerPolicy="no-referrer" />
+                                    <Image
+                                        src={toBackendAssetUrl(reel.image)}
+                                        alt={reel.title}
+                                        width={90}
+                                        height={90}
+                                        className="reel-img"
+                                        unoptimized={isBackendAssetUrl(toBackendAssetUrl(reel.image))}
+                                        referrerPolicy="no-referrer"
+                                    />
                                     <div className="reel-play-icon">
                                         <Play size={14} fill="currentColor" />
                                     </div>
@@ -116,10 +125,14 @@ const Reels: React.FC<{ data?: any }> = ({ data }) => {
                             <Carousel.Item key={reel.id}>
                                 <div className="reel-viewer-content rounded-4 overflow-hidden position-relative mx-auto"
                                     style={{ width: '100%', maxWidth: '450px', height: '700px' }}>
-                                    <img
-                                        className="d-block w-100 h-100 object-fit-cover"
+                                    <Image
                                         src={toBackendAssetUrl(reel.image)}
                                         alt={reel.title}
+                                        width={900}
+                                        height={1400}
+                                        className="d-block w-100 h-100 object-fit-cover"
+                                        style={{ objectFit: 'cover' }}
+                                        unoptimized={isBackendAssetUrl(toBackendAssetUrl(reel.image))}
                                         referrerPolicy="no-referrer"
                                     />
                                     <div className="position-absolute top-0 start-0 w-100 h-100 bg-gradient-to-b from-black/40 via-transparent to-black/80"></div>

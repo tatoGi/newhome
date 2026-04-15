@@ -1,0 +1,29 @@
+﻿C:\Users\pc\Desktop\tato\larave_cms_block\frontend\newhome\src\app\products\ProductsPage.tsx:8: import PageBlockRenderer from '@/components/PageBlockRenderer';
+C:\Users\pc\Desktop\tato\larave_cms_block\frontend\newhome\src\app\products\ProductsPage.tsx:153: <PageBlockRenderer
+C:\Users\pc\Desktop\tato\larave_cms_block\frontend\newhome\src\app\projects\ProjectsPage.tsx:11: import PageBlockRenderer from '@/components/PageBlockRenderer';
+C:\Users\pc\Desktop\tato\larave_cms_block\frontend\newhome\src\app\projects\ProjectsPage.tsx:81: <PageBlockRenderer
+C:\Users\pc\Desktop\tato\larave_cms_block\frontend\newhome\src\app\services\ServicesPage.tsx:11: import PageBlockRenderer from '@/components/PageBlockRenderer';
+C:\Users\pc\Desktop\tato\larave_cms_block\frontend\newhome\src\app\services\ServicesPage.tsx:78: <PageBlockRenderer
+C:\Users\pc\Desktop\tato\larave_cms_block\frontend\newhome\src\app\HomePage.tsx:4: import HeroSlider from '@/components/HeroSlider';
+C:\Users\pc\Desktop\tato\larave_cms_block\frontend\newhome\src\app\HomePage.tsx:5: import Reels from '@/components/Reels';
+C:\Users\pc\Desktop\tato\larave_cms_block\frontend\newhome\src\app\HomePage.tsx:9: import ImageTextSection from '@/components/ImageTextSection';
+C:\Users\pc\Desktop\tato\larave_cms_block\frontend\newhome\src\app\HomePage.tsx:38: {heroSlides.length > 0 && <HeroSlider data={{ slides: heroSlides }} />}
+C:\Users\pc\Desktop\tato\larave_cms_block\frontend\newhome\src\app\HomePage.tsx:40: <Reels data={{ reels: data?.relations?.reels || [] }} />
+C:\Users\pc\Desktop\tato\larave_cms_block\frontend\newhome\src\app\HomePage.tsx:51: <ImageTextSection blocks={blocks} pageTitle={data?.page?.title} pageDescription={data?.page?.description} />
+C:\Users\pc\Desktop\tato\larave_cms_block\frontend\newhome\src\components\HeroSlider.tsx:33: const HeroSlider: React.FC<{ data?: { slides?: HeroSlide[] } }> = ({ data }) => {
+C:\Users\pc\Desktop\tato\larave_cms_block\frontend\newhome\src\components\HeroSlider.tsx:109: export default HeroSlider;
+C:\Users\pc\Desktop\tato\larave_cms_block\frontend\newhome\src\components\ImageTextSection.tsx:9: interface ImageTextSectionProps {
+C:\Users\pc\Desktop\tato\larave_cms_block\frontend\newhome\src\components\ImageTextSection.tsx:23: export default function ImageTextSection({ blocks, pageTitle, pageDescription }: ImageTextSectionProps) {
+C:\Users\pc\Desktop\tato\larave_cms_block\frontend\newhome\src\components\PageBlockRenderer.tsx:4: import HeroSlider from '@/components/HeroSlider';
+C:\Users\pc\Desktop\tato\larave_cms_block\frontend\newhome\src\components\PageBlockRenderer.tsx:6: import ImageTextSection from '@/components/ImageTextSection';
+C:\Users\pc\Desktop\tato\larave_cms_block\frontend\newhome\src\components\PageBlockRenderer.tsx:92: export default function PageBlockRenderer({ blocks, pageTitle, pageDescription }: Props) {
+C:\Users\pc\Desktop\tato\larave_cms_block\frontend\newhome\src\components\PageBlockRenderer.tsx:107: {hasHero && <HeroSlider data={{ slides: heroSlides }} />}
+C:\Users\pc\Desktop\tato\larave_cms_block\frontend\newhome\src\components\PageBlockRenderer.tsx:109: {hasImageText && <ImageTextSection blocks={sorted} pageTitle={pageTitle} pageDescription={pageDescription} />}
+C:\Users\pc\Desktop\tato\larave_cms_block\frontend\newhome\src\components\Reels.tsx:17: const reelsData: Reel[] = [
+C:\Users\pc\Desktop\tato\larave_cms_block\frontend\newhome\src\components\Reels.tsx:62: const Reels: React.FC<{ data?: any }> = ({ data }) => {
+C:\Users\pc\Desktop\tato\larave_cms_block\frontend\newhome\src\components\Reels.tsx:63: const displayReels = data?.reels && data.reels.length > 0 ? data.reels : reelsData;
+C:\Users\pc\Desktop\tato\larave_cms_block\frontend\newhome\src\components\Reels.tsx:73: <div className="py-4 bg-white border-bottom reels-section">
+C:\Users\pc\Desktop\tato\larave_cms_block\frontend\newhome\src\components\Reels.tsx:76: {displayReels.map((reel: any, index: number) => (
+C:\Users\pc\Desktop\tato\larave_cms_block\frontend\newhome\src\components\Reels.tsx:112: className="reels-carousel"
+C:\Users\pc\Desktop\tato\larave_cms_block\frontend\newhome\src\components\Reels.tsx:115: {displayReels.map((reel: any) => (
+C:\Users\pc\Desktop\tato\larave_cms_block\frontend\newhome\src\components\Reels.tsx:151: export default Reels;

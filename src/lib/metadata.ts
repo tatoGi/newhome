@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 
 const SITE_URL = 'https://homespace.ge';
 const SITE_NAME = 'HomeSpace.ge';
+const DEFAULT_DESCRIPTION = 'HomeSpace provides modern furniture, lighting, and interior design solutions in Georgia.';
 const DEFAULT_IMAGE = '/og-image.jpg';
 
 const normalizeKeywords = (keywords?: string | string[]): string[] | undefined => {
@@ -38,14 +39,16 @@ export const buildPageMetadata = ({
     const pageUrl = url || canonicalUrl;
     const imageUrl = image || DEFAULT_IMAGE;
 
+    const metaDescription = description || DEFAULT_DESCRIPTION;
+
     return {
         title,
-        description,
+        description: metaDescription,
         keywords: normalizeKeywords(keywords),
         alternates: { canonical: canonicalUrl },
         openGraph: {
             title,
-            description,
+            description: metaDescription,
             url: pageUrl,
             siteName: SITE_NAME,
             type: 'website',
@@ -54,7 +57,7 @@ export const buildPageMetadata = ({
         twitter: {
             card: 'summary_large_image',
             title,
-            description,
+            description: metaDescription,
             images: [imageUrl],
         },
     };
