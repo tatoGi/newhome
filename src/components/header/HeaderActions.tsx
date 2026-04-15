@@ -52,7 +52,7 @@ const HeaderActions: React.FC<HeaderActionsProps> = (props) => {
 
   return (
     <div className="d-flex align-items-center gap-2 gap-md-3 flex-shrink-0">
-      <div className="position-relative">
+      <div className="position-relative d-none d-lg-block">
         <button
           type="button"
           className="btn language-toggle d-inline-flex align-items-center gap-2 rounded-pill border bg-white px-3 py-2"
