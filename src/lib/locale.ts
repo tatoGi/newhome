@@ -1,8 +1,12 @@
+import { cookies } from 'next/headers';
+
 export const LOCALE_COOKIE = 'newhome_locale';
 
 /**
- * Static site — locale is always Georgian.
+ * Read the active locale on the server side.
+ * Priority: cookie → empty string (caller falls back to API default)
  */
 export async function getServerLocale(): Promise<string> {
-    return 'ka';
+    const store = await cookies();
+    return store.get(LOCALE_COOKIE)?.value || '';
 }

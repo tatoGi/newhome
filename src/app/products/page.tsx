@@ -1,28 +1,27 @@
 import type { Metadata } from 'next';
+import { api } from '@/lib/api/client';
 import ProductsPage from './ProductsPage';
-import { getAllProducts } from '@/lib/data';
-import type { ProductRelation } from '@/lib/api/types';
+import { ProductRelation } from '@/lib/api/types';
+import { getServerLocale } from '@/lib/locale';
 
 export const metadata: Metadata = {
   title: 'პროდუქცია',
   description: 'ავეჯი, განათება და ინტერიერის სხვა ელემენტები.',
-  alternates: { canonical: 'https://homespace.ge/products' },
+  alternates: { canonical: 'https://newhome.ge/products' },
 };
 
-export default function Page() {
-  const products: ProductRelation[] = getAllProducts().map(p => ({
-    id: p.id,
-    slug: p.slug,
-    title: p.name,
-    price: p.price,
-    old_price: p.oldPrice ?? null,
-    on_sale: p.sale ?? false,
-    brand: '',
-    feature_image: p.image,
-    category: p.category,
-    colors: p.colors ?? [],
-    blocks: [],
-  }));
+export default async function Page({ searchParams }: { searchParams: Promise<{ locale?: string }> }) {
+  const { locale } = await searchParams;
+  const serverLocale = locale || await getServerLocale() || undefined;
+
+  let products: ProductRelation[] = [];
+
+  try {
+    const data = await api.getProducts(serverLocale);
+    products = data.products ?? [];
+  } catch {
+    products = [];
+  }
 
   return <ProductsPage products={products} />;
 }

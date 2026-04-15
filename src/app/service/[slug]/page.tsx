@@ -1,44 +1,81 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { api } from '@/lib/api/client';
+import { toBackendAssetUrl } from '@/lib/api/assets';
 import ServiceDetailsPage from './ServiceDetailsPage';
-import { getAllServices } from '@/lib/data';
+import { getServerLocale } from '@/lib/locale';
 
-export function generateStaticParams() {
-  return getAllServices().map(s => ({ slug: s.slug }));
+interface PageProps {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ locale?: string }>;
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
-  const { slug } = await params;
-  const s = getAllServices().find(s => s.slug === slug);
-  if (!s) return { title: 'სერვისი' };
-  return {
-    title: s.title,
-    description: s.desc,
-    alternates: { canonical: `https://homespace.ge/service/${slug}` },
-    openGraph: {
-      title: s.title,
-      description: s.desc,
-      url: `https://homespace.ge/service/${slug}`,
-      images: s.image ? [{ url: s.image }] : [],
-    },
-  };
+export async function generateStaticParams() {
+  try {
+    const bootstrap = await api.getBootstrap();
+    const route = bootstrap.routeMap.find((r) => r.template === 'service' || r.template === 'services');
+    if (!route) return [];
+    const data = await api.getPage(route.slug);
+    return (data.relations?.posts ?? []).map((p) => ({ slug: p.slug }));
+  } catch {
+    return [];
+  }
 }
 
-export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
-  const s = getAllServices().find(s => s.slug === slug);
+export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
+  try {
+    const { slug } = await params;
+    const { locale: queryLocale } = await searchParams;
+    const locale = queryLocale || await getServerLocale() || undefined;
+    const data = await api.getService(slug, locale);
+    const intro = data.post.blocks?.find((b: any) => b.type === 'post_intro');
+    const title = intro?.data?.title || data.post.title;
+    const image = toBackendAssetUrl(intro?.data?.post_image || data.post.feature_image || '');
+    return {
+      title: data.seo?.meta_title || title,
+      description: data.seo?.meta_description || data.post.excerpt || undefined,
+      alternates: { canonical: data.seo?.canonical_url || `https://newhome.ge/service/${slug}` },
+      openGraph: {
+        title: data.seo?.meta_title || title,
+        description: data.seo?.meta_description || undefined,
+        url: data.seo?.canonical_url || `https://newhome.ge/service/${decodeURIComponent(slug)}`,
+        images: image ? [{ url: image }] : [],
+      },
+    };
+  } catch {
+    return { title: 'სერვისი' };
+  }
+}
 
-  if (!s) notFound();
+export default async function Page({ params, searchParams }: PageProps) {
+  const { slug } = await params;
+  const { locale: queryLocale } = await searchParams;
+  const locale = queryLocale || await getServerLocale() || undefined;
+
+  let data;
+  try {
+    data = await api.getService(slug, locale);
+  } catch {
+    notFound();
+  }
+
+  if (!data?.post) notFound();
 
   const service = {
-    id: s.id,
-    slug: s.slug,
-    title: s.title,
-    desc: s.desc,
-    fullDesc: s.fullDesc,
-    image: s.image,
-    blocks: [],
+    id: data.post.id,
+    slug: data.post.slug ?? slug,
+    title: data.post.title,
+    desc: data.post.excerpt,
+    fullDesc: data.post.content,
+    image: data.post.feature_image || '',
+    blocks: data.post.blocks || [],
   };
 
-  return <ServiceDetailsPage service={service} phone={null} />;
+  let phone: string | null = null;
+  try {
+    const bootstrap = await api.getBootstrap();
+    phone = bootstrap.settings.footerContactText ?? null;
+  } catch {}
+
+  return <ServiceDetailsPage service={service} phone={phone} />;
 }

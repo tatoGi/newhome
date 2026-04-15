@@ -8,6 +8,8 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Providers from '@/components/Providers';
 import ChatBot from '@/components/ChatBot';
+import { api } from '@/lib/api/client';
+import { getServerLocale } from '@/lib/locale';
 
 const notoSerifGeorgian = Noto_Serif_Georgian({
   subsets: ['georgian'],
@@ -27,20 +29,20 @@ const defaultBootstrap = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://homespace.ge'),
+  metadataBase: new URL('https://newhome.ge'),
   title: {
     default: 'NewHome — ავეჯი და განათება საქართველოში',
     template: '%s | NewHome.ge',
   },
   description:
     'თანამედროვე ავეჯის და განათების ონლაინ მაღაზია. აღმოაჩინეთ საუკეთესო დიზაინი თქვენი სახლისთვის. მიწოდება მთელ საქართველოში.',
-  keywords: ['ავეჯი', 'განათება', 'ინტერიერი', 'დიზაინი', 'თბილისი', 'newhome', 'homespace.ge'],
-  authors: [{ name: 'NewHome.ge', url: 'https://homespace.ge' }],
+  keywords: ['ავეჯი', 'განათება', 'ინტერიერი', 'დიზაინი', 'თბილისი', 'newhome', 'newhome.ge'],
+  authors: [{ name: 'NewHome.ge', url: 'https://newhome.ge' }],
   creator: 'NewHome.ge',
   openGraph: {
     type: 'website',
     locale: 'ka_GE',
-    url: 'https://homespace.ge',
+    url: 'https://newhome.ge',
     siteName: 'NewHome.ge',
     title: 'NewHome — ავეჯი და განათება საქართველოში',
     description: 'თანამედროვე ავეჯის და განათების ონლაინ მაღაზია.',
@@ -53,8 +55,8 @@ export const metadata: Metadata = {
     images: ['/og-image.jpg'],
   },
   alternates: {
-    canonical: 'https://homespace.ge',
-    languages: { ka: 'https://homespace.ge' },
+    canonical: 'https://newhome.ge',
+    languages: { ka: 'https://newhome.ge' },
   },
   robots: {
     index: true,
@@ -68,10 +70,10 @@ const orgSchema = {
   '@context': 'https://schema.org',
   '@type': 'FurnitureStore',
   name: 'NewHome.ge',
-  url: 'https://homespace.ge',
-  logo: 'https://homespace.ge/logo.png',
+  url: 'https://newhome.ge',
+  logo: 'https://newhome.ge/logo.png',
   telephone: '+995-555-12-34-56',
-  email: 'info@homespace.ge',
+  email: 'info@newhome.ge',
   address: {
     '@type': 'PostalAddress',
     streetAddress: 'ი. ჭავჭავაძის გამზირი 37',
@@ -88,8 +90,15 @@ const orgSchema = {
   sameAs: ['https://www.facebook.com/newhomege', 'https://www.instagram.com/newhomege'],
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const bootstrapData = defaultBootstrap;
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const serverLocale = await getServerLocale();
+  let bootstrapData;
+  try {
+    bootstrapData = await api.getBootstrap(serverLocale || undefined);
+  } catch (error) {
+    console.error('Failed to fetch bootstrap data:', error);
+    bootstrapData = defaultBootstrap;
+  }
 
   return (
     <html lang={bootstrapData.locale} className={notoSerifGeorgian.variable}>
