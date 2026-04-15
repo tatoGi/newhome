@@ -8,6 +8,12 @@
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+html,
+body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
 body {
   font-family: "Noto Serif Georgian", serif;
   font-optical-sizing: auto;
@@ -611,10 +617,43 @@ body {
   }
 }
 
+/* ── Mobile global fixes ─────────────────────── */
+@media (max-width: 575.98px) {
+  h1, .h1 { font-size: 1.5rem !important; }
+  h2, .h2 { font-size: 1.25rem !important; }
+  h3, .h3 { font-size: 1.1rem !important; }
+  .fs-2   { font-size: 1.3rem !important; }
+  .fs-3   { font-size: 1.15rem !important; }
+  .display-5 { font-size: 1.4rem !important; }
+
+  .article-img-container {
+    height: 220px !important;
+  }
+
+  .py-5 {
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+  }
+
+  .site-header-logo {
+    max-height: 38px;
+  }
+}
+
+@media (min-width: 576px) and (max-width: 767.98px) {
+  .article-img-container {
+    height: 260px !important;
+  }
+}
+
 /* ── Article.com style ───────────────────────── */
 .article-product-card {
   text-decoration: none;
   cursor: pointer;
+}
+
+.article-img-container {
+  height: 360px;
 }
 
 .article-product-img {

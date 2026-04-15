@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { Heart, ShoppingCart } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { toBackendAssetUrl } from '@/lib/api/assets';
-import { slugify } from '@/lib/slugify';
 
 export interface Product {
   id: number;
@@ -59,7 +58,7 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="position-relative mb-2 overflow-hidden article-img-container" style={{ backgroundColor: '#f5f5f5', height: '360px' }}>
+      <div className="position-relative mb-2 overflow-hidden article-img-container" style={{ backgroundColor: '#f5f5f5' }}>
         <Link href={`/product/${productSlug}`} className="d-block w-100 h-100 position-relative z-1">
           <Image
             src={productImage}
