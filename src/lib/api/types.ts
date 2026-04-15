@@ -246,6 +246,16 @@ export interface ProductResponse {
     seo: SEO;
 }
 
+export interface SearchResult {
+    type: 'product' | 'blog' | 'service' | 'project';
+    title: string;
+    slug: string;
+    url: string;
+    image: string | null;
+    price?: number;
+    excerpt?: string | null;
+}
+
 export interface ContactSubmissionPayload {
     name: string;
     email: string;

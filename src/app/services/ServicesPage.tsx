@@ -4,7 +4,6 @@ import { Container, Row, Col, Card, Breadcrumb } from 'react-bootstrap';
 import Link from 'next/link';
 import { motion } from 'motion/react';
 import { ArrowRight } from 'lucide-react';
-import { allServices } from '@/lib/data';
 import { Block, PostRelation } from '@/lib/api/types';
 import { toBackendAssetUrl } from '@/lib/api/assets';
 import { slugify } from '@/lib/slugify';
@@ -31,25 +30,17 @@ export default function ServicesPage({ posts, pageTitle, pageDescription, blocks
   );
   const heroImage = toBackendAssetUrl(heroBlock?.data?.banner_image ?? heroBlock?.data?.image ?? '');
 
-  const services = posts && posts.length > 0
-    ? posts.map((post) => {
-      const intro = post.blocks?.find((b) => b.type === 'post_intro');
-      const rawImage = intro?.data?.post_image || post.feature_image || '';
-      return {
-        id: post.id,
-        slug: post.slug,
-        title: intro?.data?.title || post.title,
-        desc: post.excerpt,
-        image: toBackendAssetUrl(rawImage) || '',
-      };
-    })
-    : allServices.map((service) => ({
-      id: service.id,
-      slug: String(service.id),
-      title: service.title,
-      desc: service.desc,
-      image: service.image,
-    }));
+  const services = (posts ?? []).map((post) => {
+    const intro = post.blocks?.find((b) => b.type === 'post_intro');
+    const rawImage = intro?.data?.post_image || post.feature_image || '';
+    return {
+      id: post.id,
+      slug: post.slug,
+      title: intro?.data?.title || post.title,
+      desc: post.excerpt,
+      image: toBackendAssetUrl(rawImage) || '',
+    };
+  });
 
   return (
     <Container className="py-5">
@@ -73,6 +64,12 @@ export default function ServicesPage({ posts, pageTitle, pageDescription, blocks
         <div className="text-center mb-5">
           <h1 className="fw-bold display-4 mb-3">{heroTitle}</h1>
           {heroDescription ? <div className="text-muted lead mx-auto" style={{ maxWidth: '700px' }} dangerouslySetInnerHTML={{ __html: heroDescription }} /> : null}
+        </div>
+      )}
+
+      {services.length === 0 && (
+        <div className="rounded-4 border bg-white p-5 text-center text-muted">
+          სერვისები ჯერ არ არის დამატებული.
         </div>
       )}
 

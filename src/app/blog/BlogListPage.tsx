@@ -8,7 +8,6 @@ import { Calendar, ArrowRight } from 'lucide-react';
 import { PageResponse, PostRelation } from '@/lib/api/types';
 import { toBackendAssetUrl } from '@/lib/api/assets';
 import { slugify } from '@/lib/slugify';
-import { getAllBlogs } from '@/lib/data';
 
 function resolvePostDisplay(p: PostRelation) {
   const intro = p.blocks?.find((b) => b.type === 'post_intro');
@@ -25,7 +24,7 @@ export default function BlogListPage({ data }: { data?: PageResponse | null }) {
 
   const blogs = posts && posts.length > 0
     ? posts.map((p) => ({ ...p, ...resolvePostDisplay(p) }))
-    : getAllBlogs().map((b: any) => ({ ...b, date: b.date }));
+    : [];
 
   return (
     <div>
@@ -41,6 +40,12 @@ export default function BlogListPage({ data }: { data?: PageResponse | null }) {
 
       <section className="py-5">
         <Container>
+          {blogs.length === 0 && (
+            <div className="rounded-4 border bg-white p-5 text-center text-muted mt-4">
+              ბლოგის პოსტები ჯერ არ არის დამატებული.
+            </div>
+          )}
+
           <Row className="gy-4">
             {blogs.map((post: any, index: number) => {
               const href = `/blog/${slugify(post.slug)}`;

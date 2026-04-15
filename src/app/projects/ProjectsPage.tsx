@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { Container, Row, Col, Card, Badge, Breadcrumb, Button } from 'react-bootstrap';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'motion/react';
-import { allProjects } from '@/lib/data';
 import { Block, PostRelation } from '@/lib/api/types';
 import { toBackendAssetUrl } from '@/lib/api/assets';
 import { slugify } from '@/lib/slugify';
@@ -31,29 +30,19 @@ export default function ProjectsPage({ posts, pageTitle, pageDescription, blocks
   );
   const heroImage = toBackendAssetUrl(heroBlock?.data?.banner_image ?? heroBlock?.data?.image ?? '');
 
-  const allItems = posts && posts.length > 0
-    ? posts.map((post) => {
-      const intro = post.blocks?.find((b) => b.type === 'post_intro');
-      const rawImage = intro?.data?.post_image || post.feature_image || '';
-      return {
-        id: post.id,
-        slug: post.slug,
-        title: intro?.data?.title || post.title,
-        image: toBackendAssetUrl(rawImage) || '',
-        category: post.category || '',
-        publishedAt: post.published_at,
-        excerpt: post.excerpt,
-      };
-    })
-    : allProjects.map((project) => ({
-      id: project.id,
-      slug: String(project.id),
-      title: project.title,
-      image: project.image,
-      category: project.category || '',
-      publishedAt: project.year,
-      excerpt: project.location,
-    }));
+  const allItems = (posts ?? []).map((post) => {
+    const intro = post.blocks?.find((b) => b.type === 'post_intro');
+    const rawImage = intro?.data?.post_image || post.feature_image || '';
+    return {
+      id: post.id,
+      slug: post.slug,
+      title: intro?.data?.title || post.title,
+      image: toBackendAssetUrl(rawImage) || '',
+      category: post.category || '',
+      publishedAt: post.published_at,
+      excerpt: post.excerpt,
+    };
+  });
 
   const categories = ['ყველა', ...Array.from(new Set(allItems.map((p) => p.category).filter(Boolean)))];
   const [activeCategory, setActiveCategory] = useState('ყველა');
@@ -100,6 +89,12 @@ export default function ProjectsPage({ posts, pageTitle, pageDescription, blocks
               {cat}
             </Button>
           ))}
+        </div>
+      )}
+
+      {allItems.length === 0 && (
+        <div className="rounded-4 border bg-white p-5 text-center text-muted">
+          პროექტები ჯერ არ არის დამატებული.
         </div>
       )}
 

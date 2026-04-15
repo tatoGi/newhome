@@ -1,12 +1,10 @@
 'use client';
 
 import React from 'react';
-import { Container, Row, Col, Card, Button } from 'react-bootstrap';
+import { Container, Row, Col, Button } from 'react-bootstrap';
 import Link from 'next/link';
 import { motion } from 'motion/react';
-import { getAllBlogs } from '@/lib/data';
-import { Calendar, User, ArrowRight } from 'lucide-react';
-import { slugify } from '@/lib/slugify';
+import { Calendar, ArrowRight } from 'lucide-react';
 import { BlogSection as BlogSectionType } from '@/lib/api/types';
 import { toBackendAssetUrl } from '@/lib/api/assets';
 
@@ -15,30 +13,28 @@ interface BlogSectionProps {
 }
 
 const BlogSection: React.FC<BlogSectionProps> = ({ blogSection }) => {
-    const allHref = blogSection?.page_slug ? `/${blogSection.page_slug}` : '/blog';
     const sectionTitle = blogSection?.title || 'სიახლეები და ბლოგი';
     const sectionSubtitle = blogSection?.subtitle || 'მიიღეთ რჩევები ინტერიერის გასაუმჯობესებლად';
 
-    const blogs = blogSection?.posts && blogSection.posts.length > 0
+    const posts = (blogSection?.posts ?? []).map((p) => {
+        const intro = (p as any).blocks?.find((b: any) => b.type === 'post_intro');
+        return {
+            id: p.id,
+            slug: p.slug,
+            title: intro?.data?.title || p.title,
+            excerpt: intro?.data?.post_text || p.excerpt || '',
+            image: toBackendAssetUrl(intro?.data?.post_image || p.feature_image || '') || null,
+            date: p.published_at || '',
+            category: p.category || '',
+        };
+    });
 
-        ? blogSection.posts.map(p => {
-
-            const intro = (p as any).blocks?.find((b: any) => b.type === 'post_intro');
-            return {
-                id: p.id,
-                title: intro?.data?.title || p.title,
-                excerpt: intro?.data?.post_text || p.excerpt,
-                image: toBackendAssetUrl(intro?.data?.post_image || p.feature_image || '') || '/placeholder-blog.jpg',
-                date: p.published_at,
-                author: 'NewHome',
-                slug: p.slug,
-            };
-        })
-        : getAllBlogs();
+    if (posts.length === 0) return null;
 
     return (
         <section className="py-5 bg-light">
             <Container>
+                {/* Header */}
                 <div className="d-flex justify-content-between align-items-end mb-5">
                     <motion.div
                         initial={{ opacity: 0, x: -20 }}
@@ -53,76 +49,82 @@ const BlogSection: React.FC<BlogSectionProps> = ({ blogSection }) => {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                     >
-                        <Button as={Link as any} href={allHref} variant="link" className="text-primary text-decoration-none d-flex align-items-center gap-2 px-0">
+                        <Button as={Link as any} href="/blog" variant="link" className="text-primary text-decoration-none d-flex align-items-center gap-2 px-0">
                             ყველა პოსტი <ArrowRight size={18} />
                         </Button>
                     </motion.div>
                 </div>
 
-                <Row className="gy-4">
-                    {blogs.map((blog, index) => (
-                        <Col key={blog.id} lg={4}>
-                            <motion.div
-                                initial={{ opacity: 0, y: 30 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: index * 0.1 }}
-                            >
-                                <Card className="border-0 shadow-sm rounded-4 overflow-hidden h-100 blog-card">
-                                    <div className="position-relative overflow-hidden" style={{ height: '240px' }}>
-                                        <Card.Img
-                                            variant="top"
-                                            src={blog.image}
-                                            className="h-100 w-100 object-fit-cover transition-transform"
-                                        />
-                                        <div className="position-absolute top-0 start-0 m-3">
-                                            <span className="badge bg-white text-primary rounded-pill px-3 py-2 shadow-sm">ბლოგი</span>
-                                        </div>
-                                    </div>
-                                    <Card.Body className="p-4">
-                                        <div className="d-flex gap-3 mb-3 text-muted small">
-                                            <span className="d-flex align-items-center gap-1">
-                                                <Calendar size={14} /> {blog.date}
+                {/* Posts — horizontal card: image left, text right */}
+                <div className="d-flex flex-column gap-4">
+                    {posts.map((post, index) => (
+                        <motion.div
+                            key={post.id}
+                            initial={{ opacity: 0, y: 24 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: index * 0.1 }}
+                        >
+                            <Link href={`/blog/${post.slug}`} className="text-decoration-none">
+                                <Row className="g-0 bg-white rounded-4 shadow-sm overflow-hidden blog-row-card align-items-stretch">
+                                    {/* Image — left */}
+                                    <Col xs={12} md={4} className="position-relative" style={{ minHeight: '220px' }}>
+                                        {post.image ? (
+                                            <img
+                                                src={post.image}
+                                                alt={post.title}
+                                                className="w-100 h-100 blog-card-img"
+                                                style={{ objectFit: 'cover', display: 'block' }}
+                                            />
+                                        ) : (
+                                            <div className="w-100 h-100 bg-light d-flex align-items-center justify-content-center" style={{ minHeight: '220px' }}>
+                                                <span className="text-muted small">სურათი არ არის</span>
+                                            </div>
+                                        )}
+                                        {post.category && (
+                                            <span className="position-absolute top-0 start-0 m-3 badge bg-white text-primary rounded-pill px-3 py-2 shadow-sm">
+                                                {post.category}
                                             </span>
-                                            <span className="d-flex align-items-center gap-1">
-                                                <User size={14} /> {blog.author}
+                                        )}
+                                    </Col>
+
+                                    {/* Text — right */}
+                                    <Col xs={12} md={8} className="p-4 p-md-5 d-flex flex-column justify-content-center">
+                                        {post.date && (
+                                            <span className="text-muted small d-flex align-items-center gap-1 mb-3">
+                                                <Calendar size={13} /> {post.date}
                                             </span>
-                                        </div>
-                                        <Card.Title className="fw-bold h5 mb-3 line-clamp-2">
-                                            <Link href={`${allHref}/${slugify(blog.slug)}`} className="text-dark text-decoration-none">
-                                                {blog.title}
-                                            </Link>
-                                        </Card.Title>
-                                        <Card.Text className="text-muted small line-clamp-3 mb-4">
-                                            {blog.excerpt}
-                                        </Card.Text>
-                                        <Link href={`${allHref}/${slugify(blog.slug)}`} className="fw-bold text-primary text-decoration-none small d-inline-flex align-items-center gap-1">
+                                        )}
+                                        <h3 className="fw-bold h5 mb-3 text-dark">{post.title}</h3>
+                                        {post.excerpt && (
+                                            <p className="text-muted small mb-4" style={{
+                                                display: '-webkit-box',
+                                                WebkitLineClamp: 3,
+                                                WebkitBoxOrient: 'vertical',
+                                                overflow: 'hidden',
+                                            }}>
+                                                {post.excerpt.replace(/<[^>]*>/g, '')}
+                                            </p>
+                                        )}
+                                        <span className="fw-bold text-primary small d-inline-flex align-items-center gap-1">
                                             სრულად ნახვა <ArrowRight size={14} />
-                                        </Link>
-                                    </Card.Body>
-                                </Card>
-                            </motion.div>
-                        </Col>
+                                        </span>
+                                    </Col>
+                                </Row>
+                            </Link>
+                        </motion.div>
                     ))}
-                </Row>
+                </div>
             </Container>
-            <style jsx>{`
-        .blog-card:hover .card-img-top {
-          transform: scale(1.1);
-        }
-        .line-clamp-2 {
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-        }
-        .line-clamp-3 {
-          display: -webkit-box;
-          -webkit-line-clamp: 3;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-        }
-      `}</style>
+
+            <style dangerouslySetInnerHTML={{
+                __html: `
+                    .blog-row-card { transition: box-shadow 0.25s, transform 0.25s; }
+                    .blog-row-card:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.12) !important; transform: translateY(-2px); }
+                    .blog-card-img { transition: transform 0.4s ease; }
+                    .blog-row-card:hover .blog-card-img { transform: scale(1.04); }
+                `
+            }} />
         </section>
     );
 };

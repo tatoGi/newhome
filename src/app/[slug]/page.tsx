@@ -34,7 +34,12 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
             description: data.seo.meta_description,
             keywords: data.seo.keywords,
             alternates: {
-                canonical: data.seo.canonical_url || `https://newhome.ge/${slug}`,
+                canonical: data.seo.canonical_url || `https://newhome.ge/${decodeURIComponent(slug)}`,
+            },
+            openGraph: {
+                title: data.seo.meta_title || data.page.title,
+                description: data.seo.meta_description || undefined,
+                url: data.seo.canonical_url || `https://newhome.ge/${decodeURIComponent(slug)}`,
             },
         };
     } catch {

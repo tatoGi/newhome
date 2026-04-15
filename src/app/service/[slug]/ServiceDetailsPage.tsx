@@ -16,7 +16,7 @@ interface ServiceProps {
   blocks: any[];
 }
 
-export default function ServiceDetailsPage({ service }: { service: ServiceProps }) {
+export default function ServiceDetailsPage({ service, phone }: { service: ServiceProps; phone?: string | null }) {
   const intro = service.blocks?.find((b: any) => b.type === 'post_intro');
   const image = toBackendAssetUrl(intro?.data?.post_image || service.image || '');
   const title = intro?.data?.title || service.title;
@@ -87,10 +87,12 @@ export default function ServiceDetailsPage({ service }: { service: ServiceProps 
                   <p className="mb-4 opacity-75 lh-lg">
                     ჩვენი გუნდი მზად არის გაგიწიოთ კონსულტაცია და შეგირჩიოთ საუკეთესო ვარიანტი.
                   </p>
-                  <div className="d-flex align-items-center gap-3 mb-4 p-3 rounded" style={{ background: 'rgba(255,255,255,0.12)' }}>
-                    <Phone className="opacity-75" />
-                    <span className="fs-4 fw-medium">+995 555 12 34 56</span>
-                  </div>
+                  {phone && (
+                    <div className="d-flex align-items-center gap-3 mb-4 p-3 rounded" style={{ background: 'rgba(255,255,255,0.12)' }}>
+                      <Phone className="opacity-75" />
+                      <span className="fs-4 fw-medium">{phone}</span>
+                    </div>
+                  )}
                   <Link href="/contact" className="btn btn-light btn-lg w-100 fw-bold text-primary text-uppercase mt-2">
                     დაგვიკავშირდით
                   </Link>

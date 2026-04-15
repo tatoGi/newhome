@@ -34,6 +34,7 @@ export async function generateMetadata({ params }: {
             openGraph: {
                 title: data.seo?.meta_title || p.title,
                 description: data.seo?.meta_description || undefined,
+                url: data.seo?.canonical_url || `https://newhome.ge/blog/${decodeURIComponent(slug)}`,
                 images: p.feature_image ? [{ url: toBackendAssetUrl(p.feature_image) || '' }] : [],
             },
         };
@@ -60,9 +61,13 @@ export default async function Page({ params }: {
     const post = data.post;
     const relatedPosts = (data.relations?.posts ?? []).filter((p: any) => p.slug !== slug).slice(0, 6);
 
-    const dateStr = post.published_at
-        ? String(post.published_at)
-        : '';
+    const dateStr = post.published_at ? String(post.published_at) : '';
+
+    // Resolve content and image: prefer raw content field, fall back to post_intro block
+    const introBlock = (post.blocks ?? []).find((b: any) => b.type === 'post_intro');
+    const resolvedContent: string = post.content || introBlock?.data?.post_text || '';
+    const resolvedImage: string | null = post.feature_image
+        || (introBlock?.data?.post_image ? String(introBlock.data.post_image) : null);
 
     return (
         <div className="py-5 bg-white min-vh-100">
@@ -75,47 +80,54 @@ export default async function Page({ params }: {
                     </ol>
                 </nav>
 
-                <Row className="g-5">
-                    {/* Main content */}
-                    <Col lg={8}>
-                        <span className="badge bg-primary rounded-pill px-3 py-2 mb-3 d-inline-block">ბლოგი</span>
-                        <h1 className="display-5 fw-bold mb-4">{post.title}</h1>
-
-                        <div className="d-flex gap-4 text-muted small mb-5 pb-4 border-bottom">
-                            {dateStr && (
-                                <span className="d-flex align-items-center gap-2">
-                                    <Calendar size={16} /> {dateStr}
-                                </span>
-                            )}
+                {/* Header: badge + title + meta */}
+                <div className="mb-5">
+                    <span className="badge bg-primary rounded-pill px-3 py-2 mb-3 d-inline-block">ბლოგი</span>
+                    <h1 className="display-5 fw-bold mb-3">{post.title}</h1>
+                    <div className="d-flex gap-4 text-muted small pb-4 border-bottom">
+                        {dateStr && (
                             <span className="d-flex align-items-center gap-2">
-                                <User size={16} /> NewHome Team
+                                <Calendar size={16} /> {dateStr}
                             </span>
-                        </div>
+                        )}
+                        <span className="d-flex align-items-center gap-2">
+                            <User size={16} /> NewHome Team
+                        </span>
+                    </div>
+                </div>
 
-                        {post.feature_image && (
-                            <div className="mb-5 rounded-4 overflow-hidden shadow-sm">
+                <Row className="g-5">
+                    {/* Image — left */}
+                    {resolvedImage && (
+                        <Col lg={5} className="d-flex align-items-start">
+                            <div className="rounded-4 overflow-hidden shadow-sm w-100 sticky-top" style={{ top: '100px' }}>
                                 <img
-                                    src={toBackendAssetUrl(post.feature_image) || post.feature_image}
+                                    src={toBackendAssetUrl(resolvedImage) || resolvedImage}
                                     alt={post.title}
-                                    className="w-100 h-auto"
+                                    className="w-100 h-auto d-block"
                                 />
                             </div>
+                        </Col>
+                    )}
+
+                    {/* Content — right */}
+                    <Col lg={resolvedImage ? 7 : 8}>
+                        {resolvedContent ? (
+                            <div
+                                className="blog-content"
+                                dangerouslySetInnerHTML={{ __html: resolvedContent }}
+                            />
+                        ) : (
+                            <p className="text-muted">კონტენტი ჯერ არ არის დამატებული.</p>
                         )}
 
-                        <div
-                            className="blog-content"
-                            dangerouslySetInnerHTML={{ __html: post.content }}
-                        />
-                    </Col>
-
-                    {/* Sidebar */}
-                    {relatedPosts.length > 0 && (
-                        <Col lg={4}>
-                            <div className="sticky-top" style={{ top: '100px' }}>
-                                <h5 className="fw-bold mb-3 pb-2 border-bottom">მსგავსი სტატიები</h5>
+                        {/* Related posts below content */}
+                        {relatedPosts.length > 0 && (
+                            <div className="mt-5 pt-4 border-top">
+                                <h5 className="fw-bold mb-3">მსგავსი სტატიები</h5>
                                 <Row className="g-3">
                                     {relatedPosts.map((p: any) => (
-                                        <Col key={p.slug} xs={6}>
+                                        <Col key={p.slug} xs={6} md={4}>
                                             <Link href={`/blog/${p.slug}`} className="text-decoration-none text-dark d-block">
                                                 <div className="rounded-3 overflow-hidden mb-2" style={{ height: 110, backgroundColor: '#f5f5f5' }}>
                                                     {p.feature_image ? (
@@ -140,8 +152,8 @@ export default async function Page({ params }: {
                                     ))}
                                 </Row>
                             </div>
-                        </Col>
-                    )}
+                        )}
+                    </Col>
                 </Row>
             </Container>
 

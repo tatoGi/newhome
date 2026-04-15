@@ -1,11 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Container, Row, Col, Form, Accordion, Breadcrumb } from 'react-bootstrap';
 import { Check } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
 import { Block, ProductRelation } from '@/lib/api/types';
-import { api } from '@/lib/api/client';
 
 
 interface ProductsPageProps {
@@ -76,40 +75,9 @@ export default function ProductsPage({
   const [selectedMaterials, setSelectedMaterials] = useState<string[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [showSaleOnly, setShowSaleOnly] = useState(false);
-  const [sort, setSort] = useState('Newest');
-  const [products, setProducts] = useState<ProductRelation[]>(initialProducts || []);
+  const [sort, setSort] = useState('Default');
 
-  const sortedBlocks = [...(blocks ?? [])].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
-
-  // Fetch product details on client side
-  useEffect(() => {
-    const fetchProductDetails = async () => {
-      if (!initialProducts || initialProducts.length === 0) return;
-      try {
-        const productsWithDetails = await Promise.all(
-          initialProducts.map(async (product) => {
-            try {
-              const detailResponse = await api.getProduct(product.slug);
-              return {
-                ...product,
-                colors: detailResponse.product.colors || [],
-                is_featured: detailResponse.product.is_featured || false,
-                content: detailResponse.product.content || undefined,
-              };
-            } catch (error) {
-              console.error(`Client-side: Failed to fetch details for product ${product.slug}:`, error);
-              return product;
-            }
-          })
-        );
-        setProducts(productsWithDetails);
-      } catch (error) {
-        console.error('Client-side: Error fetching product details:', error);
-      }
-    };
-
-    fetchProductDetails();
-  }, [initialProducts]);
+  const products = initialProducts || [];
   const cmsProducts: ProductListItem[] = products?.map((product) => {
     const galleryImages = extractProductGalleryImages(product.blocks);
 
@@ -172,7 +140,8 @@ export default function ProductsPage({
     .sort((a, b) => {
       if (sort === 'PriceLow') return a.price - b.price;
       if (sort === 'PriceHigh') return b.price - a.price;
-      return b.id - a.id;
+      if (sort === 'Newest') return b.id - a.id;
+      return 0; // Default: preserve backend sort_order
     });
 
   return (
@@ -194,6 +163,7 @@ export default function ProductsPage({
           value={sort}
           onChange={(e) => setSort(e.target.value)}
         >
+          <option value="Default">დახარისხება: სტანდარტული</option>
           <option value="Newest">დახარისხება: უახლესი</option>
           <option value="PriceLow">ფასი: ზრდადი</option>
           <option value="PriceHigh">ფასი: კლებადი</option>

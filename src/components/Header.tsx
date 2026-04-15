@@ -114,6 +114,15 @@ const Header: React.FC = () => {
     setShowLanguageDropdown(false);
   };
 
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearchSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const q = searchQuery.trim();
+    if (!q) return;
+    router.push(`/search?q=${encodeURIComponent(q)}`);
+  };
+
   const closeMenu = () => {
     setShowMenu(false);
     setShowLanguageDropdown(false);
@@ -143,16 +152,18 @@ const Header: React.FC = () => {
               </Link>
 
               <div className="site-header-search-shell d-none d-md-flex flex-grow-1 mx-3">
-                <div className="input-group">
+                <form className="input-group" onSubmit={handleSearchSubmit}>
                   <input
                     type="text"
                     className="site-header-search-input form-control bg-light border-0 shadow-none px-3 py-2"
                     placeholder="ძებნა..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
                   />
-                  <button className="site-header-search-button btn bg-light border-0 px-3" aria-label="ძებნა">
+                  <button type="submit" className="site-header-search-button btn bg-light border-0 px-3" aria-label="ძებნა">
                     <Search size={18} className="text-muted" />
                   </button>
-                </div>
+                </form>
               </div>
 
               <HeaderActions

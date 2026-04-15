@@ -13,8 +13,13 @@ const extractProductGalleryImages = (blocks: Array<{ type?: string; data?: Recor
     });
 
 export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
-  // Purely dynamic - no static params
-  return [];
+  try {
+    const { api: apiClient } = await import('@/lib/api/client');
+    const data = await apiClient.getProducts();
+    return (data.products ?? []).map((p) => ({ slug: p.slug }));
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({ params, searchParams }: {
@@ -35,6 +40,7 @@ export async function generateMetadata({ params, searchParams }: {
       openGraph: {
         title: data.seo?.meta_title || p.title,
         description: data.seo?.meta_description || `${p.title} — ${p.price} ₾. NewHome.ge-ზე შეიძინეთ საუკეთესო ხარისხის ავეჯი და განათება.`,
+        url: data.seo?.canonical_url || `https://newhome.ge/product/${decodeURIComponent(slug)}`,
         images: [{ url: toBackendAssetUrl(p.feature_image), width: 1200, height: 800 }],
       },
     };

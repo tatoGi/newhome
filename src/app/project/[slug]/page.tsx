@@ -10,6 +10,18 @@ interface PageProps {
   searchParams: Promise<{ locale?: string }>;
 }
 
+export async function generateStaticParams() {
+  try {
+    const bootstrap = await api.getBootstrap();
+    const route = bootstrap.routeMap.find((r) => r.template === 'project' || r.template === 'projects');
+    if (!route) return [];
+    const data = await api.getPage(route.slug);
+    return (data.relations?.posts ?? []).map((p) => ({ slug: p.slug }));
+  } catch {
+    return [];
+  }
+}
+
 export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
   try {
     const { slug } = await params;
@@ -26,6 +38,7 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
       openGraph: {
         title: data.seo?.meta_title || title,
         description: data.seo?.meta_description || undefined,
+        url: data.seo?.canonical_url || `https://newhome.ge/project/${decodeURIComponent(slug)}`,
         images: image ? [{ url: image }] : [],
       },
     };

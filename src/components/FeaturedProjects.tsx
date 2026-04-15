@@ -98,7 +98,7 @@ const FeaturedProjects: React.FC<FeaturedProjectsProps> = ({ projects: propProje
                                             </div>
                                             <h3 className={`${index === 0 ? 'display-5' : 'h2'} fw-bold mb-3`}>{project.title}</h3>
                                             <p className={`mb-4 opacity-80 line-clamp-2 ${index === 0 ? 'lead mw-50' : 'small'}`}>
-                                                {project.desc}
+                                                {project.desc.replace(/<[^>]*>/g, '')}
                                             </p>
                                             <div className="d-inline-flex align-items-center gap-2 border-bottom border-white pb-1 fw-bold text-uppercase tracking-widest small">
                                                 პროექტის ნახვა <ArrowRight size={16} />

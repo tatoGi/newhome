@@ -17,12 +17,19 @@ import {
     ProductResponse,
     ProductRelation,
     SavedCard,
+    SearchResult,
 } from './types';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/web';
 
 export async function fetchApi<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${BASE_URL}${endpoint}`;
+
+    // Allow callers to override `next` revalidation; fall back to env-based default
+    const defaultNext = process.env.NODE_ENV === 'development'
+        ? { revalidate: 0 }
+        : { revalidate: 3600 };
+    const nextOption = (options as { next?: { revalidate?: number } }).next ?? defaultNext;
 
     const response = await fetch(url, {
         ...options,
@@ -31,10 +38,8 @@ export async function fetchApi<T>(endpoint: string, options: RequestInit = {}): 
             'Content-Type': 'application/json',
             ...options.headers,
         },
-        next: process.env.NODE_ENV === 'development'
-            ? { revalidate: 0 }
-            : { revalidate: 3600 },
-    });
+        next: nextOption,
+    } as RequestInit);
 
     if (!response.ok) {
         const errorBody = await response.text();
@@ -78,8 +83,8 @@ export const api = {
      */
     async getBootstrap(locale?: string): Promise<BootstrapResponse> {
         const query = locale ? `?locale=${locale}` : '';
-        return fetchApi<BootstrapResponse>(`/bootstrap${query}`);
-
+        // Always fetch fresh — navigation/menu order can change via admin reorder
+        return fetchApi<BootstrapResponse>(`/bootstrap${query}`, { next: { revalidate: 0 } } as unknown as RequestInit);
     },
 
     /**
@@ -125,6 +130,12 @@ export const api = {
     /**
      * All published products listing
      */
+    async search(query: string, locale?: string): Promise<{ query: string; results: SearchResult[] }> {
+        const params = new URLSearchParams({ q: query });
+        if (locale) params.set('locale', locale);
+        return fetchApi<{ query: string; results: SearchResult[] }>(`/search?${params.toString()}`);
+    },
+
     async getProducts(locale?: string): Promise<{ products: ProductRelation[] }> {
         const query = locale ? `?locale=${locale}` : '';
         return fetchApi<{ products: ProductRelation[] }>(`/products${query}`);
