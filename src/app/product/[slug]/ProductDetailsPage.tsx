@@ -53,7 +53,7 @@ export default function ProductDetailsPage({ product }: { product: ProductDetail
         <div
           className="position-relative overflow-hidden"
           style={{
-            minHeight: '320px',
+            minHeight: '500px',
             backgroundImage: `url(${product.coverImage})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
@@ -63,7 +63,7 @@ export default function ProductDetailsPage({ product }: { product: ProductDetail
             className="position-absolute top-0 start-0 w-100 h-100"
             style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.2))' }}
           />
-          <Container className="position-relative text-white py-5" style={{ minHeight: '320px' }}>
+          <Container className="position-relative text-white py-5" style={{ minHeight: '500px' }}>
             <div className="d-flex flex-column justify-content-end h-100">
               <div className="mb-4 d-flex align-items-center small opacity-75">
                 <Link href="/" className="text-white text-decoration-none">მთავარი</Link>
@@ -116,6 +116,19 @@ export default function ProductDetailsPage({ product }: { product: ProductDetail
               {/* Details */}
               <Col lg={5}>
                 <div className="ps-lg-4">
+                  {product.featured && (
+                    <span
+                      className="badge d-inline-flex align-items-center gap-1 px-2 py-1 fw-bold text-white mb-2"
+                      style={{
+                        background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                        fontSize: '0.75rem',
+                        borderRadius: '4px',
+                        boxShadow: '0 2px 6px rgba(217,119,6,0.4)',
+                      }}
+                    >
+                      ★ VIP
+                    </span>
+                  )}
                   <div className="d-flex justify-content-between align-items-start mb-2">
                     <h1 className="fw-bold fs-2">{product.name}</h1>
                     <button className="btn btn-light rounded-circle border-0 d-flex align-items-center justify-content-center mt-1"

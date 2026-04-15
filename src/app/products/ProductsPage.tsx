@@ -141,7 +141,10 @@ export default function ProductsPage({
       if (sort === 'PriceLow') return a.price - b.price;
       if (sort === 'PriceHigh') return b.price - a.price;
       if (sort === 'Newest') return b.id - a.id;
-      return 0; // Default: preserve backend sort_order
+      // Default: featured (VIP) first, then newest — mirrors admin panel order
+      const featuredDiff = (b.featured ? 1 : 0) - (a.featured ? 1 : 0);
+      if (featuredDiff !== 0) return featuredDiff;
+      return b.id - a.id;
     });
 
   return (
