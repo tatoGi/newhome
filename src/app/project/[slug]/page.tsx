@@ -1,76 +1,45 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { api } from '@/lib/api/client';
-import { toBackendAssetUrl } from '@/lib/api/assets';
 import ProjectDetailsPage from './ProjectDetailsPage';
-import { getServerLocale } from '@/lib/locale';
+import { getAllProjects } from '@/lib/data';
 
-interface PageProps {
-  params: Promise<{ slug: string }>;
-  searchParams: Promise<{ locale?: string }>;
+export function generateStaticParams() {
+  return getAllProjects().map(p => ({ slug: p.slug }));
 }
 
-export async function generateStaticParams() {
-  try {
-    const bootstrap = await api.getBootstrap();
-    const route = bootstrap.routeMap.find((r) => r.template === 'project' || r.template === 'projects');
-    if (!route) return [];
-    const data = await api.getPage(route.slug);
-    return (data.relations?.posts ?? []).map((p) => ({ slug: p.slug }));
-  } catch {
-    return [];
-  }
-}
-
-export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
-  try {
-    const { slug } = await params;
-    const { locale: queryLocale } = await searchParams;
-    const locale = queryLocale || await getServerLocale() || undefined;
-    const data = await api.getProject(slug, locale);
-    const intro = data.post.blocks?.find((b: any) => b.type === 'post_intro');
-    const title = intro?.data?.title || data.post.title;
-    const image = toBackendAssetUrl(intro?.data?.post_image || data.post.feature_image || '');
-    return {
-      title: data.seo?.meta_title || title,
-      description: data.seo?.meta_description || data.post.excerpt || undefined,
-      alternates: { canonical: data.seo?.canonical_url || `https://newhome.ge/project/${slug}` },
-      openGraph: {
-        title: data.seo?.meta_title || title,
-        description: data.seo?.meta_description || undefined,
-        url: data.seo?.canonical_url || `https://newhome.ge/project/${decodeURIComponent(slug)}`,
-        images: image ? [{ url: image }] : [],
-      },
-    };
-  } catch {
-    return { title: 'პროექტი' };
-  }
-}
-
-export default async function Page({ params, searchParams }: PageProps) {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const { locale: queryLocale } = await searchParams;
-  const locale = queryLocale || await getServerLocale() || undefined;
+  const p = getAllProjects().find(p => p.slug === slug);
+  if (!p) return { title: 'პროექტი' };
+  return {
+    title: p.title,
+    description: p.desc,
+    alternates: { canonical: `https://homespace.ge/project/${slug}` },
+    openGraph: {
+      title: p.title,
+      description: p.desc,
+      url: `https://homespace.ge/project/${slug}`,
+      images: p.image ? [{ url: p.image }] : [],
+    },
+  };
+}
 
-  let data;
-  try {
-    data = await api.getProject(slug, locale);
-  } catch {
-    notFound();
-  }
+export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const p = getAllProjects().find(p => p.slug === slug);
 
-  if (!data?.post) notFound();
+  if (!p) notFound();
 
   const project = {
-    id: data.post.id,
-    slug: data.post.slug ?? slug,
-    title: data.post.title,
-    desc: data.post.content || data.post.excerpt,
-    images: [data.post.feature_image].filter(Boolean) as string[],
-    category: data.post.category || '',
-    year: data.post.published_at || '',
-    location: '',
-    blocks: data.post.blocks || [],
+    id: p.id,
+    slug: p.slug,
+    title: p.title,
+    desc: p.desc,
+    images: p.images ?? [p.image],
+    category: p.category,
+    year: p.year,
+    location: p.location,
+    blocks: [],
   };
 
   return <ProjectDetailsPage project={project} />;

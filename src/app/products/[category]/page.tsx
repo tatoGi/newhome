@@ -1,41 +1,39 @@
 import type { Metadata } from 'next';
-import { api } from '@/lib/api/client';
 import ProductsPage from '../ProductsPage';
-import { ProductRelation } from '@/lib/api/types';
-import { getServerLocale } from '@/lib/locale';
+import { getAllProducts } from '@/lib/data';
+import type { ProductRelation } from '@/lib/api/types';
 
 export async function generateStaticParams() {
-  return [];
+  const products = getAllProducts();
+  const categories = [...new Set(products.map(p => p.category))];
+  return categories.map(category => ({ category: encodeURIComponent(category) }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ category: string }> }): Promise<Metadata> {
   const { category } = await params;
+  const decoded = decodeURIComponent(category);
   return {
-    title: category,
-    description: `${category} — NewHome.ge-ს კოლექცია.`,
+    title: decoded,
+    description: `${decoded} — NewHome.ge-ს კოლექცია.`,
     alternates: { canonical: `https://newhome.ge/products/${category}` },
   };
 }
 
-export default async function Page({
-  params,
-  searchParams,
-}: {
-  params: Promise<{ category: string }>;
-  searchParams: Promise<{ locale?: string }>;
-}) {
+export default async function Page({ params }: { params: Promise<{ category: string }> }) {
   const { category } = await params;
-  const { locale } = await searchParams;
-  const serverLocale = locale || await getServerLocale() || undefined;
+  const products: ProductRelation[] = getAllProducts().map(p => ({
+    id: p.id,
+    slug: p.slug,
+    title: p.name,
+    price: p.price,
+    old_price: p.oldPrice ?? null,
+    on_sale: p.sale ?? false,
+    brand: '',
+    feature_image: p.image,
+    category: p.category,
+    colors: p.colors ?? [],
+    blocks: [],
+  }));
 
-  let products: ProductRelation[] = [];
-
-  try {
-    const data = await api.getProducts(serverLocale);
-    products = data.products ?? [];
-  } catch {
-    products = [];
-  }
-
-  return <ProductsPage products={products} initialCategory={category} />;
+  return <ProductsPage products={products} initialCategory={decodeURIComponent(category)} />;
 }
