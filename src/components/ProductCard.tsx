@@ -79,8 +79,18 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
         )}
 
         {product.featured && (
-          <span className="position-absolute top-0 end-0 ms-2 mt-2 badge bg-warning text-dark rounded-0 px-2 py-1 fs-6 z-2" style={{ marginRight: '50px' }}>
-            VIP
+          <span
+            className="position-absolute top-0 start-0 m-2 z-2 d-flex align-items-center gap-1 px-2 py-1 fw-bold text-white"
+            style={{
+              background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+              fontSize: '0.7rem',
+              letterSpacing: '0.06em',
+              borderRadius: '4px',
+              marginTop: product.sale ? '2rem' : undefined,
+              boxShadow: '0 2px 6px rgba(217,119,6,0.4)',
+            }}
+          >
+            ★ VIP
           </span>
         )}
 
