@@ -53,7 +53,7 @@ export default function ProductDetailsPage({
   const [showSlider, setShowSlider] = useState(false);
   const [quantity, setQuantity] = useState(1);
 
-  const shareUrl = typeof window !== 'undefined' ? window.location.href : `https://homespace.ge/product/${product.slug}`;
+  const shareUrl = `https://homespace.ge/product/${product.slug}`;
   const encodedUrl = encodeURIComponent(shareUrl);
   const encodedTitle = encodeURIComponent(product.name);
 
