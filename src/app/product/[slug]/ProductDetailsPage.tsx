@@ -90,9 +90,9 @@ export default function ProductDetailsPage({ product }: { product: ProductDetail
           <div className="bg-white p-4 p-md-5 rounded shadow-sm mb-5">
             <Row className="gy-5">
               {/* Images */}
-              <Col lg={6}>
+              <Col lg={7}>
                 <div className="d-flex flex-column gap-3">
-                  <div className="rounded overflow-hidden position-relative" style={{ cursor: 'pointer', height: '500px', backgroundColor: '#f8f9fa' }} onClick={() => setShowSlider(true)}>
+                  <div className="rounded overflow-hidden position-relative" style={{ cursor: 'pointer', height: '560px', backgroundColor: '#f8f9fa' }} onClick={() => setShowSlider(true)}>
                     <img src={product.images[activeImageIndex]} alt={product.name} className="w-100 h-100 object-fit-cover"
                       style={{ transition: 'transform 0.3s ease' }}
                       onMouseOver={e => (e.currentTarget.style.transform = 'scale(1.05)')}
@@ -114,7 +114,7 @@ export default function ProductDetailsPage({ product }: { product: ProductDetail
               </Col>
 
               {/* Details */}
-              <Col lg={6}>
+              <Col lg={5}>
                 <div className="ps-lg-4">
                   <div className="d-flex justify-content-between align-items-start mb-2">
                     <h1 className="fw-bold fs-2">{product.name}</h1>
