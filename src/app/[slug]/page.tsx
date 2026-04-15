@@ -32,9 +32,9 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
         const data = await api.getPage(slug, locale);
         return buildPageMetadata({
             title: data.seo.meta_title || data.page.title,
-            description: data.seo.meta_description,
+            description: data.seo.meta_description || undefined,
             canonical: data.seo.canonical_url || `https://homespace.ge/${decodeURIComponent(slug)}`,
-            keywords: data.seo.keywords,
+            keywords: data.seo.keywords || undefined,
             image: data.seo.og_image || data.seo.social_image || undefined,
             url: data.seo.canonical_url || `https://homespace.ge/${decodeURIComponent(slug)}`,
         });
