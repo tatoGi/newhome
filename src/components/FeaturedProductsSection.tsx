@@ -28,7 +28,7 @@ export default function FeaturedProductsSection({ products }: FeaturedProductsSe
   const allProductsHref = productsPage ? `/${productsPage.slug}` : '/products';
 
   const items = products && products.length > 0
-    ? products.map((p) => ({ id: p.id, name: p.title, price: p.price, image: resolveProductImage(p), category: p.category, slug: p.slug }))
+    ? products.map((p) => ({ id: p.id, name: p.title, price: p.price, image: resolveProductImage(p), category: p.category, slug: p.slug, featured: p.is_featured, sale: p.on_sale, oldPrice: p.old_price ?? undefined, colors: p.colors ?? [] }))
     : allProducts.slice(0, 4);
 
   return (
