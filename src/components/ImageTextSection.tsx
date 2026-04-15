@@ -13,7 +13,7 @@ interface ImageTextSectionProps {
 }
 
 const DEFAULTS = {
-  title: 'NewHome - თქვენი სახლის დიზაინის პარტნიორი',
+  title: 'HomeSpace - თქვენი სახლის დიზაინის პარტნიორი',
   desc: 'ჩვენი მისიაა შევქმნათ გარემო, რომელიც ასახავს თქვენს ინდივიდუალურობას. 10 წლიანი გამოცდილება ინტერიერის დიზაინსა და ავეჯის წარმოებაში.',
   image: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1000&q=80',
   linkFirst: '/projects',

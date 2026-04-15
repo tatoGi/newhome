@@ -3,12 +3,14 @@ import { api } from '@/lib/api/client';
 import ProductsPage from './ProductsPage';
 import { ProductRelation } from '@/lib/api/types';
 import { getServerLocale } from '@/lib/locale';
+import { buildPageMetadata } from '@/lib/metadata';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: 'პროდუქცია',
   description: 'ავეჯი, განათება და ინტერიერის სხვა ელემენტები.',
-  alternates: { canonical: 'https://newhome.ge/products' },
-};
+  canonical: 'https://homespace.ge/products',
+  keywords: ['პროდუქცია', 'ავეჯი', 'განათება', 'ინტერიერი', 'HomeSpace'],
+});
 
 export default async function Page({ searchParams }: { searchParams: Promise<{ locale?: string }> }) {
   const { locale } = await searchParams;

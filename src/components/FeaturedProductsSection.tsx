@@ -1,12 +1,10 @@
 'use client';
 
-import React from 'react';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import Link from 'next/link';
 import { motion } from 'motion/react';
 import { ArrowRight } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
-import { allProducts } from '@/lib/data';
 import { ProductRelation } from '@/lib/api/types';
 import { useBootstrap } from '@/context/BootstrapContext';
 import { toBackendAssetUrl } from '@/lib/api/assets';
@@ -27,9 +25,20 @@ export default function FeaturedProductsSection({ products }: FeaturedProductsSe
   const productsPage = routeMap?.find((r) => r.template === 'products' || r.template === 'shop');
   const allProductsHref = productsPage ? `/${productsPage.slug}` : '/products';
 
-  const items = products && products.length > 0
-    ? products.map((p) => ({ id: p.id, name: p.title, price: p.price, image: resolveProductImage(p), category: p.category, slug: p.slug, featured: p.is_featured, sale: p.on_sale, oldPrice: p.old_price ?? undefined, colors: p.colors ?? [] }))
-    : allProducts.slice(0, 4);
+  if (!products || products.length === 0) return null;
+
+  const items = products.map((p) => ({
+    id: p.id,
+    name: p.title,
+    price: p.price,
+    image: resolveProductImage(p),
+    category: p.category,
+    slug: p.slug,
+    featured: p.is_featured,
+    sale: p.on_sale,
+    oldPrice: p.old_price ?? undefined,
+    colors: p.colors ?? [],
+  }));
 
   return (
     <section className="py-5">

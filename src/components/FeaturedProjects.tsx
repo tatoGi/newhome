@@ -1,10 +1,8 @@
 'use client';
 
-import React from 'react';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import Link from 'next/link';
 import { motion } from 'motion/react';
-import { allProjects } from '@/lib/data';
 import { ArrowRight, MapPin } from 'lucide-react';
 import { slugify } from '@/lib/slugify';
 import { ProjectSection } from '@/lib/api/types';
@@ -15,26 +13,26 @@ interface FeaturedProjectsProps {
     projectSection?: ProjectSection | null;
 }
 
-/** Extracts image/title/desc/location from a post's blocks (post_intro) with fallbacks. */
+/** Strip markdown heading syntax (##, ###, etc.) and trim. */
+function stripMarkdown(text: string): string {
+    return text.replace(/^#+\s*/, '').trim();
+}
+
 function resolvePostDisplay(post: any): { title: string; desc: string; image: string; location: string } {
     const introBlock = post.blocks?.find((b: any) => b.type === 'post_intro');
-
-    const title = introBlock?.data?.title || post.title || '';
-    const desc = introBlock?.data?.post_text || post.excerpt || '';
+    const rawTitle = introBlock?.data?.title || post.title || '';
+    const title = stripMarkdown(String(rawTitle));
+    const desc = String(introBlock?.data?.post_text || post.excerpt || '').replace(/<[^>]*>/g, '');
     const rawImage = introBlock?.data?.post_image || post.feature_image || '';
-    const location = introBlock?.data?.location || introBlock?.data?.post_location || 'თბილისი';
-    return { title, desc, image: toBackendAssetUrl(rawImage) || '/placeholder-project.jpg', location };
+    const location = String(introBlock?.data?.location || introBlock?.data?.post_location || '');
+    return { title, desc, image: toBackendAssetUrl(rawImage) || '', location };
 }
 
 const FeaturedProjects: React.FC<FeaturedProjectsProps> = ({ projects: propProjects, projectSection }) => {
-    const sectionTitle = projectSection?.title || 'რჩეული პროექტები';
-    const sectionSubtitle = projectSection?.subtitle || 'ჩვენი დასრულებული სამუშაოები და შთაგონება';
-
     const apiPosts = projectSection?.posts;
+    const sortByNewest = (arr: any[]) => [...arr].sort((a, b) => (b.id ?? 0) - (a.id ?? 0));
 
     let projects: { id: any; title: string; desc: string; image: string; location: string; slug: string }[];
-
-    const sortByNewest = (arr: any[]) => [...arr].sort((a, b) => (b.id ?? 0) - (a.id ?? 0));
 
     if (apiPosts && apiPosts.length > 0) {
         projects = sortByNewest(apiPosts).slice(0, 3).map((p: any) => {
@@ -47,8 +45,11 @@ const FeaturedProjects: React.FC<FeaturedProjectsProps> = ({ projects: propProje
             return { id: p.id, title: d.title, desc: d.desc, image: d.image, location: d.location, slug: p.slug as string };
         });
     } else {
-        projects = sortByNewest(allProjects as any[]).slice(0, 3);
+        return null;
     }
+
+    const sectionTitle = projectSection?.title || 'რჩეული პროექტები';
+    const sectionSubtitle = projectSection?.subtitle || 'ჩვენი დასრულებული სამუშაოები და შთაგონება';
 
     return (
         <section className="py-5 overflow-hidden">
@@ -84,22 +85,31 @@ const FeaturedProjects: React.FC<FeaturedProjectsProps> = ({ projects: propProje
                                 className="project-highlight-card"
                             >
                                 <Link href={`/project/${slugify(project.slug)}`} className="text-decoration-none group">
-                                    <div className={`position-relative overflow-hidden rounded-4 shadow-lg ${index === 0 ? 'ratio ratio-21x9' : 'ratio ratio-16x9'}`}>
-                                        <img
-                                            src={project.image}
-                                            alt={project.title}
-                                            className="object-fit-cover transition-transform duration-700 hover-scale-110"
-                                        />
+                                    <div
+                                        className={`position-relative overflow-hidden rounded-4 shadow-lg ${index === 0 ? 'ratio ratio-21x9' : 'ratio ratio-16x9'}`}
+                                        style={!project.image ? { background: 'linear-gradient(135deg, #0F2E47 0%, #1a4a6e 100%)' } : undefined}
+                                    >
+                                        {project.image && (
+                                            <img
+                                                src={project.image}
+                                                alt={project.title}
+                                                className="object-fit-cover transition-transform duration-700 hover-scale-110"
+                                            />
+                                        )}
                                         <div className="position-absolute inset-0 bg-gradient-to-t from-black opacity-60" />
                                         <div className="position-absolute bottom-0 start-0 p-4 p-md-5 text-white w-100">
-                                            <div className="d-flex align-items-center gap-2 mb-2 opacity-80">
-                                                <MapPin size={16} />
-                                                <span className="small text-uppercase tracking-wider">{project.location}</span>
-                                            </div>
+                                            {project.location && (
+                                                <div className="d-flex align-items-center gap-2 mb-2 opacity-80">
+                                                    <MapPin size={16} />
+                                                    <span className="small text-uppercase tracking-wider">{project.location}</span>
+                                                </div>
+                                            )}
                                             <h3 className={`${index === 0 ? 'display-5' : 'h2'} fw-bold mb-3`}>{project.title}</h3>
-                                            <p className={`mb-4 opacity-80 line-clamp-2 ${index === 0 ? 'lead mw-50' : 'small'}`}>
-                                                {project.desc.replace(/<[^>]*>/g, '')}
-                                            </p>
+                                            {project.desc && (
+                                                <p className={`mb-4 opacity-80 line-clamp-2 ${index === 0 ? 'lead mw-50' : 'small'}`}>
+                                                    {project.desc}
+                                                </p>
+                                            )}
                                             <div className="d-inline-flex align-items-center gap-2 border-bottom border-white pb-1 fw-bold text-uppercase tracking-widest small">
                                                 პროექტის ნახვა <ArrowRight size={16} />
                                             </div>
@@ -112,21 +122,11 @@ const FeaturedProjects: React.FC<FeaturedProjectsProps> = ({ projects: propProje
                 </Row>
             </Container>
             <style jsx>{`
-        .mw-50 {
-          max-width: 600px;
-        }
-        .duration-700 {
-          transition-duration: 700ms;
-        }
-        .hover-scale-110:hover {
-          transform: scale(1.05);
-        }
-        .inset-0 {
-          top: 0; right: 0; bottom: 0; left: 0;
-        }
-        .bg-gradient-to-t {
-          background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
-        }
+        .mw-50 { max-width: 600px; }
+        .duration-700 { transition-duration: 700ms; }
+        .hover-scale-110:hover { transform: scale(1.05); }
+        .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+        .bg-gradient-to-t { background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); }
         .line-clamp-2 {
           display: -webkit-box;
           -webkit-line-clamp: 2;

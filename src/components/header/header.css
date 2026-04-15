@@ -4,10 +4,17 @@
 
 .site-header-logo {
   height: 100%;
-  width: 100%;
-  max-width: 220px;
+  width: auto;
+  max-width: 160px;
   object-fit: contain;
-  max-height: 120px;
+  max-height: 52px;
+}
+
+@media (min-width: 768px) {
+  .site-header-logo {
+    max-width: 220px;
+    max-height: 80px;
+  }
 }
 
 .site-header-search-input {
@@ -162,8 +169,9 @@
 }
 
 .mobile-header-logo {
-  height: 100%;
-  width: 100%;
-  max-width: 170px;
+  height: auto;
+  width: auto;
+  max-width: 130px;
+  max-height: 48px;
   object-fit: contain;
 }

@@ -4,6 +4,7 @@ import { api } from '@/lib/api/client';
 import { toBackendAssetUrl } from '@/lib/api/assets';
 import ProjectDetailsPage from './ProjectDetailsPage';
 import { getServerLocale } from '@/lib/locale';
+import { buildPageMetadata } from '@/lib/metadata';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -31,19 +32,20 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
     const intro = data.post.blocks?.find((b: any) => b.type === 'post_intro');
     const title = intro?.data?.title || data.post.title;
     const image = toBackendAssetUrl(intro?.data?.post_image || data.post.feature_image || '');
-    return {
+    return buildPageMetadata({
       title: data.seo?.meta_title || title,
       description: data.seo?.meta_description || data.post.excerpt || undefined,
-      alternates: { canonical: data.seo?.canonical_url || `https://newhome.ge/project/${slug}` },
-      openGraph: {
-        title: data.seo?.meta_title || title,
-        description: data.seo?.meta_description || undefined,
-        url: data.seo?.canonical_url || `https://newhome.ge/project/${decodeURIComponent(slug)}`,
-        images: image ? [{ url: image }] : [],
-      },
-    };
+      canonical: data.seo?.canonical_url || `https://homespace.ge/project/${slug}`,
+      keywords: data.seo?.keywords,
+      image: image || undefined,
+    });
   } catch {
-    return { title: 'პროექტი' };
+    return buildPageMetadata({
+      title: 'პროექტი',
+      description: 'HomeSpace პროექტი',
+      canonical: 'https://homespace.ge/project',
+      keywords: ['პროექტი', 'HomeSpace'],
+    });
   }
 }
 

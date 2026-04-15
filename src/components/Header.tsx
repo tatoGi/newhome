@@ -148,7 +148,7 @@ const Header: React.FC = () => {
           <Container>
             <div className="d-flex justify-content-between align-items-center gap-2">
               <Link href="/" className="text-decoration-none flex-shrink-0">
-                <img src={headerLogo} alt="NewHome" className="site-header-logo" />
+                <img src={headerLogo} alt="HomeSpace" className="site-header-logo" />
               </Link>
 
               <div className="site-header-search-shell d-none d-md-flex flex-grow-1 mx-3">

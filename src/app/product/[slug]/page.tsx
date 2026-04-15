@@ -3,6 +3,7 @@ import { api } from '@/lib/api/client';
 import ProductDetailsPage from './ProductDetailsPage';
 import ProductJsonLd from '@/components/ProductJsonLd';
 import { toBackendAssetUrl } from '@/lib/api/assets';
+import { buildPageMetadata } from '@/lib/metadata';
 
 const extractProductGalleryImages = (blocks: Array<{ type?: string; data?: Record<string, unknown> }> = []): string[] =>
   blocks
@@ -14,8 +15,7 @@ const extractProductGalleryImages = (blocks: Array<{ type?: string; data?: Recor
 
 export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
   try {
-    const { api: apiClient } = await import('@/lib/api/client');
-    const data = await apiClient.getProducts();
+    const data = await api.getProducts();
     return (data.products ?? []).map((p) => ({ slug: p.slug }));
   } catch {
     return [];
@@ -28,28 +28,25 @@ export async function generateMetadata({ params, searchParams }: {
 }): Promise<Metadata> {
   const { slug } = await params;
   const { locale } = await searchParams;
-  
+
   try {
     const data = await api.getProduct(slug, locale);
     const p = data.product;
-
-    return {
+    return buildPageMetadata({
       title: data.seo?.meta_title || p.title,
-      description: data.seo?.meta_description || `${p.title} — ${p.price} ₾. NewHome.ge-ზე შეიძინეთ საუკეთესო ხარისხის ავეჯი და განათება.`,
-      alternates: { canonical: data.seo?.canonical_url || `https://newhome.ge/product/${slug}` },
-      openGraph: {
-        title: data.seo?.meta_title || p.title,
-        description: data.seo?.meta_description || `${p.title} — ${p.price} ₾. NewHome.ge-ზე შეიძინეთ საუკეთესო ხარისხის ავეჯი და განათება.`,
-        url: data.seo?.canonical_url || `https://newhome.ge/product/${decodeURIComponent(slug)}`,
-        images: [{ url: toBackendAssetUrl(p.feature_image), width: 1200, height: 800 }],
-      },
-    };
-  } catch (error) {
-    // Error metadata
-    return {
+      description: data.seo?.meta_description || `${p.title} — ${p.price} ₾. HomeSpace.ge-ზე შეიძინეთ საუკეთესო ხარისხის ავეჯი და განათება.`,
+      canonical: data.seo?.canonical_url || `https://homespace.ge/product/${slug}`,
+      keywords: data.seo?.keywords,
+      image: toBackendAssetUrl(p.feature_image) || undefined,
+      url: data.seo?.canonical_url || `https://homespace.ge/product/${decodeURIComponent(slug)}`,
+    });
+  } catch {
+    return buildPageMetadata({
       title: 'პროდუქტი ვერ მოიძებნა',
-      description: 'პროდუქტი ვერ მოიძებნა - NewHome.ge',
-    };
+      description: 'პროდუქტი ვერ მოიძებნა - HomeSpace.ge',
+      canonical: 'https://homespace.ge/product',
+      keywords: ['პროდუქტი', 'HomeSpace'],
+    });
   }
 }
 
@@ -59,12 +56,11 @@ export default async function Page({ params, searchParams }: {
 }) {
   const { slug } = await params;
   const { locale } = await searchParams;
-  
+
   let data;
   try {
     data = await api.getProduct(slug, locale);
-  } catch (error) {
-    // If API fails, show error page
+  } catch {
     return <div>პროდუქტი ვერ მოიძებნა</div>;
   }
 
@@ -95,10 +91,41 @@ export default async function Page({ params, searchParams }: {
     colors: data.product.colors || [],
   };
 
+  // Fetch related products from the same category
+  let relatedProducts: Array<{
+    id: number; slug: string; name: string; price: number; oldPrice?: number;
+    image: string; category: string; sale?: boolean; featured?: boolean; colors?: string[];
+  }> = [];
+  try {
+    const allData = await api.getProducts(locale);
+    relatedProducts = (allData.products ?? [])
+      .filter((p) => p.category === data.product.category && p.slug !== slug)
+      .slice(0, 4)
+      .map((p) => {
+        const galleryBlock = p.blocks?.find((b) => b.type === 'product_gallery');
+        const galleryImages: unknown[] = galleryBlock?.data?.product_images ?? [];
+        const firstGallery = Array.isArray(galleryImages) && galleryImages.length > 0 ? String(galleryImages[0]) : '';
+        return {
+          id: p.id,
+          slug: p.slug,
+          name: p.title,
+          price: p.price,
+          oldPrice: p.old_price ?? undefined,
+          sale: p.on_sale,
+          featured: p.is_featured,
+          image: toBackendAssetUrl(firstGallery || p.feature_image || '') || '/placeholder.jpg',
+          category: p.category,
+          colors: p.colors ?? [],
+        };
+      });
+  } catch {
+    // related products are optional — continue without them
+  }
+
   return (
     <>
-      <ProductJsonLd product={product as any} />
-      <ProductDetailsPage product={product as any} />
+      <ProductJsonLd product={product} />
+      <ProductDetailsPage product={product} relatedProducts={relatedProducts} />
     </>
   );
 }

@@ -17,7 +17,7 @@ export default function ChatBot() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
-      text: 'მოგესალმებით NewHome-ში! მე ვარ თქვენი ასისტენტი. რით შემიძლია დაგეხმაროთ?',
+      text: 'მოგესალმებით HomeSpace-ში! მე ვარ თქვენი ასისტენტი. რით შემიძლია დაგეხმაროთ?',
       sender: 'bot',
     },
   ]);
@@ -172,7 +172,7 @@ export default function ChatBot() {
                   <Bot size={18} />
                 </div>
                 <div>
-                  <div style={{ fontWeight: 600, fontSize: 14 }}>NewHome ასისტენტი</div>
+                  <div style={{ fontWeight: 600, fontSize: 14 }}>HomeSpace ასისტენტი</div>
                   <div style={{ fontSize: 11, opacity: 0.8 }}>ონლაინ</div>
                 </div>
               </div>

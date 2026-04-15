@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { Container, Button } from 'react-bootstrap';
 import Link from 'next/link';
 import { motion } from 'motion/react';
@@ -33,8 +32,8 @@ export default function CtaBanner({ blocks }: CtaBannerProps) {
           className="bg-primary text-white p-5 rounded-4 text-center position-relative overflow-hidden shadow-lg"
         >
           <div className="position-relative z-1">
-            <h2 className="display-6 fw-bold mb-3">{title}</h2>
-            <p className="mb-4 opacity-75 lead">{desc}</p>
+            <h2 className="display-6 fw-bold mb-3" dangerouslySetInnerHTML={{ __html: title }} />
+            <div className="mb-4 opacity-75 lead" dangerouslySetInnerHTML={{ __html: desc }} />
             <Button as={Link as any} href={href} variant="light" size="lg" className="px-5 text-primary fw-bold text-uppercase">კონსულტაცია</Button>
           </div>
           <div className="position-absolute top-50 start-50 translate-middle bg-white opacity-10 rounded-circle" style={{ width: '800px', height: '800px', zIndex: 0, filter: 'blur(50px)' }} />

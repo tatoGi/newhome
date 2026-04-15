@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import ServicesPage from './ServicesPage';
 import { api } from '@/lib/api/client';
 import { getServerLocale } from '@/lib/locale';
+import { buildPageMetadata } from '@/lib/metadata';
 
 export async function generateMetadata(): Promise<Metadata> {
   try {
@@ -10,18 +11,21 @@ export async function generateMetadata(): Promise<Metadata> {
     const route = bootstrap.routeMap.find((r) => r.template === 'service' || r.template === 'services');
     if (route) {
       const data = await api.getPage(route.slug, locale || undefined);
-      return {
+      return buildPageMetadata({
         title: data.seo.meta_title || data.page.title,
         description: data.seo.meta_description || '',
-        alternates: { canonical: data.seo.canonical_url || 'https://newhome.ge/services' },
-      };
+        canonical: data.seo.canonical_url || 'https://homespace.ge/services',
+        keywords: data.seo.keywords,
+        image: data.seo.og_image || data.seo.social_image || undefined,
+      });
     }
-  } catch {}
-  return {
+  } catch { }
+  return buildPageMetadata({
     title: 'სერვისები',
-    description: 'ინტერიერის დიზაინი, ავეჯის დამზადება, განათების დაგეგმარება და რემონტი — NewHome.ge-ს სრული სერვისები.',
-    alternates: { canonical: 'https://newhome.ge/services' },
-  };
+    description: 'ინტერიერის დიზაინი, ავეჯის დამზადება, განათების დაგეგმარება და რემონტი — HomeSpace.ge-ს სრული სერვისები.',
+    canonical: 'https://homespace.ge/services',
+    keywords: ['სერვისები', 'ინტერიერი', 'HomeSpace'],
+  });
 }
 
 export default async function Page() {

@@ -1,59 +1,61 @@
 import Groq from 'groq-sdk';
 import { NextRequest } from 'next/server';
-import { getAllProducts, getAllServices, getAllProjects } from '@/lib/data';
+import { api } from '@/lib/api/client';
 
-// ─── Dynamic system prompt built from live site data ───────────────────────
-function buildSystemPrompt(): string {
-  const products = getAllProducts();
-  const services = getAllServices();
-  const projects = getAllProjects();
+async function buildSystemPrompt(): Promise<string> {
+  let productList = '';
+  let serviceList = '';
+  let projectList = '';
+  let productCount = 0;
 
-  const productList = products
-    .map(
-      (p) =>
-        `• ${p.name} — ${p.price}₾${p.oldPrice ? ` (ძველი ფასი: ${p.oldPrice}₾)` : ''}${p.sale ? ' 🔥 აქცია' : ''}
-   კატეგორია: ${p.category} | მასალა: ${p.material ?? '—'}
-   ${p.description ?? ''}`
-    )
-    .join('\n');
+  try {
+    const data = await api.getProducts();
+    const products = data.products ?? [];
+    productCount = products.length;
+    productList = products
+      .map(
+        (p) =>
+          `• ${p.title} — ${p.price}₾${p.old_price ? ` (ძველი ფასი: ${p.old_price}₾)` : ''}${p.on_sale ? ' 🔥 აქცია' : ''}\n   კატეგორია: ${p.category}${p.brand ? ` | ბრენდი: ${p.brand}` : ''}`
+      )
+      .join('\n');
+  } catch {}
 
-  const serviceList = services
-    .map((s) => `• ${s.title} — ${s.desc}\n   ფუნქციები: ${s.features.join(', ')}`)
-    .join('\n');
+  try {
+    const bootstrap = await api.getBootstrap();
 
-  const projectList = projects
-    .map(
-      (p) =>
-        `• ${p.title} (${p.year}) — ${p.location} | ${p.area} | ${p.category}\n   ${p.desc}`
-    )
-    .join('\n');
+    const serviceRoute = bootstrap.routeMap.find((r) => r.template === 'service' || r.template === 'services');
+    if (serviceRoute) {
+      const serviceData = await api.getPage(serviceRoute.slug);
+      serviceList = (serviceData.relations?.posts ?? [])
+        .map((s) => `• ${s.title}${s.excerpt ? ` — ${s.excerpt.replace(/<[^>]*>/g, '')}` : ''}`)
+        .join('\n');
+    }
 
-  return `შენ ხარ NewHome.ge-ს ჭკვიანი ონლაინ ასისტენტი — ავეჯისა და განათების პრემიუმ მაღაზიის.
+    const projectRoute = bootstrap.routeMap.find((r) => r.template === 'project' || r.template === 'projects');
+    if (projectRoute) {
+      const projectData = await api.getPage(projectRoute.slug);
+      projectList = (projectData.relations?.posts ?? [])
+        .map((p) => `• ${p.title}${p.category ? ` (${p.category})` : ''}${p.excerpt ? ` — ${p.excerpt.replace(/<[^>]*>/g, '')}` : ''}`)
+        .join('\n');
+    }
+  } catch {}
+
+  return `შენ ხარ HomeSpace.ge-ს ჭკვიანი ონლაინ ასისტენტი — ავეჯისა და განათების პრემიუმ მაღაზიის.
 შენ კარგად იცი ჩვენი მთელი კატალოგი, სერვისები და დასრულებული პროექტები.
 
-━━━ ჩვენი პროდუქცია (${products.length} პოზიცია) ━━━
-${productList}
-
-━━━ ჩვენი სერვისები ━━━
-${serviceList}
-
-━━━ განხორციელებული პროექტები ━━━
-${projectList}
-
+${productList ? `━━━ ჩვენი პროდუქცია (${productCount} პოზიცია) ━━━\n${productList}\n` : ''}
+${serviceList ? `━━━ ჩვენი სერვისები ━━━\n${serviceList}\n` : ''}
+${projectList ? `━━━ განხორციელებული პროექტები ━━━\n${projectList}\n` : ''}
 ━━━ კონტაქტი ━━━
-• მისამართი: თბილისი, ი. ჭავჭავაძის გამზირი 37
-• ტელეფონი: +995 555 12 34 56
-• ელ-ფოსტა: info@newhome.ge
-• სამუშაო საათები: ორშაბათი–შაბათი 10:00–19:00
+• საიტი: https://homespace.ge
 
 ━━━ წესები ━━━
 - პასუხობ მხოლოდ ქართულად
 - იყავი მეგობრული, კონკრეტული და მოკლე (3-4 წინადადება)
 - თუ კონკრეტულ პროდუქტს ეძებენ, მიუთითე ზუსტი სახელი და ფასი
-- თუ ვერ პასუხობ — შესთავაზე ტელეფონზე დარეკვა: +995 555 12 34 56`;
+- თუ ვერ პასუხობ — შესთავაზე საიტის მონახულება: https://homespace.ge`;
 }
 
-// ─── POST handler ───────────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
   const { messages } = await req.json();
 
@@ -63,7 +65,7 @@ export async function POST(req: NextRequest) {
   }
 
   const groq = new Groq({ apiKey });
-
+  const systemPrompt = await buildSystemPrompt();
   const encoder = new TextEncoder();
 
   const stream = new ReadableStream({
@@ -72,7 +74,7 @@ export async function POST(req: NextRequest) {
         const completion = await groq.chat.completions.create({
           model: 'llama-3.3-70b-versatile',
           messages: [
-            { role: 'system', content: buildSystemPrompt() },
+            { role: 'system', content: systemPrompt },
             ...messages,
           ],
           stream: true,
@@ -88,9 +90,7 @@ export async function POST(req: NextRequest) {
         }
       } catch (err) {
         console.error('Groq error:', err);
-        controller.enqueue(
-          encoder.encode('ბოდიში, დროებითი შეფერხებაა. სცადეთ მოგვიანებით.')
-        );
+        controller.enqueue(encoder.encode('ბოდიში, დროებითი შეფერხებაა. სცადეთ მოგვიანებით.'));
       } finally {
         controller.close();
       }

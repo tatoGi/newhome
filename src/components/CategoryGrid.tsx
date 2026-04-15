@@ -1,10 +1,8 @@
 'use client';
 
-import React from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import Link from 'next/link';
 import { motion } from 'motion/react';
-import { getHomeCategories } from '@/lib/data';
 import { toBackendAssetUrl } from '@/lib/api/assets';
 import Image from 'next/image';
 
@@ -15,7 +13,6 @@ interface ApiProduct {
 }
 
 const CategoryGrid: React.FC<{ data?: any; products?: ApiProduct[]; textBlock?: any }> = ({ data, products, textBlock }) => {
-    // Derive real categories from API products
     const realCategories = (() => {
         if (!products || products.length === 0) return null;
         const seen = new Set<string>();
@@ -35,7 +32,9 @@ const CategoryGrid: React.FC<{ data?: any; products?: ApiProduct[]; textBlock?: 
     })();
 
     const displayCategories = realCategories
-        ?? (data?.categories && data.categories.length > 0 ? data.categories : getHomeCategories());
+        ?? (data?.categories && data.categories.length > 0 ? data.categories : null);
+
+    if (!displayCategories || displayCategories.length === 0) return null;
 
     return (
         <section className="py-5">
@@ -83,15 +82,8 @@ const CategoryGrid: React.FC<{ data?: any; products?: ApiProduct[]; textBlock?: 
                 </Row>
             </Container>
             <style jsx>{`
-        .category-card:hover img {
-          transform: scale(1.1);
-        }
-        .inset-0 {
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
-        }
+        .category-card:hover img { transform: scale(1.1); }
+        .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
       `}</style>
         </section>
     );

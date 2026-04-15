@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/checkout', '/account', '/cart', '/api/'],
     },
-    sitemap: 'https://newhome.ge/sitemap.xml',
+    sitemap: 'https://homespace.ge/sitemap.xml',
   };
 }

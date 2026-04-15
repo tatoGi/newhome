@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import ProjectsPage from './ProjectsPage';
 import { api } from '@/lib/api/client';
 import { getServerLocale } from '@/lib/locale';
+import { buildPageMetadata } from '@/lib/metadata';
 
 export async function generateMetadata(): Promise<Metadata> {
   try {
@@ -10,18 +11,21 @@ export async function generateMetadata(): Promise<Metadata> {
     const route = bootstrap.routeMap.find((r) => r.template === 'project' || r.template === 'projects');
     if (route) {
       const data = await api.getPage(route.slug, locale || undefined);
-      return {
+      return buildPageMetadata({
         title: data.seo.meta_title || data.page.title,
         description: data.seo.meta_description || '',
-        alternates: { canonical: data.seo.canonical_url || 'https://newhome.ge/projects' },
-      };
+        canonical: data.seo.canonical_url || 'https://homespace.ge/projects',
+        keywords: data.seo.keywords,
+        image: data.seo.og_image || data.seo.social_image || undefined,
+      });
     }
-  } catch {}
-  return {
+  } catch { }
+  return buildPageMetadata({
     title: 'პროექტები',
-    description: 'NewHome-ის განხორციელებული ინტერიერის დიზაინის პროექტები — საცხოვრებელი და კომერციული სივრცეები.',
-    alternates: { canonical: 'https://newhome.ge/projects' },
-  };
+    description: 'HomeSpace-ის განხორციელებული ინტერიერის დიზაინის პროექტები — საცხოვრებელი და კომერციული სივრცეები.',
+    canonical: 'https://homespace.ge/projects',
+    keywords: ['პროექტები', 'ინტერიერი', 'HomeSpace'],
+  });
 }
 
 export default async function Page() {

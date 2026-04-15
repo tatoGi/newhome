@@ -18,76 +18,76 @@ const notoSerifGeorgian = Noto_Serif_Georgian({
   display: 'swap',
 });
 
-// Default fallback data in case API is down
 const defaultBootstrap = {
   locale: 'ka',
   defaultLocale: 'ka',
   languages: [{ code: 'ka', name: 'ქართული', flag: 'ka', is_default: true }],
   navigation: { header: [], footer: [] },
   settings: { headerLogo: null, footerLogo: null, footerContactText: null, footerContactByLocale: null },
-  routeMap: []
+  routeMap: [],
 };
 
+const SITE_URL = 'https://homespace.ge';
+const SITE_NAME = 'HomeSpace.ge';
+
 export const metadata: Metadata = {
-  metadataBase: new URL('https://newhome.ge'),
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: 'NewHome — ავეჯი და განათება საქართველოში',
-    template: '%s | NewHome.ge',
+    default: 'HomeSpace — ავეჯი და განათება საქართველოში',
+    template: `%s | ${SITE_NAME}`,
   },
   description:
     'თანამედროვე ავეჯის და განათების ონლაინ მაღაზია. აღმოაჩინეთ საუკეთესო დიზაინი თქვენი სახლისთვის. მიწოდება მთელ საქართველოში.',
-  keywords: ['ავეჯი', 'განათება', 'ინტერიერი', 'დიზაინი', 'თბილისი', 'newhome', 'newhome.ge'],
-  authors: [{ name: 'NewHome.ge', url: 'https://newhome.ge' }],
-  creator: 'NewHome.ge',
+  keywords: ['ავეჯი', 'განათება', 'ინტერიერი', 'დიზაინი', 'თბილისი', 'homespace', 'homespace.ge'],
+  authors: [{ name: SITE_NAME, url: SITE_URL }],
+  creator: SITE_NAME,
   openGraph: {
     type: 'website',
     locale: 'ka_GE',
-    url: 'https://newhome.ge',
-    siteName: 'NewHome.ge',
-    title: 'NewHome — ავეჯი და განათება საქართველოში',
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    title: 'HomeSpace — ავეჯი და განათება საქართველოში',
     description: 'თანამედროვე ავეჯის და განათების ონლაინ მაღაზია.',
-    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'NewHome.ge' }],
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: SITE_NAME }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'NewHome — ავეჯი და განათება',
+    title: 'HomeSpace — ავეჯი და განათება',
     description: 'თანამედროვე ავეჯის და განათების ონლაინ მაღაზია.',
     images: ['/og-image.jpg'],
   },
   alternates: {
-    canonical: 'https://newhome.ge',
-    languages: { ka: 'https://newhome.ge' },
+    canonical: SITE_URL,
+    languages: { ka: SITE_URL },
   },
   robots: {
     index: true,
     follow: true,
-    googleBot: { index: true, follow: true },
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION || undefined,
   },
 };
 
-// Organization JSON-LD
 const orgSchema = {
   '@context': 'https://schema.org',
   '@type': 'FurnitureStore',
-  name: 'NewHome.ge',
-  url: 'https://newhome.ge',
-  logo: 'https://newhome.ge/logo.png',
-  telephone: '+995-555-12-34-56',
-  email: 'info@newhome.ge',
+  name: SITE_NAME,
+  url: SITE_URL,
+  logo: `${SITE_URL}/logo.png`,
   address: {
     '@type': 'PostalAddress',
-    streetAddress: 'ი. ჭავჭავაძის გამზირი 37',
     addressLocality: 'თბილისი',
     addressCountry: 'GE',
   },
-  openingHoursSpecification: {
-    '@type': 'OpeningHoursSpecification',
-    dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-    opens: '10:00',
-    closes: '19:00',
-  },
   priceRange: '₾₾',
-  sameAs: ['https://www.facebook.com/newhomege', 'https://www.instagram.com/newhomege'],
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -95,22 +95,40 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   let bootstrapData;
   try {
     bootstrapData = await api.getBootstrap(serverLocale || undefined);
-  } catch (error) {
-    console.error('Failed to fetch bootstrap data:', error);
+  } catch {
     bootstrapData = defaultBootstrap;
   }
 
   return (
     <html lang={bootstrapData.locale} className={notoSerifGeorgian.variable}>
       <head>
-        <link rel="preconnect" href="https://images.unsplash.com" />
-        <link rel="dns-prefetch" href="https://images.unsplash.com" />
+        {/* Google Tag Manager */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-PF39Z5RP');`,
+          }}
+        />
+        {/* End Google Tag Manager */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
         />
       </head>
       <body>
+        {/* Google Tag Manager (noscript) */}
+        <noscript>
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=GTM-PF39Z5RP"
+            height="0"
+            width="0"
+            style={{ display: 'none', visibility: 'hidden' }}
+          />
+        </noscript>
+        {/* End Google Tag Manager (noscript) */}
         <Providers bootstrapData={bootstrapData as any}>
           <div className="d-flex flex-column min-vh-100">
             <Header />

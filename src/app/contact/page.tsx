@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import ContactPage from './ContactPage';
 import { api } from '@/lib/api/client';
 import { getServerLocale } from '@/lib/locale';
+import { buildPageMetadata } from '@/lib/metadata';
 
 export async function generateMetadata(): Promise<Metadata> {
   try {
@@ -10,18 +11,21 @@ export async function generateMetadata(): Promise<Metadata> {
     const route = bootstrap.routeMap.find((r) => r.template === 'contact');
     if (route) {
       const data = await api.getPage(route.slug, locale || undefined);
-      return {
+      return buildPageMetadata({
         title: data.seo.meta_title || data.page.title,
         description: data.seo.meta_description || '',
-        alternates: { canonical: data.seo.canonical_url || 'https://newhome.ge/contact' },
-      };
+        canonical: data.seo.canonical_url || 'https://homespace.ge/contact',
+        keywords: data.seo.keywords,
+        image: data.seo.og_image || data.seo.social_image || undefined,
+      });
     }
-  } catch {}
-  return {
+  } catch { }
+  return buildPageMetadata({
     title: 'კონტაქტი',
-    description: 'დაგვიკავშირდით — თბილისი, ი. ჭავჭავაძის გამზირი 37. ტელ: +995 555 12 34 56. ორ-შაბ 10:00-19:00.',
-    alternates: { canonical: 'https://newhome.ge/contact' },
-  };
+    description: 'დაგვიკავშირდით — თბილისი, ი. ჭავჭავაძის გამზირი 37. ტელ: +995 555 12 34 56. ორშაბათი-შაბათი 10:00-19:00.',
+    canonical: 'https://homespace.ge/contact',
+    keywords: ['კონტაქტი', 'HomeSpace', 'მხარდაჭერა', 'ტელეფონი'],
+  });
 }
 
 export default async function Page() {

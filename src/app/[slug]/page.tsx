@@ -11,6 +11,7 @@ import Link from 'next/link';
 import { toBackendAssetUrl } from '@/lib/api/assets';
 import BlogListPage from '../blog/BlogListPage';
 import { getServerLocale } from '@/lib/locale';
+import { buildPageMetadata } from '@/lib/metadata';
 
 interface PageProps {
     params: Promise<{ slug: string }>;
@@ -29,23 +30,21 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
 
     try {
         const data = await api.getPage(slug, locale);
-        return {
+        return buildPageMetadata({
             title: data.seo.meta_title || data.page.title,
             description: data.seo.meta_description,
+            canonical: data.seo.canonical_url || `https://homespace.ge/${decodeURIComponent(slug)}`,
             keywords: data.seo.keywords,
-            alternates: {
-                canonical: data.seo.canonical_url || `https://newhome.ge/${decodeURIComponent(slug)}`,
-            },
-            openGraph: {
-                title: data.seo.meta_title || data.page.title,
-                description: data.seo.meta_description || undefined,
-                url: data.seo.canonical_url || `https://newhome.ge/${decodeURIComponent(slug)}`,
-            },
-        };
+            image: data.seo.og_image || data.seo.social_image || undefined,
+            url: data.seo.canonical_url || `https://homespace.ge/${decodeURIComponent(slug)}`,
+        });
     } catch {
-        return {
-            title: 'NewHome',
-        };
+        return buildPageMetadata({
+            title: 'HomeSpace',
+            description: 'HomeSpace — ავეჯი და განათება.',
+            canonical: 'https://homespace.ge',
+            keywords: ['HomeSpace', 'ავეჯი', 'განათება'],
+        });
     }
 }
 

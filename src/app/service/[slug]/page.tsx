@@ -4,6 +4,7 @@ import { api } from '@/lib/api/client';
 import { toBackendAssetUrl } from '@/lib/api/assets';
 import ServiceDetailsPage from './ServiceDetailsPage';
 import { getServerLocale } from '@/lib/locale';
+import { buildPageMetadata } from '@/lib/metadata';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -31,19 +32,20 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
     const intro = data.post.blocks?.find((b: any) => b.type === 'post_intro');
     const title = intro?.data?.title || data.post.title;
     const image = toBackendAssetUrl(intro?.data?.post_image || data.post.feature_image || '');
-    return {
+    return buildPageMetadata({
       title: data.seo?.meta_title || title,
       description: data.seo?.meta_description || data.post.excerpt || undefined,
-      alternates: { canonical: data.seo?.canonical_url || `https://newhome.ge/service/${slug}` },
-      openGraph: {
-        title: data.seo?.meta_title || title,
-        description: data.seo?.meta_description || undefined,
-        url: data.seo?.canonical_url || `https://newhome.ge/service/${decodeURIComponent(slug)}`,
-        images: image ? [{ url: image }] : [],
-      },
-    };
+      canonical: data.seo?.canonical_url || `https://homespace.ge/service/${slug}`,
+      keywords: data.seo?.keywords,
+      image: image || undefined,
+    });
   } catch {
-    return { title: 'სერვისი' };
+    return buildPageMetadata({
+      title: 'სერვისი',
+      description: 'HomeSpace სერვისი',
+      canonical: 'https://homespace.ge/service',
+      keywords: ['სერვისი', 'HomeSpace'],
+    });
   }
 }
 
@@ -75,7 +77,7 @@ export default async function Page({ params, searchParams }: PageProps) {
   try {
     const bootstrap = await api.getBootstrap();
     phone = bootstrap.settings.footerContactText ?? null;
-  } catch {}
+  } catch { }
 
   return <ServiceDetailsPage service={service} phone={phone} />;
 }

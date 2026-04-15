@@ -1,10 +1,13 @@
 import type { Metadata } from 'next';
 import AccountPage from './AccountPage';
+import { buildPageMetadata } from '@/lib/metadata';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: 'ანგარიში',
-  robots: { index: false, follow: false },
-};
+  description: 'HomeSpace პირადი გვერდი — შეკვეთების და სასურველ პროდუქტების მართვა.',
+  canonical: 'https://homespace.ge/account',
+  keywords: ['ანგარიში', 'HomeSpace', 'შეკვეთის ისტორია', 'საჩუქარი'],
+});
 
 export default function Page() {
   return <AccountPage />;

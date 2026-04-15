@@ -15,6 +15,10 @@ export interface BootstrapResponse {
         footerLogo: string | null;
         footerContactText: string | null;
         footerContactByLocale: Record<string, string> | null;
+        socialLinks: Record<string, string>;
+        contactPhone: string | null;
+        contactEmail: string | null;
+        contactAddress: string | null;
     };
     routeMap: Array<{
         id: number;
@@ -133,6 +137,7 @@ export interface SEO {
     meta_description: string | null;
     keywords: string | null;
     canonical_url: string | null;
+    og_image: string | null;
 }
 
 export interface PostRelation {
@@ -194,6 +199,7 @@ export interface PageResponse {
         title: string;
         description: string;
         template: string;
+        feature_image?: string | null;
         blocks: Block[];
     };
     relations: {
@@ -204,6 +210,7 @@ export interface PageResponse {
     project_section?: ProjectSection | null;
     blog_section?: BlogSection | null;
     seo: SEO;
+    media_alts?: Record<string, string>;
 }
 
 export interface PostResponse {
@@ -222,6 +229,7 @@ export interface PostResponse {
         posts: PostRelation[];
     };
     seo: SEO;
+    media_alts?: Record<string, string>;
 }
 
 export interface ProductResponse {

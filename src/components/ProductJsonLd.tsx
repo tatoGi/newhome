@@ -1,6 +1,14 @@
-import { Product } from '@/lib/data';
+interface ProductJsonLdProps {
+  id: number | string;
+  slug: string;
+  name: string;
+  price: number;
+  oldPrice?: number;
+  images: string[];
+  description?: string;
+}
 
-export default function ProductJsonLd({ product }: { product: Product }) {
+export default function ProductJsonLd({ product }: { product: ProductJsonLdProps }) {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -10,18 +18,18 @@ export default function ProductJsonLd({ product }: { product: Product }) {
     sku: `NH-${product.id}`,
     brand: {
       '@type': 'Brand',
-      name: 'NewHome',
+      name: 'HomeSpace',
     },
     offers: {
       '@type': 'Offer',
-      url: `https://newhome.ge/product/${product.id}`,
+      url: `https://homespace.ge/product/${product.slug}`,
       priceCurrency: 'GEL',
       price: product.price,
       availability: 'https://schema.org/InStock',
       itemCondition: 'https://schema.org/NewCondition',
       seller: {
         '@type': 'Organization',
-        name: 'NewHome.ge',
+        name: 'HomeSpace.ge',
       },
     },
   };

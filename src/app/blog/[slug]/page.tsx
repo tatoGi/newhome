@@ -6,6 +6,7 @@ import { Calendar, User } from 'lucide-react';
 import Link from 'next/link';
 import { toBackendAssetUrl } from '@/lib/api/assets';
 import { getServerLocale } from '@/lib/locale';
+import { buildPageMetadata } from '@/lib/metadata';
 
 export async function generateStaticParams() {
     try {
@@ -27,19 +28,20 @@ export async function generateMetadata({ params }: {
         const locale = await getServerLocale();
         const data = await api.getBlog(slug, locale || undefined);
         const p = data.post;
-        return {
+        return buildPageMetadata({
             title: data.seo?.meta_title || p.title,
             description: data.seo?.meta_description || p.excerpt || undefined,
-            alternates: { canonical: data.seo?.canonical_url || `https://newhome.ge/blog/${slug}` },
-            openGraph: {
-                title: data.seo?.meta_title || p.title,
-                description: data.seo?.meta_description || undefined,
-                url: data.seo?.canonical_url || `https://newhome.ge/blog/${decodeURIComponent(slug)}`,
-                images: p.feature_image ? [{ url: toBackendAssetUrl(p.feature_image) || '' }] : [],
-            },
-        };
+            canonical: data.seo?.canonical_url || `https://homespace.ge/blog/${slug}`,
+            keywords: data.seo?.keywords,
+            image: p.feature_image ? toBackendAssetUrl(p.feature_image) : undefined,
+        });
     } catch {
-        return { title: 'ბლოგი' };
+        return buildPageMetadata({
+            title: 'ბლოგი',
+            description: 'HomeSpace ბლოგი',
+            canonical: 'https://homespace.ge/blog',
+            keywords: ['ბლოგი', 'HomeSpace', 'ინტერიერი'],
+        });
     }
 }
 
@@ -91,7 +93,7 @@ export default async function Page({ params }: {
                             </span>
                         )}
                         <span className="d-flex align-items-center gap-2">
-                            <User size={16} /> NewHome Team
+                            <User size={16} /> HomeSpace Team
                         </span>
                     </div>
                 </div>

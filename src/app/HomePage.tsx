@@ -15,7 +15,6 @@ import { toBackendAssetUrl } from '@/lib/api/assets';
 interface HomePageProps {
   data: PageResponse | null;
 }
-
 function buildHeroSlides(blocks: Block[]) {
   return blocks
     .filter((b) => b.type === 'main_banner' || b.type === 'page_hero' || b.type === 'banner')
@@ -29,6 +28,8 @@ function buildHeroSlides(blocks: Block[]) {
 }
 
 export default function HomePage({ data }: HomePageProps) {
+
+
   const blocks = [...(data?.page?.blocks ?? [])].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
   const heroSlides = buildHeroSlides(blocks);
 

@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Block, PostRelation } from '@/lib/api/types';
 import { toBackendAssetUrl } from '@/lib/api/assets';
 import { slugify } from '@/lib/slugify';
+import { stripMarkdown } from '@/lib/stripMarkdown';
 import PageBlockRenderer from '@/components/PageBlockRenderer';
 
 interface ProjectsPageProps {
@@ -37,7 +38,7 @@ export default function ProjectsPage({ posts, pageTitle, pageDescription, blocks
     return {
       id: post.id,
       slug: post.slug,
-      title: intro?.data?.title || post.title,
+      title: stripMarkdown(intro?.data?.title || post.title),
       image: toBackendAssetUrl(rawImage) || '',
       category: post.category || '',
       publishedAt: post.published_at,

@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { Container, Row, Col, Card, Breadcrumb } from 'react-bootstrap';
 import Link from 'next/link';
 import { motion } from 'motion/react';
@@ -8,13 +7,14 @@ import { Calendar, ArrowRight } from 'lucide-react';
 import { PageResponse, PostRelation } from '@/lib/api/types';
 import { toBackendAssetUrl } from '@/lib/api/assets';
 import { slugify } from '@/lib/slugify';
+import { stripMarkdown } from '@/lib/stripMarkdown';
 
 function resolvePostDisplay(p: PostRelation) {
   const intro = p.blocks?.find((b) => b.type === 'post_intro');
   return {
-    title: intro?.data?.title || p.title,
-    excerpt: intro?.data?.post_text || p.excerpt,
-    image: toBackendAssetUrl(intro?.data?.post_image || p.feature_image || '') || '/placeholder-blog.jpg',
+    title: stripMarkdown(intro?.data?.title || p.title),
+    excerpt: stripMarkdown(intro?.data?.post_text || p.excerpt || ''),
+    image: toBackendAssetUrl(intro?.data?.post_image || p.feature_image || '') || '',
   };
 }
 
@@ -59,16 +59,18 @@ export default function BlogListPage({ data }: { data?: PageResponse | null }) {
                     className="h-100"
                   >
                     <Card className="border-0 shadow-sm rounded-4 overflow-hidden h-100 blog-card">
-                      <Link href={href} className="text-decoration-none">
-                        <div className="overflow-hidden" style={{ height: '220px' }}>
-                          <img
-                            src={post.image}
-                            alt={post.title}
-                            className="w-100 h-100"
-                            style={{ objectFit: 'cover', transition: 'transform 0.5s' }}
-                          />
-                        </div>
-                      </Link>
+                      {post.image && (
+                        <Link href={href} className="text-decoration-none">
+                          <div className="overflow-hidden" style={{ height: '220px' }}>
+                            <img
+                              src={post.image}
+                              alt={post.title}
+                              className="w-100 h-100"
+                              style={{ objectFit: 'cover', transition: 'transform 0.5s' }}
+                            />
+                          </div>
+                        </Link>
+                      )}
                       <Card.Body className="p-4 d-flex flex-column">
                         {post.category && (
                           <span className="badge bg-primary-subtle text-primary rounded-pill px-3 py-1 mb-3 align-self-start small">{post.category}</span>

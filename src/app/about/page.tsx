@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import AboutPage from './AboutPage';
 import { api } from '@/lib/api/client';
 import { getServerLocale } from '@/lib/locale';
+import { buildPageMetadata } from '@/lib/metadata';
 
 export async function generateMetadata(): Promise<Metadata> {
   try {
@@ -10,18 +11,21 @@ export async function generateMetadata(): Promise<Metadata> {
     const route = bootstrap.routeMap.find((r) => r.template === 'about');
     if (route) {
       const data = await api.getPage(route.slug, locale || undefined);
-      return {
+      return buildPageMetadata({
         title: data.seo.meta_title || data.page.title,
         description: data.seo.meta_description || '',
-        alternates: { canonical: data.seo.canonical_url || 'https://newhome.ge/about' },
-      };
+        canonical: data.seo.canonical_url || 'https://homespace.ge/about',
+        keywords: data.seo.keywords,
+        image: data.seo.og_image || data.seo.social_image || undefined,
+      });
     }
-  } catch {}
-  return {
+  } catch { }
+  return buildPageMetadata({
     title: 'ჩვენს შესახებ',
-    description: 'NewHome — 2015 წლიდან ვეხმარებით ადამიანებს საოცნებო სახლის მოწყობაში.',
-    alternates: { canonical: 'https://newhome.ge/about' },
-  };
+    description: 'HomeSpace — 2015 წლიდან ვეხმარებით ადამიანებს საოცნებო სახლის მოწყობაში.',
+    canonical: 'https://homespace.ge/about',
+    keywords: ['HomeSpace', 'ავეჯი', 'ინტერიერი', 'ხარისხი'],
+  });
 }
 
 export default async function Page() {

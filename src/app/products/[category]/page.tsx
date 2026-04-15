@@ -3,6 +3,7 @@ import { api } from '@/lib/api/client';
 import ProductsPage from '../ProductsPage';
 import { ProductRelation } from '@/lib/api/types';
 import { getServerLocale } from '@/lib/locale';
+import { buildPageMetadata } from '@/lib/metadata';
 
 export async function generateStaticParams() {
   return [];
@@ -10,11 +11,12 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ category: string }> }): Promise<Metadata> {
   const { category } = await params;
-  return {
+  return buildPageMetadata({
     title: category,
-    description: `${category} — NewHome.ge-ს კოლექცია.`,
-    alternates: { canonical: `https://newhome.ge/products/${category}` },
-  };
+    description: `${category} — HomeSpace.ge-ს კოლექცია.`,
+    canonical: `https://homespace.ge/products/${category}`,
+    keywords: [category, 'პროდუქცია', 'HomeSpace'],
+  });
 }
 
 export default async function Page({

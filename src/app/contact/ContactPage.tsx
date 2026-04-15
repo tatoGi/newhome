@@ -37,7 +37,7 @@ type ContactInfoItem = {
 const DEFAULT_CONTACT_ITEMS: ContactInfoItem[] = [
   { kind: 'address', label: 'მისამართი', text: 'თბილისი, ი. ჭავჭავაძის გამზირი 37' },
   { kind: 'phone', label: 'ტელეფონი', text: '+995 555 12 34 56' },
-  { kind: 'email', label: 'ელ-ფოსტა', text: 'info@newhome.ge' },
+  { kind: 'email', label: 'ელ-ფოსტა', text: 'info@homespace.ge' },
   { kind: 'hours', label: 'სამუშაო საათები', text: 'ორშაბათი - შაბათი: 10:00 - 19:00' },
 ];
 

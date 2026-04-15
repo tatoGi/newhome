@@ -1,21 +1,51 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Container, Row, Col, Button, Modal, Carousel, Tabs, Tab } from 'react-bootstrap';
 import Link from 'next/link';
-import { Heart, ShoppingCart, ChevronRight, Check } from 'lucide-react';
+import { Heart, ShoppingCart, ChevronRight, Check, Facebook, Twitter, Linkedin, Link as LinkIcon } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { useAuth } from '@/context/AuthContext';
 import ProductCard from '@/components/ProductCard';
-import { Product, allProducts } from '@/lib/data';
 
-type ProductDetails = Product & {
-  coverImage?: string | null;
+export interface ProductDetails {
+  id: number;
+  slug: string;
+  name: string;
+  price: number;
+  oldPrice?: number;
+  sale?: boolean;
+  featured?: boolean;
   brand?: string;
+  description?: string;
   content?: string;
-};
+  coverImage?: string | null;
+  images: string[];
+  category: string;
+  colors?: string[];
+  specifications?: Record<string, string>;
+}
 
-export default function ProductDetailsPage({ product }: { product: ProductDetails }) {
+interface RelatedProduct {
+  id: number;
+  slug: string;
+  name: string;
+  price: number;
+  oldPrice?: number;
+  image: string;
+  category: string;
+  sale?: boolean;
+  featured?: boolean;
+  colors?: string[];
+}
+
+export default function ProductDetailsPage({
+  product,
+  relatedProducts = [],
+}: {
+  product: ProductDetails;
+  relatedProducts?: RelatedProduct[];
+}) {
   const { addToCart, addToWishlist, removeFromWishlist, isInWishlist } = useApp();
   const { user, openAuthModal } = useAuth();
   const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -23,10 +53,15 @@ export default function ProductDetailsPage({ product }: { product: ProductDetail
   const [showSlider, setShowSlider] = useState(false);
   const [quantity, setQuantity] = useState(1);
 
-  // Filter related products by same category, excluding current product
-  const relatedProducts = allProducts
-    .filter(p => p.category === product.category && p.id !== product.id)
-    .slice(0, 4);
+  const shareUrl = typeof window !== 'undefined' ? window.location.href : `https://homespace.ge/product/${product.slug}`;
+  const encodedUrl = encodeURIComponent(shareUrl);
+  const encodedTitle = encodeURIComponent(product.name);
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      alert('ლინკი დაკოპირდა!');
+    });
+  };
 
   const handleWishlist = () => {
     if (isInWishlist(product.id)) {
@@ -41,7 +76,6 @@ export default function ProductDetailsPage({ product }: { product: ProductDetail
       openAuthModal('register');
       return;
     }
-
     for (let i = 0; i < quantity; i++) {
       addToCart({ id: product.id, slug: product.slug, name: product.name, price: product.price, image: product.images[0], category: product.category });
     }
@@ -78,33 +112,44 @@ export default function ProductDetailsPage({ product }: { product: ProductDetail
 
       <div className="py-5">
         <Container>
-          {/* Breadcrumb */}
-          {!product.coverImage && <div className="mb-4 d-flex align-items-center text-muted small">
-            <Link href="/" className="text-muted text-decoration-none">მთავარი</Link>
-            <ChevronRight size={14} className="mx-2" />
-            <Link href="/products" className="text-muted text-decoration-none">პროდუქცია</Link>
-            <ChevronRight size={14} className="mx-2" />
-            <span className="text-dark fw-medium">{product.name}</span>
-          </div>}
+          {!product.coverImage && (
+            <div className="mb-4 d-flex align-items-center text-muted small">
+              <Link href="/" className="text-muted text-decoration-none">მთავარი</Link>
+              <ChevronRight size={14} className="mx-2" />
+              <Link href="/products" className="text-muted text-decoration-none">პროდუქცია</Link>
+              <ChevronRight size={14} className="mx-2" />
+              <span className="text-dark fw-medium">{product.name}</span>
+            </div>
+          )}
 
           <div className="bg-white p-4 p-md-5 rounded shadow-sm mb-5">
             <Row className="gy-5">
-              {/* Images */}
               <Col lg={7}>
                 <div className="d-flex flex-column gap-3">
-                  <div className="rounded overflow-hidden position-relative" style={{ cursor: 'pointer', height: '560px', backgroundColor: '#f8f9fa' }} onClick={() => setShowSlider(true)}>
-                    <img src={product.images[activeImageIndex]} alt={product.name} className="w-100 h-100 object-fit-cover"
+                  <div
+                    className="rounded overflow-hidden position-relative"
+                    style={{ cursor: 'pointer', height: '560px', backgroundColor: '#f8f9fa' }}
+                    onClick={() => setShowSlider(true)}
+                  >
+                    <img
+                      src={product.images[activeImageIndex]}
+                      alt={product.name}
+                      className="w-100 h-100 object-fit-cover"
                       style={{ transition: 'transform 0.3s ease' }}
                       onMouseOver={e => (e.currentTarget.style.transform = 'scale(1.05)')}
                       onMouseOut={e => (e.currentTarget.style.transform = 'scale(1)')}
-                      referrerPolicy="no-referrer" />
+                      referrerPolicy="no-referrer"
+                    />
                     <div className="position-absolute bottom-0 end-0 m-3 px-3 py-1 bg-white rounded-pill shadow-sm small fw-medium">🔍 გაშლა</div>
                   </div>
                   <Row className="gx-2">
                     {product.images.map((img, idx) => (
                       <Col xs={3} key={idx}>
-                        <div className={`rounded overflow-hidden border ${activeImageIndex === idx ? 'border-primary border-2' : 'border-light'} p-1`}
-                          style={{ cursor: 'pointer', height: '80px' }} onClick={() => setActiveImageIndex(idx)}>
+                        <div
+                          className={`rounded overflow-hidden border ${activeImageIndex === idx ? 'border-primary border-2' : 'border-light'} p-1`}
+                          style={{ cursor: 'pointer', height: '80px' }}
+                          onClick={() => setActiveImageIndex(idx)}
+                        >
                           <img src={img} alt={`${product.name} ${idx + 1}`} className="w-100 h-100 object-fit-cover" referrerPolicy="no-referrer" />
                         </div>
                       </Col>
@@ -113,7 +158,6 @@ export default function ProductDetailsPage({ product }: { product: ProductDetail
                 </div>
               </Col>
 
-              {/* Details */}
               <Col lg={5}>
                 <div className="ps-lg-4">
                   {product.featured && (
@@ -131,14 +175,16 @@ export default function ProductDetailsPage({ product }: { product: ProductDetail
                   )}
                   <div className="d-flex justify-content-between align-items-start mb-2">
                     <h1 className="fw-bold fs-2">{product.name}</h1>
-                    <button className="btn btn-light rounded-circle border-0 d-flex align-items-center justify-content-center mt-1"
-                      onClick={handleWishlist} style={{ width: '45px', height: '45px', backgroundColor: '#f8f9fa' }}>
+                    <button
+                      className="btn btn-light rounded-circle border-0 d-flex align-items-center justify-content-center mt-1"
+                      onClick={handleWishlist}
+                      style={{ width: '45px', height: '45px', backgroundColor: '#f8f9fa' }}
+                    >
                       <Heart size={22} fill={isInWishlist(product.id) ? '#D9534F' : 'none'} color={isInWishlist(product.id) ? '#D9534F' : '#333'} />
                     </button>
                   </div>
 
                   {product.brand && <p className="text-muted mb-1 small">ბრენდი: <span className="fw-medium text-dark">{product.brand}</span></p>}
-
                   <p className="text-muted mb-4">კოდი: NH-{product.id}-2026</p>
 
                   <div className="d-flex align-items-end gap-3 mb-4">
@@ -149,15 +195,18 @@ export default function ProductDetailsPage({ product }: { product: ProductDetail
 
                   <hr className="my-4 text-muted opacity-25" />
 
-                  {/* Colors */}
-                  {product.colors && (
+                  {product.colors && product.colors.length > 0 && (
                     <div className="mb-4">
                       <h6 className="fw-bold mb-3">ფერის არჩევა:</h6>
                       <div className="d-flex gap-2">
                         {product.colors.map((color, idx) => (
-                          <button key={idx} className="rounded-circle p-0 position-relative border-0 shadow-sm"
+                          <button
+                            key={idx}
+                            className="rounded-circle p-0 position-relative border-0 shadow-sm"
                             style={{ width: '40px', height: '40px', backgroundColor: color, outline: activeColor === idx ? `2px solid ${color}` : 'none', outlineOffset: '2px', transition: 'all 0.2s ease' }}
-                            onClick={() => setActiveColor(idx)} aria-label={`ფერი ${idx + 1}`}>
+                            onClick={() => setActiveColor(idx)}
+                            aria-label={`ფერი ${idx + 1}`}
+                          >
                             {activeColor === idx && <div className="position-absolute top-50 start-50 translate-middle text-white mix-blend-difference"><Check size={16} /></div>}
                           </button>
                         ))}
@@ -196,31 +245,69 @@ export default function ProductDetailsPage({ product }: { product: ProductDetail
                     ✓ 2 წლიანი გარანტია<br />
                     ✓ გადაცვლა / დაბრუნება 14 დღის განმავლობაში
                   </div>
+
+                  <div className="mt-4 pt-3 border-top d-flex align-items-center gap-3">
+                    <span className="fw-medium text-muted small">გაზიარება:</span>
+                    <a
+                      href={`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center p-0"
+                      style={{ width: '36px', height: '36px', color: '#1877F2', borderColor: '#e9ecef' }}
+                      title="Facebook-ზე გაზიარება"
+                    >
+                      <Facebook size={18} />
+                    </a>
+                    <a
+                      href={`https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center p-0"
+                      style={{ width: '36px', height: '36px', color: '#1DA1F2', borderColor: '#e9ecef' }}
+                      title="Twitter-ზე გაზიარება"
+                    >
+                      <Twitter size={18} />
+                    </a>
+                    <a
+                      href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center p-0"
+                      style={{ width: '36px', height: '36px', color: '#0A66C2', borderColor: '#e9ecef' }}
+                      title="LinkedIn-ზე გაზიარება"
+                    >
+                      <Linkedin size={18} />
+                    </a>
+                    <button
+                      onClick={handleCopyLink}
+                      className="btn btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center p-0"
+                      style={{ width: '36px', height: '36px', color: '#6c757d', borderColor: '#e9ecef' }}
+                      title="ლინკის კოპირება"
+                    >
+                      <LinkIcon size={18} />
+                    </button>
+                  </div>
                 </div>
               </Col>
             </Row>
           </div>
 
-          {/* Description & Specs */}
           <div className="bg-white p-4 p-md-5 rounded shadow-sm mb-5">
             <Tabs defaultActiveKey="description" className="mb-4 border-bottom-0">
               <Tab eventKey="description" title="აღწერა">
                 <div className="py-3 px-2">
                   <h4 className="fw-bold mb-4">პროდუქტის შესახებ</h4>
                   {product.content ? (
-                    <div
-                      className="product-content lh-lg"
-                      dangerouslySetInnerHTML={{ __html: product.content }}
-                    />
-                  ) : (
+                    <div className="product-content lh-lg" dangerouslySetInnerHTML={{ __html: product.content }} />
+                  ) : product.description ? (
                     <p className="text-muted lh-lg fs-5">{product.description}</p>
-                  )}
+                  ) : null}
                 </div>
               </Tab>
-              <Tab eventKey="specs" title="სპეციფიკაციები">
-                <div className="py-3 px-2">
-                  <h4 className="fw-bold mb-4">ტექნიკური მახასიათებლები</h4>
-                  {product.specifications && (
+              {product.specifications && Object.keys(product.specifications).length > 0 && (
+                <Tab eventKey="specs" title="სპეციფიკაციები">
+                  <div className="py-3 px-2">
+                    <h4 className="fw-bold mb-4">ტექნიკური მახასიათებლები</h4>
                     <Row><Col md={8}>
                       <table className="table table-bordered table-striped m-0">
                         <tbody>
@@ -233,35 +320,40 @@ export default function ProductDetailsPage({ product }: { product: ProductDetail
                         </tbody>
                       </table>
                     </Col></Row>
-                  )}
-                </div>
-              </Tab>
+                  </div>
+                </Tab>
+              )}
             </Tabs>
           </div>
 
-{/* Related Products */}
-          <div>
-            <h3 className="fw-bold mb-4 border-bottom pb-2">მსგავსი პროდუქტები</h3>
-            <Row className="gy-4">
-              {relatedProducts.map(p => (
-                <Col sm={6} key={p.id}>
-                  <ProductCard product={p} />
-                </Col>
-              ))}
-            </Row>
-          </div>
+          {relatedProducts.length > 0 && (
+            <div>
+              <h3 className="fw-bold mb-4 border-bottom pb-2">მსგავსი პროდუქტები</h3>
+              <Row className="gy-4">
+                {relatedProducts.map((p) => (
+                  <Col sm={6} lg={3} key={p.id}>
+                    <ProductCard product={p as any} />
+                  </Col>
+                ))}
+              </Row>
+            </div>
+          )}
         </Container>
       </div>
 
-      {/* Lightbox */}
       <Modal show={showSlider} onHide={() => setShowSlider(false)} size="xl" centered contentClassName="bg-transparent border-0">
         <Modal.Header closeButton className="border-0 position-absolute end-0 z-3 m-2" style={{ filter: 'invert(1)' }} />
         <Modal.Body className="p-0">
           <Carousel activeIndex={activeImageIndex} onSelect={s => setActiveImageIndex(s)} slide={false} interval={null} indicators>
             {product.images.map((img, idx) => (
               <Carousel.Item key={idx}>
-                <img src={img} alt={`${product.name} ${idx + 1}`} className="d-block w-100"
-                  style={{ height: '80vh', objectFit: 'contain', backgroundColor: 'rgba(0,0,0,0.8)' }} referrerPolicy="no-referrer" />
+                <img
+                  src={img}
+                  alt={`${product.name} ${idx + 1}`}
+                  className="d-block w-100"
+                  style={{ height: '80vh', objectFit: 'contain', backgroundColor: 'rgba(0,0,0,0.8)' }}
+                  referrerPolicy="no-referrer"
+                />
               </Carousel.Item>
             ))}
           </Carousel>
