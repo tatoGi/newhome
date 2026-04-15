@@ -8,8 +8,10 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'images.unsplash.com' },
-      { protocol: 'http', hostname: '127.0.0.1', port: '8000', pathname: '/storage/**' },
-      { protocol: 'http', hostname: 'localhost', port: '8000', pathname: '/storage/**' },
+      { protocol: 'https', hostname: 'cms.homespace.ge', pathname: '/storage/**' },
+      { protocol: 'http', hostname: '127.0.0.1', port: '8000', pathname: '/**' },
+      { protocol: 'http', hostname: 'localhost', port: '8000', pathname: '/**' },
+      { protocol: 'http', hostname: 'localhost', port: '8080', pathname: '/**' },
     ],
     qualities: [75, 80, 85],
   },

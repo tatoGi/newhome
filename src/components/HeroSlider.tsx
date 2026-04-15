@@ -2,10 +2,12 @@
 
 import React from 'react';
 import { Button, Carousel, Container } from 'react-bootstrap';
+import Image from 'next/image';
 import { motion } from 'motion/react';
 import Link from 'next/link';
 import { useBootstrap } from '@/context/BootstrapContext';
 import { getUiText } from '@/lib/i18n/ui';
+import { isBackendAssetUrl } from '@/lib/api/assets';
 
 type HeroSlide = {
   id?: string | number;
@@ -55,12 +57,18 @@ const HeroSlider: React.FC<{ data?: { slides?: HeroSlide[] } }> = ({ data }) => 
       >
         {displaySlides.map((slide, index) => (
           <Carousel.Item key={slide.id ?? index}>
-            <div className="hero-slide-image-container">
+            <div className="hero-slide-image-container" style={{ position: 'relative', minHeight: '440px' }}>
               {slide.image ? (
-                <img
+                <Image
                   src={slide.image}
                   alt={slide.title || 'Banner'}
+                  fill
+                  priority={index === 0}
+                  loading={index === 0 ? 'eager' : 'lazy'}
+                  sizes="100vw"
+                  unoptimized={isBackendAssetUrl(slide.image)}
                   className="hero-slide-image"
+                  style={{ objectFit: 'cover' }}
                 />
               ) : (
                 <div className="hero-slide-fallback" />

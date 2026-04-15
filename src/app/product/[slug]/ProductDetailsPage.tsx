@@ -2,11 +2,13 @@
 
 import { useState } from 'react';
 import { Container, Row, Col, Button, Modal, Carousel, Tabs, Tab } from 'react-bootstrap';
+import Image from 'next/image';
 import Link from 'next/link';
 import { Heart, ShoppingCart, ChevronRight, Check, Facebook, Twitter, Linkedin, Link as LinkIcon } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { useAuth } from '@/context/AuthContext';
 import ProductCard from '@/components/ProductCard';
+import { isBackendAssetUrl } from '@/lib/api/assets';
 
 export interface ProductDetails {
   id: number;
@@ -131,13 +133,16 @@ export default function ProductDetailsPage({
                     style={{ cursor: 'pointer', height: '560px', backgroundColor: '#f8f9fa' }}
                     onClick={() => setShowSlider(true)}
                   >
-                    <img
+                    <Image
                       src={product.images[activeImageIndex]}
                       alt={product.name}
+                      fill
+                      priority
+                      loading="eager"
+                      sizes="(max-width: 992px) 100vw, 700px"
+                      unoptimized={isBackendAssetUrl(product.images[activeImageIndex])}
                       className="w-100 h-100 object-fit-cover"
                       style={{ transition: 'transform 0.3s ease' }}
-                      onMouseOver={e => (e.currentTarget.style.transform = 'scale(1.05)')}
-                      onMouseOut={e => (e.currentTarget.style.transform = 'scale(1)')}
                       referrerPolicy="no-referrer"
                     />
                     <div className="position-absolute bottom-0 end-0 m-3 px-3 py-1 bg-white rounded-pill shadow-sm small fw-medium">🔍 გაშლა</div>
@@ -147,10 +152,19 @@ export default function ProductDetailsPage({
                       <Col xs={3} key={idx}>
                         <div
                           className={`rounded overflow-hidden border ${activeImageIndex === idx ? 'border-primary border-2' : 'border-light'} p-1`}
-                          style={{ cursor: 'pointer', height: '80px' }}
+                          style={{ cursor: 'pointer', height: '80px', position: 'relative' }}
                           onClick={() => setActiveImageIndex(idx)}
                         >
-                          <img src={img} alt={`${product.name} ${idx + 1}`} className="w-100 h-100 object-fit-cover" referrerPolicy="no-referrer" />
+                          <Image
+                            src={img}
+                            alt={`${product.name} ${idx + 1}`}
+                            fill
+                            sizes="80px"
+                            className="w-100 h-100 object-fit-cover"
+                            style={{ objectFit: 'cover' }}
+                            unoptimized={isBackendAssetUrl(img)}
+                            referrerPolicy="no-referrer"
+                          />
                         </div>
                       </Col>
                     ))}
@@ -347,13 +361,16 @@ export default function ProductDetailsPage({
           <Carousel activeIndex={activeImageIndex} onSelect={s => setActiveImageIndex(s)} slide={false} interval={null} indicators>
             {product.images.map((img, idx) => (
               <Carousel.Item key={idx}>
-                <img
-                  src={img}
-                  alt={`${product.name} ${idx + 1}`}
-                  className="d-block w-100"
-                  style={{ height: '80vh', objectFit: 'contain', backgroundColor: 'rgba(0,0,0,0.8)' }}
-                  referrerPolicy="no-referrer"
-                />
+                <div style={{ position: 'relative', height: '80vh', backgroundColor: 'rgba(0,0,0,0.8)' }}>
+                  <Image
+                    src={img}
+                    alt={`${product.name} ${idx + 1}`}
+                    fill
+                    sizes="100vw"
+                    style={{ objectFit: 'contain' }}
+                    referrerPolicy="no-referrer"
+                  />
+                </div>
               </Carousel.Item>
             ))}
           </Carousel>

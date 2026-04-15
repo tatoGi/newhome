@@ -3,7 +3,7 @@
 import { Container, Row, Col } from 'react-bootstrap';
 import Link from 'next/link';
 import { motion } from 'motion/react';
-import { toBackendAssetUrl } from '@/lib/api/assets';
+import { toBackendAssetUrl, isBackendAssetUrl } from '@/lib/api/assets';
 import Image from 'next/image';
 
 interface ApiProduct {
@@ -68,6 +68,7 @@ const CategoryGrid: React.FC<{ data?: any; products?: ApiProduct[]; textBlock?: 
                                             className="object-fit-cover transition-transform"
                                             sizes="(max-width: 768px) 50vw, 25vw"
                                             quality={80}
+                                            unoptimized={isBackendAssetUrl(cat.image)}
                                         />
                                         <div className="position-absolute inset-0 bg-dark opacity-20 hover-opacity-40 transition-opacity" />
                                         <div className="position-absolute bottom-0 start-0 p-4 w-100 text-white">

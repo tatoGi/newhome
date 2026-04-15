@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Heart, ShoppingCart } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
-import { toBackendAssetUrl } from '@/lib/api/assets';
+import { toBackendAssetUrl, isBackendAssetUrl } from '@/lib/api/assets';
 
 export interface Product {
   id: number;
@@ -29,6 +29,7 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [activeColor, setActiveColor] = useState(0);
   const productImage = toBackendAssetUrl(product.image) || '/placeholder.jpg';
+  const shouldUnoptimizeImage = isBackendAssetUrl(productImage);
   const productSlug = product.slug || `product-${product.id}`;
 
   const handleWishlist = (e: React.MouseEvent) => {
@@ -64,8 +65,8 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
             src={productImage}
             alt={product.name}
             fill
-            unoptimized
             sizes="(max-width: 576px) 100vw, (max-width: 992px) 50vw, 25vw"
+            unoptimized={shouldUnoptimizeImage}
             className="article-product-img"
             style={{ objectFit: 'cover' }}
           />
