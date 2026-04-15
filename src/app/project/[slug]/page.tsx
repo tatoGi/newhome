@@ -36,7 +36,7 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
       title: data.seo?.meta_title || title,
       description: data.seo?.meta_description || data.post.excerpt || undefined,
       canonical: data.seo?.canonical_url || `https://homespace.ge/project/${slug}`,
-      keywords: data.seo?.keywords,
+      keywords: data.seo?.keywords || undefined,
       image: image || undefined,
     });
   } catch {

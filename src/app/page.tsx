@@ -10,9 +10,9 @@ export async function generateMetadata(): Promise<Metadata> {
     const data = await api.getPage('home', locale || undefined);
     return buildPageMetadata({
       title: data.seo.meta_title || 'HomeSpace',
-      description: data.seo.meta_description,
+      description: data.seo.meta_description || undefined,
       canonical: data.seo.canonical_url || 'https://homespace.ge',
-      keywords: data.seo.keywords,
+      keywords: data.seo.keywords || undefined,
       image: data.seo.og_image || data.seo.social_image || undefined,
     });
   } catch {

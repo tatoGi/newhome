@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: {
             title: data.seo?.meta_title || p.title,
             description: data.seo?.meta_description || p.excerpt || undefined,
             canonical: data.seo?.canonical_url || `https://homespace.ge/blog/${slug}`,
-            keywords: data.seo?.keywords,
+            keywords: data.seo?.keywords || undefined,
             image: p.feature_image ? toBackendAssetUrl(p.feature_image) : undefined,
         });
     } catch {

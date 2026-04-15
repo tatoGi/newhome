@@ -36,7 +36,7 @@ export async function generateMetadata({ params, searchParams }: {
       title: data.seo?.meta_title || p.title,
       description: data.seo?.meta_description || `${p.title} — ${p.price} ₾. HomeSpace.ge-ზე შეიძინეთ საუკეთესო ხარისხის ავეჯი და განათება.`,
       canonical: data.seo?.canonical_url || `https://homespace.ge/product/${slug}`,
-      keywords: data.seo?.keywords,
+      keywords: data.seo?.keywords || undefined,
       image: toBackendAssetUrl(p.feature_image) || undefined,
       url: data.seo?.canonical_url || `https://homespace.ge/product/${decodeURIComponent(slug)}`,
     });

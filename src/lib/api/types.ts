@@ -138,6 +138,7 @@ export interface SEO {
     keywords: string | null;
     canonical_url: string | null;
     og_image: string | null;
+    social_image?: string | null;
 }
 
 export interface PostRelation {

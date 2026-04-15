@@ -15,7 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
         title: data.seo.meta_title || data.page.title,
         description: data.seo.meta_description || '',
         canonical: data.seo.canonical_url || 'https://homespace.ge/blog',
-        keywords: data.seo.keywords,
+        keywords: data.seo.keywords || undefined,
         image: data.seo.og_image || data.seo.social_image || undefined,
       });
     }
