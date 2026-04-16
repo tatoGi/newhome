@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Noto_Serif_Georgian } from 'next/font/google';
+import { Analytics } from '@vercel/analytics/next';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'leaflet/dist/leaflet.css';
 import './globals.css';
@@ -48,13 +49,13 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     title: 'HomeSpace — ავეჯი და განათება საქართველოში',
     description: 'თანამედროვე ავეჯის და განათების ონლაინ მაღაზია.',
-    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: SITE_NAME }],
+    images: [{ url: `${SITE_URL}/og-image.jpg`, width: 1200, height: 630, alt: SITE_NAME }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'HomeSpace — ავეჯი და განათება',
     description: 'თანამედროვე ავეჯის და განათების ონლაინ მაღაზია.',
-    images: ['/og-image.jpg'],
+    images: [`${SITE_URL}/og-image.jpg`],
   },
   alternates: {
     canonical: SITE_URL,
@@ -137,6 +138,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           </div>
           <ChatBot />
         </Providers>
+        <Analytics />
       </body>
     </html>
   );
