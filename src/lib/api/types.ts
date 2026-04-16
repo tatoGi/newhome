@@ -223,6 +223,7 @@ export interface PostResponse {
         excerpt: string;
         category: string;
         published_at: string;
+        cover_image: string | null;
         feature_image: string | null;
         blocks: Block[];
     };

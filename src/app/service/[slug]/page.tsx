@@ -69,6 +69,7 @@ export default async function Page({ params, searchParams }: PageProps) {
     title: data.post.title,
     desc: data.post.excerpt,
     fullDesc: data.post.content,
+    coverImage: data.post.cover_image || '',
     image: data.post.feature_image || '',
     blocks: data.post.blocks || [],
   };
