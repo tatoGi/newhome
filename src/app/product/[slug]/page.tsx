@@ -32,12 +32,21 @@ export async function generateMetadata({ params, searchParams }: {
   try {
     const data = await api.getProduct(slug, locale);
     const p = data.product;
+
+    // Resolve OG image: prefer feature_image, fall back to first gallery block image
+    const galleryImages = extractProductGalleryImages(p.blocks || []);
+    const firstGallery = (p.gallery?.[0]) || galleryImages[0] || '';
+    const ogImage =
+      toBackendAssetUrl(p.feature_image) ||
+      toBackendAssetUrl(firstGallery) ||
+      undefined;
+
     return buildPageMetadata({
       title: data.seo?.meta_title || p.title,
       description: data.seo?.meta_description || `${p.title} — ${p.price} ₾. HomeSpace.ge-ზე შეიძინეთ საუკეთესო ხარისხის ავეჯი და განათება.`,
       canonical: data.seo?.canonical_url || `https://homespace.ge/product/${slug}`,
       keywords: data.seo?.keywords || undefined,
-      image: toBackendAssetUrl(p.feature_image) || undefined,
+      image: ogImage,
       url: data.seo?.canonical_url || `https://homespace.ge/product/${decodeURIComponent(slug)}`,
     });
   } catch {

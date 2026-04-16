@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 const SITE_URL = 'https://homespace.ge';
 const SITE_NAME = 'HomeSpace.ge';
 const DEFAULT_DESCRIPTION = 'HomeSpace provides modern furniture, lighting, and interior design solutions in Georgia.';
-const DEFAULT_IMAGE = '/og-image.jpg';
+const DEFAULT_IMAGE = `${SITE_URL}/og-image.jpg`;
 
 const normalizeKeywords = (keywords?: string | string[]): string[] | undefined => {
     if (!keywords) {
