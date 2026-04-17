@@ -169,6 +169,14 @@ export interface ProductRelation {
     blocks: Block[];
 }
 
+export interface ProductCategoryRelation {
+    id: number;
+    slug: string;
+    title: string;
+    feature_image: string | null;
+    product_count: number;
+}
+
 export interface ReelRelation {
     id: number;
     title: string;
@@ -207,6 +215,7 @@ export interface PageResponse {
         posts: PostRelation[];
         products: ProductRelation[];
         reels: ReelRelation[];
+        categories?: ProductCategoryRelation[];
     };
     project_section?: ProjectSection | null;
     blog_section?: BlogSection | null;

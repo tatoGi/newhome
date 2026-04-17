@@ -105,10 +105,11 @@ export default async function Page({ params, searchParams }: PageProps) {
             );
         }
 
-        if (template === 'products' || template === 'product-listing') {
+        if (template === 'products' || template === 'product-listing' || template === 'product') {
             return (
                 <ProductsPage
                     products={data.relations.products}
+                    categories={data.relations.categories ?? []}
                     pageTitle={data.page.title}
                     pageDescription={data.page.description}
                     blocks={data.page.blocks}

@@ -3,14 +3,17 @@
 import React, { useState } from 'react';
 import { Container, Row, Col, Form, Accordion, Breadcrumb } from 'react-bootstrap';
 import { Check } from 'lucide-react';
+import Link from 'next/link';
 import ProductCard from '@/components/ProductCard';
-import { Block, ProductRelation } from '@/lib/api/types';
+import { Block, ProductRelation, ProductCategoryRelation } from '@/lib/api/types';
+import { toBackendAssetUrl } from '@/lib/api/assets';
 import PageBlockRenderer from '@/components/PageBlockRenderer';
 
 
 interface ProductsPageProps {
   initialCategory?: string;
   products?: ProductRelation[];
+  categories?: ProductCategoryRelation[];
   pageTitle?: string;
   pageDescription?: string;
   blocks?: Block[];
@@ -68,6 +71,7 @@ const buildInfoItems = (block: Block): Array<{ title: string; description: strin
 export default function ProductsPage({
   initialCategory,
   products: initialProducts,
+  categories: childCategories,
   pageTitle,
   pageDescription,
   blocks,
@@ -161,6 +165,39 @@ export default function ProductsPage({
         <Breadcrumb.Item active>{pageTitle}</Breadcrumb.Item>
       </Breadcrumb>
 
+
+      {childCategories && childCategories.length > 0 ? (
+        <div className="mb-5">
+          <Row className="g-3 g-md-4">
+            {childCategories.map((cat) => {
+              const image = toBackendAssetUrl(cat.feature_image);
+              return (
+                <Col key={cat.id} xs={6} md={4} lg={3}>
+                  <Link
+                    href={`/${cat.slug}`}
+                    className="d-block text-decoration-none text-dark border rounded-3 overflow-hidden bg-white h-100 shadow-sm"
+                  >
+                    <div className="ratio ratio-4x3 bg-light">
+                      {image ? (
+                        <img
+                          src={image}
+                          alt={cat.title}
+                          className="w-100 h-100"
+                          style={{ objectFit: 'cover' }}
+                        />
+                      ) : null}
+                    </div>
+                    <div className="p-3 d-flex justify-content-between align-items-center">
+                      <span className="fw-semibold">{cat.title}</span>
+                      <span className="small text-muted">{cat.product_count}</span>
+                    </div>
+                  </Link>
+                </Col>
+              );
+            })}
+          </Row>
+        </div>
+      ) : null}
 
       <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3 border-bottom pb-4">
         <div>

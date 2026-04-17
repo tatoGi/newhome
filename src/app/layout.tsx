@@ -11,6 +11,7 @@ import Providers from '@/components/Providers';
 import ChatBot from '@/components/ChatBot';
 import { api } from '@/lib/api/client';
 import { getServerLocale } from '@/lib/locale';
+import { toBackendAssetUrl } from '@/lib/api/assets';
 
 const notoSerifGeorgian = Noto_Serif_Georgian({
   subsets: ['georgian'],
@@ -31,51 +32,69 @@ const defaultBootstrap = {
 const SITE_URL = 'https://homespace.ge';
 const SITE_NAME = 'HomeSpace.ge';
 
-export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
-  title: {
-    default: 'HomeSpace — ავეჯი და განათება საქართველოში',
-    template: `%s | ${SITE_NAME}`,
-  },
-  description:
-    'თანამედროვე ავეჯის და განათების ონლაინ მაღაზია. აღმოაჩინეთ საუკეთესო დიზაინი თქვენი სახლისთვის. მიწოდება მთელ საქართველოში.',
-  keywords: ['ავეჯი', 'განათება', 'ინტერიერი', 'დიზაინი', 'თბილისი', 'homespace', 'homespace.ge'],
-  authors: [{ name: SITE_NAME, url: SITE_URL }],
-  creator: SITE_NAME,
-  openGraph: {
-    type: 'website',
-    locale: 'ka_GE',
-    url: SITE_URL,
-    siteName: SITE_NAME,
-    title: 'HomeSpace — ავეჯი და განათება საქართველოში',
-    description: 'თანამედროვე ავეჯის და განათების ონლაინ მაღაზია.',
-    images: [{ url: `${SITE_URL}/og-image.jpg`, width: 1200, height: 630, alt: SITE_NAME }],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'HomeSpace — ავეჯი და განათება',
-    description: 'თანამედროვე ავეჯის და განათების ონლაინ მაღაზია.',
-    images: [`${SITE_URL}/og-image.jpg`],
-  },
-  alternates: {
-    canonical: SITE_URL,
-    languages: { ka: SITE_URL },
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
+export async function generateMetadata(): Promise<Metadata> {
+  const serverLocale = await getServerLocale();
+  let headerLogoPath: string | null = null;
+  try {
+    const bootstrap = await api.getBootstrap(serverLocale || undefined);
+    headerLogoPath = bootstrap?.settings?.headerLogo ?? null;
+  } catch {
+    headerLogoPath = null;
+  }
+
+  const faviconUrl = toBackendAssetUrl(headerLogoPath) || '/favicon.ico';
+
+  return {
+    metadataBase: new URL(SITE_URL),
+    title: {
+      default: 'HomeSpace — ავეჯი და განათება საქართველოში',
+      template: `%s | ${SITE_NAME}`,
+    },
+    description:
+      'თანამედროვე ავეჯის და განათების ონლაინ მაღაზია. აღმოაჩინეთ საუკეთესო დიზაინი თქვენი სახლისთვის. მიწოდება მთელ საქართველოში.',
+    keywords: ['ავეჯი', 'განათება', 'ინტერიერი', 'დიზაინი', 'თბილისი', 'homespace', 'homespace.ge'],
+    authors: [{ name: SITE_NAME, url: SITE_URL }],
+    creator: SITE_NAME,
+    icons: {
+      icon: faviconUrl,
+      shortcut: faviconUrl,
+      apple: faviconUrl,
+    },
+    openGraph: {
+      type: 'website',
+      locale: 'ka_GE',
+      url: SITE_URL,
+      siteName: SITE_NAME,
+      title: 'HomeSpace — ავეჯი და განათება საქართველოში',
+      description: 'თანამედროვე ავეჯის და განათების ონლაინ მაღაზია.',
+      images: [{ url: `${SITE_URL}/og-image.jpg`, width: 1200, height: 630, alt: SITE_NAME }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: 'HomeSpace — ავეჯი და განათება',
+      description: 'თანამედროვე ავეჯის და განათების ონლაინ მაღაზია.',
+      images: [`${SITE_URL}/og-image.jpg`],
+    },
+    alternates: {
+      canonical: SITE_URL,
+      languages: { ka: SITE_URL },
+    },
+    robots: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
     },
-  },
-  verification: {
-    google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION || undefined,
-  },
-};
+    verification: {
+      google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION || undefined,
+    },
+  };
+}
 
 const orgSchema = {
   '@context': 'https://schema.org',
