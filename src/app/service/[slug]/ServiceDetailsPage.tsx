@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { motion } from 'motion/react';
 import { ChevronRight, Phone } from 'lucide-react';
 import { toBackendAssetUrl } from '@/lib/api/assets';
+import PageBlockRenderer from '@/components/PageBlockRenderer';
 
 interface ServiceProps {
   id: number;
@@ -24,6 +25,9 @@ export default function ServiceDetailsPage({ service, phone }: { service: Servic
   );
   const title = intro?.data?.title || service.title;
   const desc = intro?.data?.post_text || service.desc;
+  const extraBlocks = (service.blocks ?? []).filter(
+    (b: any) => b.type !== 'post_intro'
+  );
 
   return (
     <div className="pb-5 bg-light min-vh-100">
@@ -68,6 +72,12 @@ export default function ServiceDetailsPage({ service, phone }: { service: Servic
             <ChevronRight size={14} className="mx-2" />
             <span className="text-dark fw-medium">{title}</span>
           </div>
+
+          {extraBlocks.length > 0 && (
+            <div className="mb-5">
+              <PageBlockRenderer blocks={extraBlocks} pageTitle={title} pageDescription={desc} />
+            </div>
+          )}
 
           <Row className="gy-5">
             <Col lg={7}>

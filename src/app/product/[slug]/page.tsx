@@ -131,10 +131,12 @@ export default async function Page({ params, searchParams }: {
     // related products are optional — continue without them
   }
 
+  const blocks = data.product.blocks ?? [];
+
   return (
     <>
       <ProductJsonLd product={product} />
-      <ProductDetailsPage product={product} relatedProducts={relatedProducts} />
+      <ProductDetailsPage product={product} relatedProducts={relatedProducts} blocks={blocks} />
     </>
   );
 }

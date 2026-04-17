@@ -9,6 +9,8 @@ import { useApp } from '@/context/AppContext';
 import { useAuth } from '@/context/AuthContext';
 import ProductCard from '@/components/ProductCard';
 import { isBackendAssetUrl } from '@/lib/api/assets';
+import PageBlockRenderer from '@/components/PageBlockRenderer';
+import type { Block } from '@/lib/api/types';
 
 export interface ProductDetails {
   id: number;
@@ -44,10 +46,15 @@ interface RelatedProduct {
 export default function ProductDetailsPage({
   product,
   relatedProducts = [],
+  blocks = [],
 }: {
   product: ProductDetails;
   relatedProducts?: RelatedProduct[];
+  blocks?: Block[];
 }) {
+  const extraBlocks = blocks.filter(
+    (b) => b.type !== 'product_intro' && b.type !== 'product_gallery'
+  );
   const { addToCart, addToWishlist, removeFromWishlist, isInWishlist } = useApp();
   const { user, openAuthModal } = useAuth();
   const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -121,6 +128,12 @@ export default function ProductDetailsPage({
               <Link href="/products" className="text-muted text-decoration-none">პროდუქცია</Link>
               <ChevronRight size={14} className="mx-2" />
               <span className="text-dark fw-medium">{product.name}</span>
+            </div>
+          )}
+
+          {extraBlocks.length > 0 && (
+            <div className="mb-5">
+              <PageBlockRenderer blocks={extraBlocks} pageTitle={product.name} pageDescription={product.description} />
             </div>
           )}
 
