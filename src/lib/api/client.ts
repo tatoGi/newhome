@@ -28,7 +28,7 @@ export async function fetchApi<T>(endpoint: string, options: RequestInit = {}): 
     // Allow callers to override `next` revalidation; fall back to env-based default
     const defaultNext = process.env.NODE_ENV === 'development'
         ? { revalidate: 0 }
-        : { revalidate: 3600 };
+        : { revalidate: 60 };
     const nextOption = (options as { next?: { revalidate?: number } }).next ?? defaultNext;
 
     const response = await fetch(url, {
@@ -43,7 +43,12 @@ export async function fetchApi<T>(endpoint: string, options: RequestInit = {}): 
 
     if (!response.ok) {
         const errorBody = await response.text();
-        console.error(`API Error [${response.status}]: ${url}`, errorBody);
+        // 404 is an expected signal for missing CMS content — log softly to avoid alert noise.
+        if (response.status === 404) {
+            console.warn(`API 404: ${url}`);
+        } else {
+            console.error(`API Error [${response.status}]: ${url}`, errorBody);
+        }
         throw new Error(`Failed to fetch from API: ${response.statusText}`);
     }
 

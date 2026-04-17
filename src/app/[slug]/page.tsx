@@ -18,14 +18,29 @@ interface PageProps {
     searchParams: Promise<{ locale?: string }>;
 }
 
+const RESERVED_SLUGS = new Set([
+    'favicon.ico',
+    'robots.txt',
+    'sitemap.xml',
+    'manifest.json',
+    'apple-touch-icon.png',
+    'apple-touch-icon-precomposed.png',
+]);
+
+const isReservedSlug = (slug: string): boolean =>
+    RESERVED_SLUGS.has(slug) || slug.startsWith('.well-known') || /\.[a-z0-9]{2,5}$/i.test(slug);
+
 export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
     const { slug } = await params;
     const { locale: queryLocale } = await searchParams;
     const locale = queryLocale || await getServerLocale() || undefined;
 
-    // If slug is 'home', we might want to redirect to root or just handle it
-    if (slug === 'home') {
-        // Handled below but let's fetch for metadata
+    if (isReservedSlug(slug)) {
+        return buildPageMetadata({
+            title: 'HomeSpace',
+            description: 'HomeSpace — ავეჯი და განათება.',
+            canonical: 'https://homespace.ge',
+        });
     }
 
     try {
@@ -56,6 +71,10 @@ export default async function Page({ params, searchParams }: PageProps) {
     // Handle 'home' slug by redirecting to root or rendering HomePage
     if (slug === 'home') {
         redirect('/');
+    }
+
+    if (isReservedSlug(slug)) {
+        return notFound();
     }
 
     try {
@@ -207,8 +226,7 @@ export default async function Page({ params, searchParams }: PageProps) {
             </div>
         );
 
-    } catch (error) {
-        console.error(`Failed to fetch page data for slug: ${slug}`, error);
+    } catch {
         return notFound();
     }
 }
