@@ -5,11 +5,13 @@ import { Button, Offcanvas } from 'react-bootstrap';
 import { useRouter } from 'next/navigation';
 import { ShoppingCart, X } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
-import { toBackendAssetUrl } from '@/lib/api/assets';
+import { resolveImageOrFallback } from '@/lib/api/assets';
+import { useFallbackLogo } from '@/context/BootstrapContext';
 
 const CartDrawer: React.FC<{ show: boolean; onHide: () => void }> = ({ show, onHide }) => {
   const { cart, removeFromCart, updateQuantity } = useApp();
   const router = useRouter();
+  const fallbackLogo = useFallbackLogo();
   const total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   return (
@@ -29,7 +31,7 @@ const CartDrawer: React.FC<{ show: boolean; onHide: () => void }> = ({ show, onH
             <div className="flex-grow-1 overflow-auto">
               {cart.map((item) => (
                 <div key={item.id} className="d-flex gap-3 mb-4 border-bottom pb-3">
-                  <img src={toBackendAssetUrl(item.image)} alt={item.name} style={{ width: 80, height: 80, objectFit: 'cover' }} className="rounded" />
+                  <img src={resolveImageOrFallback(item.image, fallbackLogo)} alt={item.name} style={{ width: 80, height: 80, objectFit: 'cover' }} className="rounded" />
                   <div className="flex-grow-1">
                     <h6 className="mb-1 small">{item.name}</h6>
                     <p className="text-muted small mb-2">{item.price} ₾</p>

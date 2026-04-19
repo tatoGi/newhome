@@ -5,7 +5,8 @@ import { Container, Row, Col, Button } from 'react-bootstrap';
 import Link from 'next/link';
 import { motion } from 'motion/react';
 import { Block } from '@/lib/api/types';
-import { isBackendAssetUrl, toBackendAssetUrl } from '@/lib/api/assets';
+import { isBackendAssetUrl, resolveImageOrFallback } from '@/lib/api/assets';
+import { useFallbackLogo } from '@/context/BootstrapContext';
 
 interface ImageTextSectionProps {
   blocks: Block[];
@@ -16,16 +17,16 @@ interface ImageTextSectionProps {
 const DEFAULTS = {
   title: 'HomeSpace - თქვენი სახლის დიზაინის პარტნიორი',
   desc: 'ჩვენი მისიაა შევქმნათ გარემო, რომელიც ასახავს თქვენს ინდივიდუალურობას. 10 წლიანი გამოცდილება ინტერიერის დიზაინსა და ავეჯის წარმოებაში.',
-  image: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1000&q=80',
   linkFirst: '/projects',
   linkSecond: '/about',
 };
 
 export default function ImageTextSection({ blocks, pageTitle, pageDescription }: ImageTextSectionProps) {
   const block = blocks.find((b) => b.type === 'image_text');
+  const fallbackLogo = useFallbackLogo();
   const title = String(block?.data?.content_title ?? block?.data?.section_title ?? block?.data?.title ?? pageTitle ?? DEFAULTS.title);
   const desc = String(block?.data?.content_text ?? block?.data?.textarea ?? pageDescription ?? DEFAULTS.desc);
-  const image = block?.data?.image ? toBackendAssetUrl(String(block.data.image)) : DEFAULTS.image;
+  const image = resolveImageOrFallback(block?.data?.image, fallbackLogo);
   const linkFirst = String(block?.data?.cta_primary_url ?? block?.data?.redairect_link_first ?? DEFAULTS.linkFirst);
   const linkSecond = String(block?.data?.cta_secondary_url ?? block?.data?.redairect_link_second ?? DEFAULTS.linkSecond);
 

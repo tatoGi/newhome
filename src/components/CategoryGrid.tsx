@@ -3,7 +3,8 @@
 import { Container, Row, Col } from 'react-bootstrap';
 import Link from 'next/link';
 import { motion } from 'motion/react';
-import { toBackendAssetUrl, isBackendAssetUrl } from '@/lib/api/assets';
+import { resolveImageOrFallback, isBackendAssetUrl } from '@/lib/api/assets';
+import { useFallbackLogo } from '@/context/BootstrapContext';
 import Image from 'next/image';
 
 interface ApiProduct {
@@ -13,6 +14,7 @@ interface ApiProduct {
 }
 
 const CategoryGrid: React.FC<{ data?: any; products?: ApiProduct[]; textBlock?: any }> = ({ data, products, textBlock }) => {
+    const fallbackLogo = useFallbackLogo();
     const realCategories = (() => {
         if (!products || products.length === 0) return null;
         const seen = new Set<string>();
@@ -24,15 +26,16 @@ const CategoryGrid: React.FC<{ data?: any; products?: ApiProduct[]; textBlock?: 
             cats.push({
                 id: cat,
                 name: cat,
-                image: toBackendAssetUrl(p.feature_image) || '/placeholder.jpg',
+                image: resolveImageOrFallback(p.feature_image, fallbackLogo),
                 link: '/products',
             });
         }
         return cats.length > 0 ? cats : null;
     })();
 
-    const displayCategories = realCategories
-        ?? (data?.categories && data.categories.length > 0 ? data.categories : null);
+    const displayCategories = (realCategories
+        ?? (data?.categories && data.categories.length > 0 ? data.categories : null))
+        ?.map((cat: any) => ({ ...cat, image: resolveImageOrFallback(cat.image, fallbackLogo) }));
 
     if (!displayCategories || displayCategories.length === 0) return null;
 

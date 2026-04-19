@@ -6,7 +6,8 @@ import { Check } from 'lucide-react';
 import Link from 'next/link';
 import ProductCard from '@/components/ProductCard';
 import { Block, ProductRelation, ProductCategoryRelation } from '@/lib/api/types';
-import { toBackendAssetUrl } from '@/lib/api/assets';
+import { resolveImageOrFallback } from '@/lib/api/assets';
+import { useFallbackLogo } from '@/context/BootstrapContext';
 import PageBlockRenderer from '@/components/PageBlockRenderer';
 
 
@@ -81,6 +82,7 @@ export default function ProductsPage({
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [showSaleOnly, setShowSaleOnly] = useState(false);
   const [sort, setSort] = useState('Default');
+  const fallbackLogo = useFallbackLogo();
 
   const products = initialProducts || [];
   const cmsProducts: ProductListItem[] = products?.map((product) => {
@@ -94,7 +96,7 @@ export default function ProductsPage({
       oldPrice: product.old_price ? Number(product.old_price) : undefined,
       sale: product.on_sale,
       featured: product.is_featured,
-      image: product.feature_image || galleryImages[0] || '/placeholder.jpg',
+      image: product.feature_image || galleryImages[0] || '',
       category: product.category || 'პროდუქცია',
       slug: product.slug || `product-${product.id}`, // Fallback slug if empty
       blocks: product.blocks,
@@ -170,7 +172,7 @@ export default function ProductsPage({
         <div className="mb-5">
           <Row className="g-3 g-md-4">
             {childCategories.map((cat) => {
-              const image = toBackendAssetUrl(cat.feature_image);
+              const image = resolveImageOrFallback(cat.feature_image, fallbackLogo);
               return (
                 <Col key={cat.id} xs={6} md={4} lg={3}>
                   <Link
@@ -178,14 +180,12 @@ export default function ProductsPage({
                     className="d-block text-decoration-none text-dark border rounded-3 overflow-hidden bg-white h-100 shadow-sm"
                   >
                     <div className="ratio ratio-4x3 bg-light">
-                      {image ? (
-                        <img
-                          src={image}
-                          alt={cat.title}
-                          className="w-100 h-100"
-                          style={{ objectFit: 'cover' }}
-                        />
-                      ) : null}
+                      <img
+                        src={image}
+                        alt={cat.title}
+                        className="w-100 h-100"
+                        style={{ objectFit: 'cover' }}
+                      />
                     </div>
                     <div className="p-3 d-flex justify-content-between align-items-center">
                       <span className="fw-semibold">{cat.title}</span>

@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { api } from '@/lib/api/client';
-import { toBackendAssetUrl } from '@/lib/api/assets';
+import { resolveImageOrFallback } from '@/lib/api/assets';
+import { getServerFallbackLogo } from '@/lib/api/serverFallback';
 import ServiceDetailsPage from './ServiceDetailsPage';
 import { getServerLocale } from '@/lib/locale';
 import { buildPageMetadata } from '@/lib/metadata';
@@ -31,7 +32,8 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
     const data = await api.getService(slug, locale);
     const intro = data.post.blocks?.find((b: any) => b.type === 'post_intro');
     const title = intro?.data?.title || data.post.title;
-    const image = toBackendAssetUrl(intro?.data?.post_image || data.post.feature_image || '');
+    const fallbackLogo = await getServerFallbackLogo(locale);
+    const image = resolveImageOrFallback(intro?.data?.post_image || data.post.feature_image || '', fallbackLogo);
     return buildPageMetadata({
       title: data.seo?.meta_title || title,
       description: data.seo?.meta_description || data.post.excerpt || undefined,

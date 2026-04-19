@@ -7,7 +7,8 @@ import Link from 'next/link';
 import { Search, Package, FileText, Wrench, FolderOpen } from 'lucide-react';
 import { api } from '@/lib/api/client';
 import { SearchResult } from '@/lib/api/types';
-import { toBackendAssetUrl } from '@/lib/api/assets';
+import { resolveImageOrFallback } from '@/lib/api/assets';
+import { useFallbackLogo } from '@/context/BootstrapContext';
 
 const TYPE_LABELS: Record<string, string> = {
     product: 'პროდუქტი',
@@ -26,6 +27,7 @@ const TYPE_ICONS: Record<string, React.ReactNode> = {
 export default function SearchPage() {
     const searchParams = useSearchParams();
     const router = useRouter();
+    const fallbackLogo = useFallbackLogo();
     const initialQ = searchParams.get('q') ?? '';
 
     const [inputValue, setInputValue] = useState(initialQ);
@@ -120,18 +122,12 @@ export default function SearchPage() {
                                     <Link href={item.url} className="text-decoration-none">
                                         <div className="bg-white rounded-3 shadow-sm overflow-hidden h-100 d-flex flex-column search-result-card">
                                             <div style={{ height: 180, overflow: 'hidden', background: '#f5f5f5' }}>
-                                                {item.image ? (
-                                                    <img
-                                                        src={toBackendAssetUrl(item.image) || item.image}
-                                                        alt={item.title}
-                                                        className="w-100 h-100"
-                                                        style={{ objectFit: 'cover' }}
-                                                    />
-                                                ) : (
-                                                    <div className="w-100 h-100 d-flex align-items-center justify-content-center text-muted">
-                                                        <Search size={32} className="opacity-25" />
-                                                    </div>
-                                                )}
+                                                <img
+                                                    src={resolveImageOrFallback(item.image, fallbackLogo)}
+                                                    alt={item.title}
+                                                    className="w-100 h-100"
+                                                    style={{ objectFit: 'cover' }}
+                                                />
                                             </div>
                                             <div className="p-3 d-flex flex-column flex-grow-1">
                                                 <span className="d-inline-flex align-items-center gap-1 badge bg-primary bg-opacity-10 text-primary rounded-pill px-2 py-1 mb-2 small">

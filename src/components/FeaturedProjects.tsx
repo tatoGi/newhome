@@ -7,7 +7,8 @@ import { motion } from 'motion/react';
 import { ArrowRight, MapPin } from 'lucide-react';
 import { slugify } from '@/lib/slugify';
 import { ProjectSection } from '@/lib/api/types';
-import { isBackendAssetUrl, toBackendAssetUrl } from '@/lib/api/assets';
+import { isBackendAssetUrl, resolveImageOrFallback } from '@/lib/api/assets';
+import { useFallbackLogo } from '@/context/BootstrapContext';
 
 interface FeaturedProjectsProps {
     projects?: any[];
@@ -19,30 +20,31 @@ function stripMarkdown(text: string): string {
     return text.replace(/^#+\s*/, '').trim();
 }
 
-function resolvePostDisplay(post: any): { title: string; desc: string; image: string; location: string } {
+function resolvePostDisplay(post: any, fallbackLogo: string): { title: string; desc: string; image: string; location: string } {
     const introBlock = post.blocks?.find((b: any) => b.type === 'post_intro');
     const rawTitle = introBlock?.data?.title || post.title || '';
     const title = stripMarkdown(String(rawTitle));
     const desc = String(introBlock?.data?.post_text || post.excerpt || '').replace(/<[^>]*>/g, '');
     const rawImage = introBlock?.data?.post_image || post.feature_image || '';
     const location = String(introBlock?.data?.location || introBlock?.data?.post_location || '');
-    return { title, desc, image: toBackendAssetUrl(rawImage) || '', location };
+    return { title, desc, image: resolveImageOrFallback(rawImage, fallbackLogo), location };
 }
 
 const FeaturedProjects: React.FC<FeaturedProjectsProps> = ({ projects: propProjects, projectSection }) => {
     const apiPosts = projectSection?.posts;
+    const fallbackLogo = useFallbackLogo();
     const sortByNewest = (arr: any[]) => [...arr].sort((a, b) => (b.id ?? 0) - (a.id ?? 0));
 
     let projects: { id: any; title: string; desc: string; image: string; location: string; slug: string }[];
 
     if (apiPosts && apiPosts.length > 0) {
         projects = sortByNewest(apiPosts).slice(0, 3).map((p: any) => {
-            const d = resolvePostDisplay(p);
+            const d = resolvePostDisplay(p, fallbackLogo);
             return { id: p.id, title: d.title, desc: d.desc, image: d.image, location: d.location, slug: p.slug as string };
         });
     } else if (propProjects && propProjects.length > 0) {
         projects = sortByNewest(propProjects).slice(0, 3).map((p: any) => {
-            const d = resolvePostDisplay(p);
+            const d = resolvePostDisplay(p, fallbackLogo);
             return { id: p.id, title: d.title, desc: d.desc, image: d.image, location: d.location, slug: p.slug as string };
         });
     } else {
@@ -88,17 +90,14 @@ const FeaturedProjects: React.FC<FeaturedProjectsProps> = ({ projects: propProje
                                 <Link href={`/project/${slugify(project.slug)}`} className="text-decoration-none group">
                                     <div
                                         className={`position-relative overflow-hidden rounded-4 shadow-lg ${index === 0 ? 'ratio ratio-21x9' : 'ratio ratio-16x9'}`}
-                                        style={!project.image ? { background: 'linear-gradient(135deg, #0F2E47 0%, #1a4a6e 100%)' } : undefined}
                                     >
-                                        {project.image && (
-                                            <Image
-                                                src={project.image}
-                                                alt={project.title}
-                                                fill
-                                                className="object-fit-cover transition-transform duration-700 hover-scale-110"
-                                                unoptimized={isBackendAssetUrl(project.image)}
-                                            />
-                                        )}
+                                        <Image
+                                            src={project.image}
+                                            alt={project.title}
+                                            fill
+                                            className="object-fit-cover transition-transform duration-700 hover-scale-110"
+                                            unoptimized={isBackendAssetUrl(project.image)}
+                                        />
                                         <div className="position-absolute inset-0 bg-gradient-to-t from-black opacity-60" />
                                         <div className="position-absolute bottom-0 start-0 p-4 p-md-5 text-white w-100">
                                             {project.location && (

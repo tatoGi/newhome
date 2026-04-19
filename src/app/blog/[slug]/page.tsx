@@ -4,7 +4,8 @@ import { api } from '@/lib/api/client';
 import { Container, Row, Col } from 'react-bootstrap';
 import { Calendar, User } from 'lucide-react';
 import Link from 'next/link';
-import { toBackendAssetUrl } from '@/lib/api/assets';
+import { resolveImageOrFallback, toBackendAssetUrl } from '@/lib/api/assets';
+import { getServerFallbackLogo } from '@/lib/api/serverFallback';
 import { getServerLocale } from '@/lib/locale';
 import { buildPageMetadata } from '@/lib/metadata';
 
@@ -28,12 +29,13 @@ export async function generateMetadata({ params }: {
         const locale = await getServerLocale();
         const data = await api.getBlog(slug, locale || undefined);
         const p = data.post;
+        const fallbackLogo = await getServerFallbackLogo(locale || undefined);
         return buildPageMetadata({
             title: data.seo?.meta_title || p.title,
             description: data.seo?.meta_description || p.excerpt || undefined,
             canonical: data.seo?.canonical_url || `https://homespace.ge/blog/${slug}`,
             keywords: data.seo?.keywords || undefined,
-            image: p.feature_image ? toBackendAssetUrl(p.feature_image) : undefined,
+            image: toBackendAssetUrl(p.feature_image) || fallbackLogo,
         });
     } catch {
         return buildPageMetadata({
@@ -62,14 +64,16 @@ export default async function Page({ params }: {
 
     const post = data.post;
     const relatedPosts = (data.relations?.posts ?? []).filter((p: any) => p.slug !== slug).slice(0, 6);
+    const fallbackLogo = await getServerFallbackLogo(locale || undefined);
 
     const dateStr = post.published_at ? String(post.published_at) : '';
 
-    // Resolve content and image: prefer raw content field, fall back to post_intro block
     const introBlock = (post.blocks ?? []).find((b: any) => b.type === 'post_intro');
     const resolvedContent: string = post.content || introBlock?.data?.post_text || '';
-    const resolvedImage: string | null = post.feature_image
-        || (introBlock?.data?.post_image ? String(introBlock.data.post_image) : null);
+    const resolvedImage: string = resolveImageOrFallback(
+        post.feature_image || introBlock?.data?.post_image,
+        fallbackLogo,
+    );
 
     return (
         <div className="py-5 bg-white min-vh-100">
@@ -99,21 +103,17 @@ export default async function Page({ params }: {
                 </div>
 
                 <Row className="g-5">
-                    {/* Image — left */}
-                    {resolvedImage && (
-                        <Col lg={5} className="d-flex align-items-start">
-                            <div className="rounded-4 overflow-hidden shadow-sm w-100 sticky-top" style={{ top: '100px' }}>
-                                <img
-                                    src={toBackendAssetUrl(resolvedImage) || resolvedImage}
-                                    alt={post.title}
-                                    className="w-100 h-auto d-block"
-                                />
-                            </div>
-                        </Col>
-                    )}
+                    <Col lg={5} className="d-flex align-items-start">
+                        <div className="rounded-4 overflow-hidden shadow-sm w-100 sticky-top" style={{ top: '100px' }}>
+                            <img
+                                src={resolvedImage}
+                                alt={post.title}
+                                className="w-100 h-auto d-block"
+                            />
+                        </div>
+                    </Col>
 
-                    {/* Content — right */}
-                    <Col lg={resolvedImage ? 7 : 8}>
+                    <Col lg={7}>
                         {resolvedContent ? (
                             <div
                                 className="blog-content"
@@ -132,16 +132,12 @@ export default async function Page({ params }: {
                                         <Col key={p.slug} xs={6} md={4}>
                                             <Link href={`/blog/${p.slug}`} className="text-decoration-none text-dark d-block">
                                                 <div className="rounded-3 overflow-hidden mb-2" style={{ height: 110, backgroundColor: '#f5f5f5' }}>
-                                                    {p.feature_image ? (
-                                                        <img
-                                                            src={toBackendAssetUrl(p.feature_image) || p.feature_image}
-                                                            alt={p.title}
-                                                            className="w-100 h-100"
-                                                            style={{ objectFit: 'cover' }}
-                                                        />
-                                                    ) : (
-                                                        <div className="w-100 h-100 d-flex align-items-center justify-content-center text-muted small">სურათი არ არის</div>
-                                                    )}
+                                                    <img
+                                                        src={resolveImageOrFallback(p.feature_image, fallbackLogo)}
+                                                        alt={p.title}
+                                                        className="w-100 h-100"
+                                                        style={{ objectFit: 'cover' }}
+                                                    />
                                                 </div>
                                                 <p className="small fw-semibold mb-0 lh-sm" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                                                     {p.title}

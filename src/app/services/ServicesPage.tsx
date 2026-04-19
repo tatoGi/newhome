@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { motion } from 'motion/react';
 import { ArrowRight } from 'lucide-react';
 import { Block, PostRelation } from '@/lib/api/types';
-import { toBackendAssetUrl } from '@/lib/api/assets';
+import { resolveImageOrFallback } from '@/lib/api/assets';
+import { useFallbackLogo } from '@/context/BootstrapContext';
 import { slugify } from '@/lib/slugify';
 import { stripMarkdown } from '@/lib/stripMarkdown';
 import PageBlockRenderer from '@/components/PageBlockRenderer';
@@ -18,6 +19,7 @@ interface ServicesPageProps {
 }
 
 export default function ServicesPage({ posts, pageTitle, pageDescription, blocks }: ServicesPageProps) {
+  const fallbackLogo = useFallbackLogo();
   const heroBlock = [...(blocks ?? [])]
     .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
     .find((block) => block.type === 'page_hero' || block.type === 'main_banner' || block.type === 'banner');
@@ -30,7 +32,7 @@ export default function ServicesPage({ posts, pageTitle, pageDescription, blocks
     pageDescription ??
     ''
   );
-  const heroImage = toBackendAssetUrl(heroBlock?.data?.banner_image ?? heroBlock?.data?.image ?? '');
+  const heroImage = resolveImageOrFallback(heroBlock?.data?.banner_image ?? heroBlock?.data?.image, fallbackLogo);
 
   const services = (posts ?? []).map((post) => {
     const intro = post.blocks?.find((b) => b.type === 'post_intro');
@@ -40,7 +42,7 @@ export default function ServicesPage({ posts, pageTitle, pageDescription, blocks
       slug: post.slug,
       title: stripMarkdown(intro?.data?.title || post.title),
       desc: post.excerpt,
-      image: toBackendAssetUrl(rawImage) || '',
+      image: resolveImageOrFallback(rawImage, fallbackLogo),
     };
   });
 
@@ -51,23 +53,16 @@ export default function ServicesPage({ posts, pageTitle, pageDescription, blocks
         <Breadcrumb.Item active>{heroTitle}</Breadcrumb.Item>
       </Breadcrumb>
 
-      {heroImage ? (
-        <div
-          className="position-relative overflow-hidden rounded-4 mb-5"
-          style={{ minHeight: '260px', backgroundImage: `url(${heroImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
-        >
-          <div className="position-absolute top-0 start-0 w-100 h-100" style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0.42), rgba(0,0,0,0.18))' }} />
-          <div className="position-relative text-white d-flex flex-column justify-content-end h-100 p-4 p-md-5">
-            <h1 className="fw-bold display-5 mb-3">{heroTitle}</h1>
-            {heroDescription ? <div className="lead mb-0 opacity-75" style={{ maxWidth: '700px' }} dangerouslySetInnerHTML={{ __html: heroDescription }} /> : null}
-          </div>
+      <div
+        className="position-relative overflow-hidden rounded-4 mb-5"
+        style={{ minHeight: '260px', backgroundImage: `url(${heroImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+      >
+        <div className="position-absolute top-0 start-0 w-100 h-100" style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0.42), rgba(0,0,0,0.18))' }} />
+        <div className="position-relative text-white d-flex flex-column justify-content-end h-100 p-4 p-md-5">
+          <h1 className="fw-bold display-5 mb-3">{heroTitle}</h1>
+          {heroDescription ? <div className="lead mb-0 opacity-75" style={{ maxWidth: '700px' }} dangerouslySetInnerHTML={{ __html: heroDescription }} /> : null}
         </div>
-      ) : (
-        <div className="text-center mb-5">
-          <h1 className="fw-bold display-4 mb-3">{heroTitle}</h1>
-          {heroDescription ? <div className="text-muted lead mx-auto" style={{ maxWidth: '700px' }} dangerouslySetInnerHTML={{ __html: heroDescription }} /> : null}
-        </div>
-      )}
+      </div>
 
       {services.length === 0 && (
         <div className="rounded-4 border bg-white p-5 text-center text-muted">
@@ -89,19 +84,13 @@ export default function ServicesPage({ posts, pageTitle, pageDescription, blocks
                 <Row className="g-0 h-100">
                   <Col md={5}>
                     <Link href={`/service/${slugify(service.slug)}`} className="d-block h-100">
-                      {service.image ? (
-                        <img
-                          src={service.image}
-                          alt={service.title}
-                          className="img-fluid h-100 w-100"
-                          style={{ objectFit: 'cover', minHeight: '200px' }}
-                          referrerPolicy="no-referrer"
-                        />
-                      ) : (
-                        <div className="h-100 w-100 bg-light d-flex align-items-center justify-content-center" style={{ minHeight: '200px' }}>
-                          <span className="text-muted small">სურათი არ არის</span>
-                        </div>
-                      )}
+                      <img
+                        src={service.image}
+                        alt={service.title}
+                        className="img-fluid h-100 w-100"
+                        style={{ objectFit: 'cover', minHeight: '200px' }}
+                        referrerPolicy="no-referrer"
+                      />
                     </Link>
                   </Col>
                   <Col md={7}>

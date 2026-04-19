@@ -8,7 +8,8 @@ import ProjectsPage from '../projects/ProjectsPage';
 import ServicesPage from '../services/ServicesPage';
 import { notFound, redirect } from 'next/navigation';
 import Link from 'next/link';
-import { toBackendAssetUrl } from '@/lib/api/assets';
+import { resolveImageOrFallback } from '@/lib/api/assets';
+import { getServerFallbackLogo } from '@/lib/api/serverFallback';
 import BlogListPage from '../blog/BlogListPage';
 import { getServerLocale } from '@/lib/locale';
 import { buildPageMetadata } from '@/lib/metadata';
@@ -45,12 +46,13 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
 
     try {
         const data = await api.getPage(slug, locale);
+        const fallbackLogo = await getServerFallbackLogo(locale);
         return buildPageMetadata({
             title: data.seo.meta_title || data.page.title,
             description: data.seo.meta_description || undefined,
             canonical: data.seo.canonical_url || `https://homespace.ge/${decodeURIComponent(slug)}`,
             keywords: data.seo.keywords || undefined,
-            image: data.seo.og_image || data.seo.social_image || undefined,
+            image: data.seo.og_image || data.seo.social_image || fallbackLogo,
             url: data.seo.canonical_url || `https://homespace.ge/${decodeURIComponent(slug)}`,
         });
     } catch {
@@ -147,6 +149,7 @@ export default async function Page({ params, searchParams }: PageProps) {
         const relatedPosts = data.relations?.posts ?? [];
         const relatedProducts = data.relations?.products ?? [];
         const hasSidebar = relatedPosts.length > 0 || relatedProducts.length > 0;
+        const fallbackLogo = await getServerFallbackLogo(locale);
 
         return (
             <div className="py-5 bg-white min-vh-100">
@@ -173,14 +176,12 @@ export default async function Page({ params, searchParams }: PageProps) {
                                                     <div key={p.slug} className="col-6">
                                                         <Link href={`/blog/${p.slug}`} className="text-decoration-none text-dark d-block">
                                                             <div className="rounded-3 overflow-hidden mb-2" style={{ height: 100, backgroundColor: '#f5f5f5' }}>
-                                                                {p.feature_image ? (
-                                                                    <img
-                                                                        src={toBackendAssetUrl(p.feature_image)}
-                                                                        alt={p.title}
-                                                                        className="w-100 h-100"
-                                                                        style={{ objectFit: 'cover' }}
-                                                                    />
-                                                                ) : null}
+                                                                <img
+                                                                    src={resolveImageOrFallback(p.feature_image, fallbackLogo)}
+                                                                    alt={p.title}
+                                                                    className="w-100 h-100"
+                                                                    style={{ objectFit: 'cover' }}
+                                                                />
                                                             </div>
                                                             <p className="small fw-semibold mb-0 lh-sm" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                                                                 {p.title}
@@ -200,14 +201,12 @@ export default async function Page({ params, searchParams }: PageProps) {
                                                     <div key={p.id} className="col-6">
                                                         <Link href={`/product/${p.slug}`} className="text-decoration-none text-dark d-block">
                                                             <div className="rounded-3 overflow-hidden mb-2" style={{ height: 130, backgroundColor: '#f5f5f5' }}>
-                                                                {p.feature_image ? (
-                                                                    <img
-                                                                        src={toBackendAssetUrl(p.feature_image)}
-                                                                        alt={p.title}
-                                                                        className="w-100 h-100"
-                                                                        style={{ objectFit: 'cover' }}
-                                                                    />
-                                                                ) : null}
+                                                                <img
+                                                                    src={resolveImageOrFallback(p.feature_image, fallbackLogo)}
+                                                                    alt={p.title}
+                                                                    className="w-100 h-100"
+                                                                    style={{ objectFit: 'cover' }}
+                                                                />
                                                             </div>
                                                             <p className="small fw-semibold mb-1 lh-sm" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                                                                 {p.title}

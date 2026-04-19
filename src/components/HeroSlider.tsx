@@ -5,9 +5,9 @@ import { Button, Carousel, Container } from 'react-bootstrap';
 import Image from 'next/image';
 import { motion } from 'motion/react';
 import Link from 'next/link';
-import { useBootstrap } from '@/context/BootstrapContext';
+import { useBootstrap, useFallbackLogo } from '@/context/BootstrapContext';
 import { getUiText } from '@/lib/i18n/ui';
-import { isBackendAssetUrl } from '@/lib/api/assets';
+import { isBackendAssetUrl, resolveImageOrFallback } from '@/lib/api/assets';
 
 type HeroSlide = {
   id?: string | number;
@@ -33,6 +33,7 @@ const ChevronRight = () => (
 const HeroSlider: React.FC<{ data?: { slides?: HeroSlide[] } }> = ({ data }) => {
 
   const { locale } = useBootstrap();
+  const fallbackLogo = useFallbackLogo();
   const displaySlides = Array.isArray(data?.slides) ? data.slides.filter(Boolean) : [];
   const hasMultipleSlides = displaySlides.length > 1;
 
@@ -55,24 +56,22 @@ const HeroSlider: React.FC<{ data?: { slides?: HeroSlide[] } }> = ({ data }) => 
         prevLabel={getUiText(locale, 'hero.previous_slide')}
         nextLabel={getUiText(locale, 'hero.next_slide')}
       >
-        {displaySlides.map((slide, index) => (
+        {displaySlides.map((slide, index) => {
+          const slideImage = resolveImageOrFallback(slide.image, fallbackLogo);
+          return (
           <Carousel.Item key={slide.id ?? index}>
             <div className="hero-slide-image-container" style={{ position: 'relative', minHeight: '440px' }}>
-              {slide.image ? (
-                <Image
-                  src={slide.image}
-                  alt={slide.title || 'Banner'}
-                  fill
-                  priority={index === 0}
-                  loading={index === 0 ? 'eager' : 'lazy'}
-                  sizes="100vw"
-                  unoptimized={isBackendAssetUrl(slide.image)}
-                  className="hero-slide-image"
-                  style={{ objectFit: 'cover' }}
-                />
-              ) : (
-                <div className="hero-slide-fallback" />
-              )}
+              <Image
+                src={slideImage}
+                alt={slide.title || 'Banner'}
+                fill
+                priority={index === 0}
+                loading={index === 0 ? 'eager' : 'lazy'}
+                sizes="100vw"
+                unoptimized={isBackendAssetUrl(slideImage)}
+                className="hero-slide-image"
+                style={{ objectFit: 'cover' }}
+              />
             </div>
 
             <Carousel.Caption className="hero-slide-overlay">
@@ -100,7 +99,8 @@ const HeroSlider: React.FC<{ data?: { slides?: HeroSlide[] } }> = ({ data }) => 
               </Container>
             </Carousel.Caption>
           </Carousel.Item>
-        ))}
+          );
+        })}
       </Carousel>
     </section>
   );

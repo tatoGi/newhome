@@ -1,8 +1,9 @@
 'use client';
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useMemo, useState } from 'react';
 import { BootstrapResponse } from '@/lib/api/types';
 import { api } from '@/lib/api/client';
+import { toBackendAssetUrl } from '@/lib/api/assets';
 
 interface BootstrapContextType {
     data: BootstrapResponse;
@@ -56,4 +57,10 @@ export const useBootstrap = () => {
         isLoading: context.isLoading,
         refreshBootstrap: context.refreshBootstrap,
     };
+};
+
+export const useFallbackLogo = (): string => {
+    const context = useContext(BootstrapContext);
+    const headerLogo = context?.data.settings.headerLogo ?? null;
+    return useMemo(() => toBackendAssetUrl(headerLogo) || '/logo.png', [headerLogo]);
 };

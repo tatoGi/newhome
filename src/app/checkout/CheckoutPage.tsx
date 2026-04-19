@@ -9,11 +9,14 @@ import { useApp } from '@/context/AppContext';
 import { useAuth } from '@/context/AuthContext';
 import { api } from '@/lib/api/client';
 import { SavedCard } from '@/lib/api/types';
+import { resolveImageOrFallback } from '@/lib/api/assets';
+import { useFallbackLogo } from '@/context/BootstrapContext';
 
 export default function CheckoutPage() {
   const router = useRouter();
   const { user, token, openAuthModal } = useAuth();
   const { cart, isCartLoading } = useApp();
+  const fallbackLogo = useFallbackLogo();
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCardsLoading, setIsCardsLoading] = useState(true);
@@ -324,7 +327,7 @@ export default function CheckoutPage() {
               {cart.map((item) => (
                 <div key={item.id} className="d-flex gap-3 align-items-center">
                   <img
-                    src={item.image}
+                    src={resolveImageOrFallback(item.image, fallbackLogo)}
                     alt={item.name}
                     className="rounded-3"
                     style={{ width: 64, height: 64, objectFit: 'cover' }}

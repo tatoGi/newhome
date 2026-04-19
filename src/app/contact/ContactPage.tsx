@@ -6,7 +6,8 @@ import { Alert, Breadcrumb, Button, Card, Col, Container, Form, Row } from 'reac
 import { Clock, Mail, MapPin, Phone } from 'lucide-react';
 import { api } from '@/lib/api/client';
 import { Block } from '@/lib/api/types';
-import { toBackendAssetUrl } from '@/lib/api/assets';
+import { resolveImageOrFallback } from '@/lib/api/assets';
+import { useFallbackLogo } from '@/context/BootstrapContext';
 
 const LeafletContactMap = dynamic(() => import('@/components/LeafletContactMap'), {
   ssr: false,
@@ -144,6 +145,7 @@ function resolveContactItems(blocks?: Block[]): ContactInfoItem[] {
 export default function ContactPage({ pageTitle, pageDescription, blocks }: ContactPageProps) {
   const sortedBlocks = [...(blocks ?? [])].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
   const heroBlock = sortedBlocks.find((block) => block.type === 'page_hero' || block.type === 'main_banner' || block.type === 'banner');
+  const fallbackLogo = useFallbackLogo();
 
   const heroTitle = String(heroBlock?.data?.banner_title ?? heroBlock?.data?.title ?? pageTitle ?? 'კონტაქტი');
   const heroDescription = String(
@@ -153,7 +155,7 @@ export default function ContactPage({ pageTitle, pageDescription, blocks }: Cont
     pageDescription ??
     '',
   );
-  const heroImage = toBackendAssetUrl(heroBlock?.data?.banner_image ?? heroBlock?.data?.image ?? '');
+  const heroImage = resolveImageOrFallback(heroBlock?.data?.banner_image ?? heroBlock?.data?.image, fallbackLogo);
   const contactItems = resolveContactItems(sortedBlocks);
   const addressItem = contactItems.find((item) => item.kind === 'address');
 
@@ -206,18 +208,16 @@ export default function ContactPage({ pageTitle, pageDescription, blocks }: Cont
         <Breadcrumb.Item active>{heroTitle}</Breadcrumb.Item>
       </Breadcrumb>
 
-      {heroImage ? (
-        <div
-          className="position-relative overflow-hidden rounded-4 mb-5"
-          style={{ minHeight: '260px', backgroundImage: `url(${heroImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
-        >
-          <div className="position-absolute top-0 start-0 w-100 h-100" style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0.42), rgba(0,0,0,0.18))' }} />
-          <div className="position-relative text-white d-flex flex-column justify-content-end h-100 p-4 p-md-5">
-            <h1 className="fw-bold display-5 mb-2">{heroTitle}</h1>
-            {heroDescription ? <div className="mb-0 opacity-75" style={{ maxWidth: '720px' }} dangerouslySetInnerHTML={{ __html: heroDescription }} /> : null}
-          </div>
+      <div
+        className="position-relative overflow-hidden rounded-4 mb-5"
+        style={{ minHeight: '260px', backgroundImage: `url(${heroImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+      >
+        <div className="position-absolute top-0 start-0 w-100 h-100" style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0.42), rgba(0,0,0,0.18))' }} />
+        <div className="position-relative text-white d-flex flex-column justify-content-end h-100 p-4 p-md-5">
+          <h1 className="fw-bold display-5 mb-2">{heroTitle}</h1>
+          {heroDescription ? <div className="mb-0 opacity-75" style={{ maxWidth: '720px' }} dangerouslySetInnerHTML={{ __html: heroDescription }} /> : null}
         </div>
-      ) : null}
+      </div>
 
       <Row className="gy-5">
         <Col lg={5}>

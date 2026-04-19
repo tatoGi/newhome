@@ -5,7 +5,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Heart, ShoppingCart } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
-import { toBackendAssetUrl, isBackendAssetUrl } from '@/lib/api/assets';
+import { useFallbackLogo } from '@/context/BootstrapContext';
+import { resolveImageOrFallback, isBackendAssetUrl } from '@/lib/api/assets';
 
 export interface Product {
   id: number;
@@ -28,7 +29,8 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
   const { addToCart, addToWishlist, removeFromWishlist, isInWishlist } = useApp();
   const [isHovered, setIsHovered] = useState(false);
   const [activeColor, setActiveColor] = useState(0);
-  const productImage = toBackendAssetUrl(product.image) || '/placeholder.jpg';
+  const fallbackLogo = useFallbackLogo();
+  const productImage = resolveImageOrFallback(product.image, fallbackLogo);
   const shouldUnoptimizeImage = isBackendAssetUrl(productImage);
   const productSlug = product.slug || `product-${product.id}`;
 

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { motion } from 'motion/react';
 import { ChevronRight, Calendar, MapPin, Tag } from 'lucide-react';
 import { toBackendAssetUrl } from '@/lib/api/assets';
+import { useFallbackLogo } from '@/context/BootstrapContext';
 
 interface ProjectProps {
   id: number;
@@ -20,6 +21,7 @@ interface ProjectProps {
 
 export default function ProjectDetailsPage({ project }: { project: ProjectProps }) {
   const intro = project.blocks?.find((b: any) => b.type === 'post_intro');
+  const fallbackLogo = useFallbackLogo();
 
   const title = intro?.data?.title || project.title;
   const desc = intro?.data?.post_text || project.desc;
@@ -29,9 +31,10 @@ export default function ProjectDetailsPage({ project }: { project: ProjectProps 
     intro?.data?.post_image,
     ...(project.images ?? []),
   ];
-  const images = rawImages
+  const resolvedImages = rawImages
     .map((img) => toBackendAssetUrl(img || ''))
     .filter(Boolean) as string[];
+  const images = resolvedImages.length > 0 ? resolvedImages : [fallbackLogo];
 
   const details = [
     project.category ? { icon: <Tag size={20} />, label: 'კატეგორია', value: project.category } : null,
@@ -87,7 +90,7 @@ export default function ProjectDetailsPage({ project }: { project: ProjectProps 
                 ))}
               </Carousel>
             </div>
-          ) : images.length === 1 ? (
+          ) : (
             <div className="mb-5 rounded overflow-hidden shadow-sm">
               <img
                 src={images[0]}
@@ -97,7 +100,7 @@ export default function ProjectDetailsPage({ project }: { project: ProjectProps 
                 referrerPolicy="no-referrer"
               />
             </div>
-          ) : null}
+          )}
 
           <Row className="gy-5">
             <Col lg={details.length > 0 ? 8 : 12}>

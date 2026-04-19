@@ -6,14 +6,14 @@ import { motion } from 'motion/react';
 import { ArrowRight } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
 import { ProductRelation } from '@/lib/api/types';
-import { useBootstrap } from '@/context/BootstrapContext';
-import { toBackendAssetUrl } from '@/lib/api/assets';
+import { useBootstrap, useFallbackLogo } from '@/context/BootstrapContext';
+import { resolveImageOrFallback } from '@/lib/api/assets';
 
-function resolveProductImage(p: ProductRelation): string {
+function resolveProductImage(p: ProductRelation, fallbackLogo: string): string {
   const galleryBlock = p.blocks?.find((b) => b.type === 'product_gallery');
   const images: unknown[] = galleryBlock?.data?.product_images ?? [];
   const first = Array.isArray(images) && images.length > 0 ? String(images[0]) : '';
-  return toBackendAssetUrl(first || p.feature_image || '') || '/placeholder.jpg';
+  return resolveImageOrFallback(first || p.feature_image || '', fallbackLogo);
 }
 
 interface FeaturedProductsSectionProps {
@@ -22,6 +22,7 @@ interface FeaturedProductsSectionProps {
 
 export default function FeaturedProductsSection({ products }: FeaturedProductsSectionProps) {
   const { routeMap } = useBootstrap();
+  const fallbackLogo = useFallbackLogo();
   const productsPage = routeMap?.find((r) => r.template === 'products' || r.template === 'shop');
   const allProductsHref = productsPage ? `/${productsPage.slug}` : '/products';
 
@@ -31,7 +32,7 @@ export default function FeaturedProductsSection({ products }: FeaturedProductsSe
     id: p.id,
     name: p.title,
     price: p.price,
-    image: resolveProductImage(p),
+    image: resolveProductImage(p, fallbackLogo),
     category: p.category,
     slug: p.slug,
     featured: p.is_featured,

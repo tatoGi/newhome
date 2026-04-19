@@ -9,12 +9,14 @@ import { useApp } from '@/context/AppContext';
 import { useAuth } from '@/context/AuthContext';
 import { api } from '@/lib/api/client';
 import { slugify } from '@/lib/slugify';
-import { toBackendAssetUrl } from '@/lib/api/assets';
+import { resolveImageOrFallback } from '@/lib/api/assets';
+import { useFallbackLogo } from '@/context/BootstrapContext';
 
 export default function CartPage() {
   const searchParams = useSearchParams();
   const { cart, removeFromCart, updateQuantity, refreshCart } = useApp();
   const { token } = useAuth();
+  const fallbackLogo = useFallbackLogo();
   const [checkoutMessage, setCheckoutMessage] = useState<{ variant: 'success' | 'danger' | 'warning'; text: string; } | null>(null);
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
@@ -99,7 +101,7 @@ export default function CartPage() {
                   <div className="d-flex gap-3 align-items-start">
                     <Link href={item.slug ? `/product/${slugify(item.slug)}` : '/products'} className="flex-shrink-0">
                       <img
-                        src={toBackendAssetUrl(item.image)}
+                        src={resolveImageOrFallback(item.image, fallbackLogo)}
                         alt={item.name}
                         className="rounded-4"
                         style={{ width: 120, height: 120, objectFit: 'cover' }}

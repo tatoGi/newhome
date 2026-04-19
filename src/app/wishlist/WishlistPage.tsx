@@ -5,10 +5,12 @@ import { Button, Col, Container, Row } from 'react-bootstrap';
 import { Heart, ShoppingCart, Trash2 } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { slugify } from '@/lib/slugify';
-import { toBackendAssetUrl } from '@/lib/api/assets';
+import { resolveImageOrFallback } from '@/lib/api/assets';
+import { useFallbackLogo } from '@/context/BootstrapContext';
 
 export default function WishlistPage() {
   const { wishlist, addToCart, removeFromWishlist } = useApp();
+  const fallbackLogo = useFallbackLogo();
 
   return (
     <Container className="py-5">
@@ -38,7 +40,7 @@ export default function WishlistPage() {
               <div className="h-100 border rounded-4 p-3 bg-white shadow-sm d-flex flex-column">
                 <Link href={item.slug ? `/product/${slugify(item.slug)}` : '/products'} className="text-decoration-none text-dark">
                   <img
-                    src={toBackendAssetUrl(item.image)}
+                    src={resolveImageOrFallback(item.image, fallbackLogo)}
                     alt={item.name}
                     className="w-100 rounded-4 mb-3"
                     style={{ height: 260, objectFit: 'cover' }}

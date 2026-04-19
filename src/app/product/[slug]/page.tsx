@@ -3,6 +3,7 @@ import { api } from '@/lib/api/client';
 import ProductDetailsPage from './ProductDetailsPage';
 import ProductJsonLd from '@/components/ProductJsonLd';
 import { toBackendAssetUrl } from '@/lib/api/assets';
+import { getServerFallbackLogo } from '@/lib/api/serverFallback';
 import { buildPageMetadata } from '@/lib/metadata';
 
 const extractProductGalleryImages = (blocks: Array<{ type?: string; data?: Record<string, unknown> }> = []): string[] =>
@@ -33,13 +34,14 @@ export async function generateMetadata({ params, searchParams }: {
     const data = await api.getProduct(slug, locale);
     const p = data.product;
 
-    // Resolve OG image: prefer feature_image, fall back to first gallery block image
+    // Resolve OG image: prefer feature_image, fall back to first gallery block image, then settings logo
     const galleryImages = extractProductGalleryImages(p.blocks || []);
     const firstGallery = (p.gallery?.[0]) || galleryImages[0] || '';
+    const fallbackLogo = await getServerFallbackLogo(locale);
     const ogImage =
       toBackendAssetUrl(p.feature_image) ||
       toBackendAssetUrl(firstGallery) ||
-      undefined;
+      fallbackLogo;
 
     return buildPageMetadata({
       title: data.seo?.meta_title || p.title,
@@ -75,13 +77,15 @@ export default async function Page({ params, searchParams }: {
 
   if (!data || !data.product) return <div>პროდუქტი ვერ მოიძებნა</div>;
 
-  const images = [
+  const fallbackLogo = await getServerFallbackLogo(locale);
+  const resolvedImages = [
     data.product.feature_image,
     ...(data.product.gallery || []),
     ...extractProductGalleryImages(data.product.blocks || []),
   ]
     .map((image) => toBackendAssetUrl(image))
     .filter((image, index, array): image is string => Boolean(image) && array.indexOf(image) === index);
+  const images = resolvedImages.length > 0 ? resolvedImages : [fallbackLogo];
 
   const product = {
     id: data.product.id,
@@ -122,7 +126,7 @@ export default async function Page({ params, searchParams }: {
           oldPrice: p.old_price ?? undefined,
           sale: p.on_sale,
           featured: p.is_featured,
-          image: toBackendAssetUrl(firstGallery || p.feature_image || '') || '/placeholder.jpg',
+          image: toBackendAssetUrl(firstGallery || p.feature_image || '') || fallbackLogo,
           category: p.category,
           colors: p.colors ?? [],
         };

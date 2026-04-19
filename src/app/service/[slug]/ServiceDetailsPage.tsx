@@ -4,7 +4,8 @@ import { Container, Row, Col } from 'react-bootstrap';
 import Link from 'next/link';
 import { motion } from 'motion/react';
 import { ChevronRight, Phone } from 'lucide-react';
-import { toBackendAssetUrl } from '@/lib/api/assets';
+import { resolveImageOrFallback } from '@/lib/api/assets';
+import { useFallbackLogo } from '@/context/BootstrapContext';
 import PageBlockRenderer from '@/components/PageBlockRenderer';
 
 interface ServiceProps {
@@ -19,9 +20,11 @@ interface ServiceProps {
 }
 
 export default function ServiceDetailsPage({ service, phone }: { service: ServiceProps; phone?: string | null }) {
+  const fallbackLogo = useFallbackLogo();
   const intro = service.blocks?.find((b: any) => b.type === 'post_intro');
-  const heroImage = toBackendAssetUrl(
-    intro?.data?.post_image || service.coverImage || service.image || ''
+  const heroImage = resolveImageOrFallback(
+    intro?.data?.post_image || service.coverImage || service.image || '',
+    fallbackLogo
   );
   const title = intro?.data?.title || service.title;
   const desc = intro?.data?.post_text || service.desc;
@@ -31,36 +34,33 @@ export default function ServiceDetailsPage({ service, phone }: { service: Servic
 
   return (
     <div className="pb-5 bg-light min-vh-100">
-      {/* Hero — only render when there is an image */}
-      {heroImage && (
-        <div
-          className="position-relative d-flex align-items-center justify-content-center"
-          style={{
-            minHeight: '380px',
-            backgroundImage: `url(${heroImage})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        >
-          <div className="position-absolute top-0 start-0 w-100 h-100 bg-dark" style={{ opacity: 0.55 }} />
-          <div className="position-relative z-1 text-center text-white px-3">
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
-              className="display-4 fw-bold mb-3"
-            >
-              {title}
-            </motion.h1>
-            {desc && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}
-                className="lead opacity-75 mx-auto"
-                style={{ maxWidth: '600px' }}
-                dangerouslySetInnerHTML={{ __html: desc }}
-              />
-            )}
-          </div>
+      <div
+        className="position-relative d-flex align-items-center justify-content-center"
+        style={{
+          minHeight: '380px',
+          backgroundImage: `url(${heroImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        <div className="position-absolute top-0 start-0 w-100 h-100 bg-dark" style={{ opacity: 0.55 }} />
+        <div className="position-relative z-1 text-center text-white px-3">
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
+            className="display-4 fw-bold mb-3"
+          >
+            {title}
+          </motion.h1>
+          {desc && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}
+              className="lead opacity-75 mx-auto"
+              style={{ maxWidth: '600px' }}
+              dangerouslySetInnerHTML={{ __html: desc }}
+            />
+          )}
         </div>
-      )}
+      </div>
 
       <Container className="mt-n4 position-relative" style={{ zIndex: 2 }}>
         <div className="bg-white p-4 p-md-5 rounded shadow-sm">

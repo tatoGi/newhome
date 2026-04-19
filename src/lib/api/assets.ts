@@ -27,6 +27,11 @@ export function toBackendAssetUrl(value: unknown): string {
   return `${BACKEND_BASE_URL}/storage/${path.replace(/^storage\//, '')}`;
 }
 
+export function resolveImageOrFallback(value: unknown, fallback: string): string {
+  const resolved = toBackendAssetUrl(value);
+  return resolved || fallback || '/logo.png';
+}
+
 export function isBackendAssetUrl(value: unknown): boolean {
   const url = String(value ?? '').trim();
   if (!url) {

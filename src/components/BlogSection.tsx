@@ -6,7 +6,8 @@ import Link from 'next/link';
 import { motion } from 'motion/react';
 import { Calendar, ArrowRight } from 'lucide-react';
 import { BlogSection as BlogSectionType } from '@/lib/api/types';
-import { toBackendAssetUrl } from '@/lib/api/assets';
+import { resolveImageOrFallback } from '@/lib/api/assets';
+import { useFallbackLogo } from '@/context/BootstrapContext';
 
 interface BlogSectionProps {
     blogSection?: BlogSectionType | null;
@@ -15,6 +16,7 @@ interface BlogSectionProps {
 const BlogSection: React.FC<BlogSectionProps> = ({ blogSection }) => {
     const sectionTitle = blogSection?.title || 'სიახლეები და ბლოგი';
     const sectionSubtitle = blogSection?.subtitle || 'მიიღეთ რჩევები ინტერიერის გასაუმჯობესებლად';
+    const fallbackLogo = useFallbackLogo();
 
     const posts = (blogSection?.posts ?? []).map((p) => {
         const intro = (p as any).blocks?.find((b: any) => b.type === 'post_intro');
@@ -23,7 +25,7 @@ const BlogSection: React.FC<BlogSectionProps> = ({ blogSection }) => {
             slug: p.slug,
             title: intro?.data?.title || p.title,
             excerpt: intro?.data?.post_text || p.excerpt || '',
-            image: toBackendAssetUrl(intro?.data?.post_image || p.feature_image || '') || null,
+            image: resolveImageOrFallback(intro?.data?.post_image || p.feature_image || '', fallbackLogo),
             date: p.published_at || '',
             category: p.category || '',
         };
@@ -69,18 +71,12 @@ const BlogSection: React.FC<BlogSectionProps> = ({ blogSection }) => {
                                 <Row className="g-0 bg-white rounded-4 shadow-sm overflow-hidden blog-row-card align-items-stretch">
                                     {/* Image — left */}
                                     <Col xs={12} md={4} className="position-relative" style={{ minHeight: '220px' }}>
-                                        {post.image ? (
-                                            <img
-                                                src={post.image}
-                                                alt={post.title}
-                                                className="w-100 h-100 blog-card-img"
-                                                style={{ objectFit: 'cover', display: 'block' }}
-                                            />
-                                        ) : (
-                                            <div className="w-100 h-100 bg-light d-flex align-items-center justify-content-center" style={{ minHeight: '220px' }}>
-                                                <span className="text-muted small">სურათი არ არის</span>
-                                            </div>
-                                        )}
+                                        <img
+                                            src={post.image}
+                                            alt={post.title}
+                                            className="w-100 h-100 blog-card-img"
+                                            style={{ objectFit: 'cover', display: 'block' }}
+                                        />
                                         {post.category && (
                                             <span className="position-absolute top-0 start-0 m-3 badge bg-white text-primary rounded-pill px-3 py-2 shadow-sm">
                                                 {post.category}

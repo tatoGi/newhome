@@ -5,7 +5,8 @@ import { Container, Row, Col, Card, Badge, Breadcrumb, Button } from 'react-boot
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'motion/react';
 import { Block, PostRelation } from '@/lib/api/types';
-import { toBackendAssetUrl } from '@/lib/api/assets';
+import { resolveImageOrFallback } from '@/lib/api/assets';
+import { useFallbackLogo } from '@/context/BootstrapContext';
 import { slugify } from '@/lib/slugify';
 import { stripMarkdown } from '@/lib/stripMarkdown';
 import PageBlockRenderer from '@/components/PageBlockRenderer';
@@ -18,6 +19,7 @@ interface ProjectsPageProps {
 }
 
 export default function ProjectsPage({ posts, pageTitle, pageDescription, blocks }: ProjectsPageProps) {
+  const fallbackLogo = useFallbackLogo();
   const heroBlock = [...(blocks ?? [])]
     .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
     .find((block) => block.type === 'page_hero' || block.type === 'main_banner' || block.type === 'banner');
@@ -30,7 +32,7 @@ export default function ProjectsPage({ posts, pageTitle, pageDescription, blocks
     pageDescription ??
     ''
   );
-  const heroImage = toBackendAssetUrl(heroBlock?.data?.banner_image ?? heroBlock?.data?.image ?? '');
+  const heroImage = resolveImageOrFallback(heroBlock?.data?.banner_image ?? heroBlock?.data?.image, fallbackLogo);
 
   const allItems = (posts ?? []).map((post) => {
     const intro = post.blocks?.find((b) => b.type === 'post_intro');
@@ -39,7 +41,7 @@ export default function ProjectsPage({ posts, pageTitle, pageDescription, blocks
       id: post.id,
       slug: post.slug,
       title: stripMarkdown(intro?.data?.title || post.title),
-      image: toBackendAssetUrl(rawImage) || '',
+      image: resolveImageOrFallback(rawImage, fallbackLogo),
       category: post.category || '',
       publishedAt: post.published_at,
       excerpt: post.excerpt,
@@ -60,23 +62,16 @@ export default function ProjectsPage({ posts, pageTitle, pageDescription, blocks
         <Breadcrumb.Item active>{heroTitle}</Breadcrumb.Item>
       </Breadcrumb>
 
-      {heroImage ? (
-        <div
-          className="position-relative overflow-hidden rounded-4 mb-4"
-          style={{ minHeight: '260px', backgroundImage: `url(${heroImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
-        >
-          <div className="position-absolute top-0 start-0 w-100 h-100" style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0.42), rgba(0,0,0,0.18))' }} />
-          <div className="position-relative text-white d-flex flex-column justify-content-end h-100 p-4 p-md-5">
-            <h1 className="fw-bold display-5 mb-2">{heroTitle}</h1>
-            {heroDescription ? <div className="mb-0 opacity-75" style={{ maxWidth: '720px' }} dangerouslySetInnerHTML={{ __html: heroDescription }} /> : null}
-          </div>
+      <div
+        className="position-relative overflow-hidden rounded-4 mb-4"
+        style={{ minHeight: '260px', backgroundImage: `url(${heroImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+      >
+        <div className="position-absolute top-0 start-0 w-100 h-100" style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0.42), rgba(0,0,0,0.18))' }} />
+        <div className="position-relative text-white d-flex flex-column justify-content-end h-100 p-4 p-md-5">
+          <h1 className="fw-bold display-5 mb-2">{heroTitle}</h1>
+          {heroDescription ? <div className="mb-0 opacity-75" style={{ maxWidth: '720px' }} dangerouslySetInnerHTML={{ __html: heroDescription }} /> : null}
         </div>
-      ) : (
-        <div className="mb-4">
-          <h1 className="fw-bold mb-2">{heroTitle}</h1>
-          {heroDescription ? <div className="text-muted mb-0" dangerouslySetInnerHTML={{ __html: heroDescription }} /> : null}
-        </div>
-      )}
+      </div>
 
       <PageBlockRenderer
         blocks={(blocks ?? []).filter((b) => b.type !== 'main_banner' && b.type !== 'page_hero' && b.type !== 'banner')}
@@ -119,13 +114,7 @@ export default function ProjectsPage({ posts, pageTitle, pageDescription, blocks
                 <Card className="border-0 shadow-sm overflow-hidden">
                   <div className="position-relative overflow-hidden">
                     <Link href={`/project/${slugify(project.slug)}`}>
-                      {project.image ? (
-                        <Card.Img variant="top" src={project.image} style={{ height: '400px', objectFit: 'cover' }} referrerPolicy="no-referrer" />
-                      ) : (
-                        <div className="bg-light d-flex align-items-center justify-content-center" style={{ height: '400px' }}>
-                          <span className="text-muted small">სურათი არ არის</span>
-                        </div>
-                      )}
+                      <Card.Img variant="top" src={project.image} style={{ height: '400px', objectFit: 'cover' }} referrerPolicy="no-referrer" />
                     </Link>
                     {project.category && (
                       <div className="position-absolute top-0 start-0 m-3">

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import BlogListPage from './BlogListPage';
 import { api } from '@/lib/api/client';
 import { getServerLocale } from '@/lib/locale';
+import { getServerFallbackLogo } from '@/lib/api/serverFallback';
 import { buildPageMetadata } from '@/lib/metadata';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -11,12 +12,13 @@ export async function generateMetadata(): Promise<Metadata> {
     const route = bootstrap.routeMap.find((r) => r.template === 'blog' || r.template === 'news');
     if (route) {
       const data = await api.getPage(route.slug, locale || undefined);
+      const fallbackLogo = await getServerFallbackLogo(locale || undefined);
       return buildPageMetadata({
         title: data.seo.meta_title || data.page.title,
         description: data.seo.meta_description || '',
         canonical: data.seo.canonical_url || 'https://homespace.ge/blog',
         keywords: data.seo.keywords || undefined,
-        image: data.seo.og_image || data.seo.social_image || undefined,
+        image: data.seo.og_image || data.seo.social_image || fallbackLogo,
       });
     }
   } catch { }

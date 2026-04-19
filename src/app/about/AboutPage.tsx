@@ -5,7 +5,8 @@ import { Container, Row, Col, Card, Breadcrumb } from 'react-bootstrap';
 import Link from 'next/link';
 import { History, Users, Target, Award } from 'lucide-react';
 import { PageResponse } from '@/lib/api/types';
-import { toBackendAssetUrl } from '@/lib/api/assets';
+import { resolveImageOrFallback } from '@/lib/api/assets';
+import { useFallbackLogo } from '@/context/BootstrapContext';
 
 const STAT_ICONS = [
   <History size={40} className="text-primary mb-3 mx-auto d-block" />,
@@ -16,15 +17,14 @@ const STAT_ICONS = [
 
 export default function AboutPage({ data }: { data?: PageResponse | null }) {
   const blocks = data?.page?.blocks ?? [];
+  const fallbackLogo = useFallbackLogo();
 
   const imageTextBlock = blocks.find((b) => b.type === 'image_text');
   const statBlocks = blocks.filter((b) => b.type === 'items_grid');
 
   const title = imageTextBlock?.data?.title || data?.page?.title || 'ჩვენ შესახებ';
   const description = imageTextBlock?.data?.textarea || data?.page?.description || '';
-  const image = imageTextBlock?.data?.image
-    ? toBackendAssetUrl(String(imageTextBlock.data.image))
-    : 'https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1000&q=80';
+  const image = resolveImageOrFallback(imageTextBlock?.data?.image, fallbackLogo);
 
   return (
     <div>
