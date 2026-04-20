@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 const SITE_URL = 'https://homespace.ge';
 const SITE_NAME = 'HomeSpace.ge';
 const DEFAULT_DESCRIPTION = 'HomeSpace provides modern furniture, lighting, and interior design solutions in Georgia.';
-const DEFAULT_IMAGE = `${SITE_URL}/og-image.jpg`;
+const DEFAULT_IMAGE = `${SITE_URL}/logo.png`;
 
 const normalizeKeywords = (keywords?: string | string[]): string[] | undefined => {
     if (!keywords) {
@@ -32,12 +32,14 @@ export const buildPageMetadata = ({
     description?: string;
     canonical?: string;
     keywords?: string | string[];
-    image?: string;
+    /** Pass a URL string to use a specific image, omit for the default fallback, or pass `null` to let an opengraph-image route handler provide the image. */
+    image?: string | null;
     url?: string;
 }): Metadata => {
     const canonicalUrl = canonical || url || SITE_URL;
     const pageUrl = url || canonicalUrl;
-    const imageUrl = image || DEFAULT_IMAGE;
+    // null means "no explicit image" — opengraph-image.tsx route handler takes over
+    const imageUrl = image === null ? null : (image || DEFAULT_IMAGE);
 
     const metaDescription = description || DEFAULT_DESCRIPTION;
 
@@ -51,14 +53,15 @@ export const buildPageMetadata = ({
             description: metaDescription,
             url: pageUrl,
             siteName: SITE_NAME,
+            locale: 'ka_GE',
             type: 'website',
-            images: [{ url: imageUrl, width: 1200, height: 630, alt: title }],
+            ...(imageUrl ? { images: [{ url: imageUrl, width: 1200, height: 630, alt: title }] } : {}),
         },
         twitter: {
             card: 'summary_large_image',
             title,
             description: metaDescription,
-            images: [imageUrl],
+            ...(imageUrl ? { images: [imageUrl] } : {}),
         },
     };
 };
