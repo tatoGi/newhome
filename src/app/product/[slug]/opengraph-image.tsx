@@ -1,11 +1,30 @@
 import { ImageResponse } from 'next/og';
 import { api } from '@/lib/api/client';
 import { toBackendAssetUrl } from '@/lib/api/assets';
+import type { Block } from '@/lib/api/types';
 
 export const runtime = 'nodejs';
 export const alt = 'Product';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
+
+function firstProductImage(
+  featureImage: string | null,
+  gallery: string[],
+  blocks: Block[],
+): string {
+  const fromGallery = gallery.find(Boolean);
+  const fromBlocks = blocks
+    .filter((b) => b.type === 'product_gallery')
+    .flatMap((b) => {
+      const imgs = (b.data as Record<string, unknown>)?.product_images;
+      return Array.isArray(imgs) ? (imgs as unknown[]).map(String).filter(Boolean) : [];
+    })[0];
+  return toBackendAssetUrl(featureImage) ||
+    toBackendAssetUrl(fromGallery) ||
+    toBackendAssetUrl(fromBlocks) ||
+    '';
+}
 
 async function fetchImageAsDataUrl(url: string): Promise<string | null> {
   try {
@@ -22,26 +41,19 @@ async function fetchImageAsDataUrl(url: string): Promise<string | null> {
 export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
 
-  let productName = '';
   let productPrice = '';
   let imageData: string | null = null;
 
   try {
     const data = await api.getProduct(slug);
     const p = data.product;
-    productName = p.title || '';
     productPrice = p.price ? `${p.price} GEL` : '';
 
-    const imgUrl =
-      toBackendAssetUrl(p.feature_image) ||
-      toBackendAssetUrl((p.gallery as string[] | undefined)?.[0]) ||
-      '';
+    const imgUrl = firstProductImage(p.feature_image, p.gallery, p.blocks);
     if (imgUrl) imageData = await fetchImageAsDataUrl(imgUrl);
   } catch {
     // fall through with defaults
   }
-
-  const hasImage = Boolean(imageData);
 
   return new ImageResponse(
     (
@@ -51,93 +63,77 @@ export default async function Image({ params }: { params: Promise<{ slug: string
           width: '100%',
           height: '100%',
           backgroundColor: '#0F2E47',
+          position: 'relative',
           fontFamily: 'sans-serif',
         }}
       >
-        {/* Product image (left 55%) */}
-        {hasImage && (
-          <div
+        {/* Full-bleed product photo */}
+        {imageData && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={imageData}
+            alt=""
             style={{
-              display: 'flex',
-              width: '55%',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
               height: '100%',
-              overflow: 'hidden',
+              objectFit: 'cover',
             }}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={imageData!}
-              alt=""
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
-          </div>
+          />
         )}
 
-        {/* Info panel */}
+        {/* Dark gradient overlay at bottom */}
         <div
           style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: imageData ? '200px' : '100%',
+            background: imageData
+              ? 'linear-gradient(to top, rgba(15,46,71,0.95) 0%, rgba(15,46,71,0.6) 60%, transparent 100%)'
+              : '#0F2E47',
             display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            padding: hasImage ? '56px 52px' : '56px 80px',
-            flex: 1,
+          }}
+        />
+
+        {/* Branding + price */}
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            padding: '28px 48px',
+            display: 'flex',
+            alignItems: 'flex-end',
+            justifyContent: 'space-between',
           }}
         >
-          {/* Brand */}
           <div
             style={{
               color: '#CC7A50',
-              fontSize: 20,
-              fontWeight: 600,
+              fontSize: 22,
+              fontWeight: 700,
               letterSpacing: 3,
-              marginBottom: 32,
             }}
           >
             HOMESPACE.GE
           </div>
 
-          {/* Product name — truncate long names */}
-          {productName ? (
+          {productPrice && (
             <div
               style={{
                 color: '#ffffff',
-                fontSize: hasImage ? 38 : 48,
-                fontWeight: 700,
-                lineHeight: 1.25,
-                marginBottom: 28,
-                overflow: 'hidden',
-                display: '-webkit-box',
-                WebkitLineClamp: 3,
-                WebkitBoxOrient: 'vertical',
-              }}
-            >
-              {productName}
-            </div>
-          ) : null}
-
-          {/* Price */}
-          {productPrice ? (
-            <div
-              style={{
-                color: '#CC7A50',
-                fontSize: 36,
+                fontSize: 32,
                 fontWeight: 700,
               }}
             >
               {productPrice}
             </div>
-          ) : null}
-
-          {/* Tagline */}
-          <div
-            style={{
-              color: 'rgba(255,255,255,0.45)',
-              fontSize: 15,
-              marginTop: 40,
-            }}
-          >
-            aveji • ganaTeba • interi
-          </div>
+          )}
         </div>
 
         {/* Bottom accent bar */}
@@ -147,7 +143,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
             bottom: 0,
             left: 0,
             right: 0,
-            height: 6,
+            height: 5,
             backgroundColor: '#CC7A50',
             display: 'flex',
           }}
