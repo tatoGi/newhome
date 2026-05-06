@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Heart, ShoppingCart } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { useFallbackLogo } from '@/context/BootstrapContext';
-import { resolveImageOrFallback, isBackendAssetUrl } from '@/lib/api/assets';
+import { resolveImageOrFallback } from '@/lib/api/assets';
 
 export interface Product {
   id: number;
@@ -31,7 +31,6 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
   const [activeColor, setActiveColor] = useState(0);
   const fallbackLogo = useFallbackLogo();
   const productImage = resolveImageOrFallback(product.image, fallbackLogo);
-  const shouldUnoptimizeImage = isBackendAssetUrl(productImage);
   const productSlug = product.slug || `product-${product.id}`;
 
   const handleWishlist = (e: React.MouseEvent) => {
@@ -67,8 +66,7 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
             src={productImage}
             alt={product.name}
             fill
-            sizes="(max-width: 576px) 100vw, (max-width: 992px) 50vw, 25vw"
-            unoptimized={shouldUnoptimizeImage}
+            sizes="(max-width: 576px) 100vw, (max-width: 992px) 50vw, (max-width: 1400px) 33vw, 25vw"
             className="article-product-img"
             style={{ objectFit: 'cover' }}
           />

@@ -5,7 +5,7 @@ import { Container, Row, Col, Button } from 'react-bootstrap';
 import Link from 'next/link';
 import { motion } from 'motion/react';
 import { Block } from '@/lib/api/types';
-import { isBackendAssetUrl, resolveImageOrFallback } from '@/lib/api/assets';
+import { resolveImageOrFallback } from '@/lib/api/assets';
 import { useFallbackLogo } from '@/context/BootstrapContext';
 
 interface ImageTextSectionProps {
@@ -54,7 +54,6 @@ export default function ImageTextSection({ blocks, pageTitle, pageDescription }:
                 sizes="(max-width: 992px) 100vw, 50vw"
                 className="img-fluid rounded shadow-lg"
                 style={{ objectFit: 'cover' }}
-                unoptimized={isBackendAssetUrl(image)}
                 referrerPolicy="no-referrer"
               />
             </motion.div>

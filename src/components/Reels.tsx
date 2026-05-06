@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { Modal, Carousel } from 'react-bootstrap';
 import { motion } from 'motion/react';
 import { Play } from 'lucide-react';
-import { isBackendAssetUrl, resolveImageOrFallback } from '@/lib/api/assets';
+import { resolveImageOrFallback } from '@/lib/api/assets';
 import { useFallbackLogo } from '@/context/BootstrapContext';
 
 interface Reel {
@@ -95,8 +95,8 @@ const Reels: React.FC<{ data?: any }> = ({ data }) => {
                                                 alt={reel.title}
                                                 width={90}
                                                 height={90}
+                                                sizes="90px"
                                                 className="reel-img"
-                                                unoptimized={isBackendAssetUrl(reelImg)}
                                                 referrerPolicy="no-referrer"
                                             />
                                         );
@@ -140,9 +140,9 @@ const Reels: React.FC<{ data?: any }> = ({ data }) => {
                                                 alt={reel.title}
                                                 width={900}
                                                 height={1400}
+                                                sizes="(max-width: 576px) 92vw, (max-width: 992px) 80vw, 450px"
                                                 className="d-block w-100 h-100 object-fit-cover"
                                                 style={{ objectFit: 'cover' }}
-                                                unoptimized={isBackendAssetUrl(reelImg)}
                                                 referrerPolicy="no-referrer"
                                             />
                                         );

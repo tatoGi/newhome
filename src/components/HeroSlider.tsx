@@ -7,7 +7,7 @@ import { motion } from 'motion/react';
 import Link from 'next/link';
 import { useBootstrap, useFallbackLogo } from '@/context/BootstrapContext';
 import { getUiText } from '@/lib/i18n/ui';
-import { isBackendAssetUrl, resolveImageOrFallback } from '@/lib/api/assets';
+import { resolveImageOrFallback } from '@/lib/api/assets';
 
 type HeroSlide = {
   id?: string | number;
@@ -66,9 +66,9 @@ const HeroSlider: React.FC<{ data?: { slides?: HeroSlide[] } }> = ({ data }) => 
                   alt={slide.title || 'Banner'}
                   fill
                   priority={index === 0}
+                  fetchPriority={index === 0 ? 'high' : 'auto'}
                   loading={index === 0 ? 'eager' : 'lazy'}
-                  sizes="100vw"
-                  unoptimized={isBackendAssetUrl(slideImage)}
+                  sizes="(max-width: 576px) 100vw, (max-width: 1200px) 100vw, 100vw"
                   className="hero-slide-image"
                 />
               </div>

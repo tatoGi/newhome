@@ -19,6 +19,25 @@ interface ServiceProps {
   blocks: any[];
 }
 
+function extractChecklistItems(data: Record<string, any> = {}): string[] {
+  const items = data.items;
+  if (Array.isArray(items) && items.length > 0) {
+    return items
+      .map((item) => {
+        if (typeof item === 'string') return item.trim();
+        if (item && typeof item === 'object') {
+          return String(item.title ?? item.label ?? item.text ?? item.value ?? '').trim();
+        }
+        return '';
+      })
+      .filter(Boolean);
+  }
+
+  return [1, 2, 3, 4, 5, 6]
+    .map((index) => String(data[`item_${index}`] ?? data[`item_${index}_title`] ?? '').trim())
+    .filter(Boolean);
+}
+
 export default function ServiceDetailsPage({ service, phone }: { service: ServiceProps; phone?: string | null }) {
   const fallbackLogo = useFallbackLogo();
   const intro = service.blocks?.find((b: any) => b.type === 'post_intro');
@@ -31,6 +50,8 @@ export default function ServiceDetailsPage({ service, phone }: { service: Servic
   const extraBlocks = (service.blocks ?? []).filter(
     (b: any) => b.type !== 'post_intro'
   );
+  const checklistBlocks = extraBlocks.filter((b: any) => b.type === 'checklist' || b.type === 'post_checklist');
+  const quoteBlocks = extraBlocks.filter((b: any) => b.type === 'quote' || b.type === 'post_quote');
 
   return (
     <div className="pb-5 bg-light min-vh-100">
@@ -76,6 +97,41 @@ export default function ServiceDetailsPage({ service, phone }: { service: Servic
           {extraBlocks.length > 0 && (
             <div className="mb-5">
               <PageBlockRenderer blocks={extraBlocks} pageTitle={title} pageDescription={desc} />
+            </div>
+          )}
+
+          {checklistBlocks.length > 0 && (
+            <div className="mb-5">
+              {checklistBlocks.map((block: any, blockIndex: number) => {
+                const items = extractChecklistItems(block?.data ?? {});
+                if (items.length === 0) return null;
+                return (
+                  <div key={`checklist-${blockIndex}`} className="mb-4">
+                    <h3 className="h4 fw-bold mb-3">{String(block?.data?.title ?? 'ჩეკლისტი')}</h3>
+                    <ul className="ps-3 mb-0">
+                      {items.map((item, itemIndex) => (
+                        <li key={`checklist-item-${itemIndex}`} className="mb-2 text-muted">{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {quoteBlocks.length > 0 && (
+            <div className="mb-5">
+              {quoteBlocks.map((block: any, blockIndex: number) => {
+                const quote = String(block?.data?.quote ?? block?.data?.text ?? block?.data?.content ?? '').trim();
+                const author = String(block?.data?.author ?? block?.data?.name ?? '').trim();
+                if (!quote) return null;
+                return (
+                  <blockquote key={`quote-${blockIndex}`} className="border-start border-4 ps-3 py-2 mb-3 bg-light rounded">
+                    <p className="mb-2 fst-italic">{quote}</p>
+                    {author ? <footer className="text-muted small">- {author}</footer> : null}
+                  </blockquote>
+                );
+              })}
             </div>
           )}
 

@@ -1,17 +1,19 @@
 'use client';
 
 import React from 'react';
+import dynamic from 'next/dynamic';
 import HeroSlider from '@/components/HeroSlider';
-import Reels from '@/components/Reels';
-import FeaturedProjects from '@/components/FeaturedProjects';
 import FeaturesSection from '@/components/FeaturesSection';
-import FeaturedProductsSection from '@/components/FeaturedProductsSection';
-import ImageTextSection from '@/components/ImageTextSection';
 import CtaBanner from '@/components/CtaBanner';
-import BlogSection from '@/components/BlogSection';
 import { PageResponse, Block } from '@/lib/api/types';
 import { resolveImageOrFallback } from '@/lib/api/assets';
 import { useFallbackLogo } from '@/context/BootstrapContext';
+
+const Reels = dynamic(() => import('@/components/Reels'));
+const FeaturedProjects = dynamic(() => import('@/components/FeaturedProjects'));
+const FeaturedProductsSection = dynamic(() => import('@/components/FeaturedProductsSection'));
+const ImageTextSection = dynamic(() => import('@/components/ImageTextSection'));
+const BlogSection = dynamic(() => import('@/components/BlogSection'));
 
 interface HomePageProps {
   data: PageResponse | null;

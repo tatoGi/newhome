@@ -7,6 +7,14 @@ import ServiceDetailsPage from './ServiceDetailsPage';
 import { getServerLocale } from '@/lib/locale';
 import { buildPageMetadata } from '@/lib/metadata';
 
+function resolveServicesRoute(routeMap: Array<{ template?: string; slug: string }>) {
+  return (
+    routeMap.find((r) => r.template === 'services') ??
+    routeMap.find((r) => r.template === 'service') ??
+    null
+  );
+}
+
 interface PageProps {
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ locale?: string }>;
@@ -15,7 +23,7 @@ interface PageProps {
 export async function generateStaticParams() {
   try {
     const bootstrap = await api.getBootstrap();
-    const route = bootstrap.routeMap.find((r) => r.template === 'service' || r.template === 'services');
+    const route = resolveServicesRoute(bootstrap.routeMap);
     if (!route) return [];
     const data = await api.getPage(route.slug);
     return (data.relations?.posts ?? []).map((p) => ({ slug: p.slug }));

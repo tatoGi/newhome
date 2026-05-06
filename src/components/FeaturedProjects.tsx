@@ -7,7 +7,7 @@ import { motion } from 'motion/react';
 import { ArrowRight, MapPin } from 'lucide-react';
 import { slugify } from '@/lib/slugify';
 import { ProjectSection } from '@/lib/api/types';
-import { isBackendAssetUrl, resolveImageOrFallback } from '@/lib/api/assets';
+import { resolveImageOrFallback } from '@/lib/api/assets';
 import { useFallbackLogo } from '@/context/BootstrapContext';
 
 interface FeaturedProjectsProps {
@@ -95,8 +95,8 @@ const FeaturedProjects: React.FC<FeaturedProjectsProps> = ({ projects: propProje
                                             src={project.image}
                                             alt={project.title}
                                             fill
+                                            sizes={index === 0 ? '(max-width: 992px) 100vw, 92vw' : '(max-width: 992px) 100vw, 46vw'}
                                             className="object-fit-cover transition-transform duration-700 hover-scale-110"
-                                            unoptimized={isBackendAssetUrl(project.image)}
                                         />
                                         <div className="position-absolute inset-0 bg-gradient-to-t from-black opacity-60" />
                                         <div className="position-absolute bottom-0 start-0 p-4 p-md-5 text-white w-100">

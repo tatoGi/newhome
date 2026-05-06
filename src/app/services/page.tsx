@@ -5,11 +5,19 @@ import { getServerLocale } from '@/lib/locale';
 import { getServerFallbackLogo } from '@/lib/api/serverFallback';
 import { buildPageMetadata } from '@/lib/metadata';
 
+function resolveServicesRoute(routeMap: Array<{ template?: string; slug: string }>) {
+  return (
+    routeMap.find((r) => r.template === 'services') ??
+    routeMap.find((r) => r.template === 'service') ??
+    null
+  );
+}
+
 export async function generateMetadata(): Promise<Metadata> {
   try {
     const locale = await getServerLocale();
     const bootstrap = await api.getBootstrap(locale || undefined);
-    const route = bootstrap.routeMap.find((r) => r.template === 'service' || r.template === 'services');
+    const route = resolveServicesRoute(bootstrap.routeMap);
     if (route) {
       const data = await api.getPage(route.slug, locale || undefined);
       const fallbackLogo = await getServerFallbackLogo(locale || undefined);
@@ -38,7 +46,7 @@ export default async function Page() {
   let blocks;
   try {
     const bootstrap = await api.getBootstrap(locale || undefined);
-    const route = bootstrap.routeMap.find((r) => r.template === 'service' || r.template === 'services');
+    const route = resolveServicesRoute(bootstrap.routeMap);
     if (route) {
       const data = await api.getPage(route.slug, locale || undefined);
       posts = data.relations?.posts;

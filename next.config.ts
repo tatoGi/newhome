@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
     root: path.resolve(__dirname),
   },
   images: {
+    dangerouslyAllowLocalIP: true,
     remotePatterns: [
       { protocol: 'https', hostname: 'images.unsplash.com' },
       { protocol: 'https', hostname: 'cms.homespace.ge', pathname: '/storage/**' },
