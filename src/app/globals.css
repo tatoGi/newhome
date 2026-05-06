@@ -258,17 +258,21 @@ body {
   text-align: center;
   padding: 0 5%;
   z-index: 2;
+  pointer-events: none;
 }
 
 .hero-slide-content {
   width: min(92vw, 760px);
   max-width: 760px;
+  pointer-events: auto;
 }
 
 .hero-slider .carousel-control-prev,
 .hero-slider .carousel-control-next {
   width: auto;
   opacity: 1;
+  z-index: 5;
+  pointer-events: auto;
 }
 
 .hero-slider .carousel-control-prev {
