@@ -52,6 +52,9 @@ export default function ServiceDetailsPage({ service, phone }: { service: Servic
   );
   const checklistBlocks = extraBlocks.filter((b: any) => b.type === 'checklist' || b.type === 'post_checklist');
   const quoteBlocks = extraBlocks.filter((b: any) => b.type === 'quote' || b.type === 'post_quote');
+  const layoutBlocks = extraBlocks.filter(
+    (b: any) => b.type !== 'checklist' && b.type !== 'post_checklist' && b.type !== 'quote' && b.type !== 'post_quote'
+  );
 
   return (
     <div className="pb-5 bg-light min-vh-100">
@@ -94,9 +97,9 @@ export default function ServiceDetailsPage({ service, phone }: { service: Servic
             <span className="text-dark fw-medium">{title}</span>
           </div>
 
-          {extraBlocks.length > 0 && (
+          {layoutBlocks.length > 0 && (
             <div className="mb-5">
-              <PageBlockRenderer blocks={extraBlocks} pageTitle={title} pageDescription={desc} />
+              <PageBlockRenderer blocks={layoutBlocks} pageTitle={title} pageDescription={desc} />
             </div>
           )}
 

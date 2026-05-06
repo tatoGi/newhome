@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Container } from 'react-bootstrap';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useApp } from '@/context/AppContext';
@@ -148,7 +149,15 @@ const Header: React.FC = () => {
           <Container>
             <div className="d-flex justify-content-between align-items-center gap-2">
               <Link href="/" className="site-header-logo-link text-decoration-none flex-shrink-0" aria-label="HomeSpace">
-                <img src={headerLogo} alt="HomeSpace" className="site-header-logo" />
+                <Image
+                  src={headerLogo}
+                  alt="HomeSpace"
+                  width={168}
+                  height={82}
+                  sizes="(max-width: 767px) 120px, (max-width: 1199px) 150px, 168px"
+                  className="site-header-logo"
+                  priority
+                />
               </Link>
 
               <div className="site-header-search-shell d-none d-md-flex flex-grow-1 mx-3">

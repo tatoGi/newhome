@@ -68,7 +68,8 @@ const HeroSlider: React.FC<{ data?: { slides?: HeroSlide[] } }> = ({ data }) => 
                   priority={index === 0}
                   fetchPriority={index === 0 ? 'high' : 'auto'}
                   loading={index === 0 ? 'eager' : 'lazy'}
-                  sizes="(max-width: 576px) 100vw, (max-width: 1200px) 100vw, 100vw"
+                  sizes="100vw"
+                  quality={75}
                   className="hero-slide-image"
                 />
               </div>

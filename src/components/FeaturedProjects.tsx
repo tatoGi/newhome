@@ -95,7 +95,8 @@ const FeaturedProjects: React.FC<FeaturedProjectsProps> = ({ projects: propProje
                                             src={project.image}
                                             alt={project.title}
                                             fill
-                                            sizes={index === 0 ? '(max-width: 992px) 100vw, 92vw' : '(max-width: 992px) 100vw, 46vw'}
+                                            sizes={index === 0 ? '(max-width: 992px) 100vw, 1140px' : '(max-width: 992px) 100vw, 540px'}
+                                            quality={70}
                                             className="object-fit-cover transition-transform duration-700 hover-scale-110"
                                         />
                                         <div className="position-absolute inset-0 bg-gradient-to-t from-black opacity-60" />

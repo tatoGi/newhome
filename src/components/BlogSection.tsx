@@ -3,6 +3,7 @@
 import React from 'react';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'motion/react';
 import { Calendar, ArrowRight } from 'lucide-react';
 import { BlogSection as BlogSectionType } from '@/lib/api/types';
@@ -71,11 +72,13 @@ const BlogSection: React.FC<BlogSectionProps> = ({ blogSection }) => {
                                 <Row className="g-0 bg-white rounded-4 shadow-sm overflow-hidden blog-row-card align-items-stretch">
                                     {/* Image — left */}
                                     <Col xs={12} md={4} className="position-relative" style={{ minHeight: '220px' }}>
-                                        <img
+                                        <Image
                                             src={post.image}
                                             alt={post.title}
-                                            className="w-100 h-100 blog-card-img"
-                                            style={{ objectFit: 'cover', display: 'block' }}
+                                            fill
+                                            sizes="(max-width: 767px) 100vw, 33vw"
+                                            className="blog-card-img"
+                                            style={{ objectFit: 'cover' }}
                                         />
                                         {post.category && (
                                             <span className="position-absolute top-0 start-0 m-3 badge bg-white text-primary rounded-pill px-3 py-2 shadow-sm">

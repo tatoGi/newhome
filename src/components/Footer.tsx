@@ -3,6 +3,7 @@
 import React from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Phone, Mail, MapPin } from 'lucide-react';
 import { useBootstrap } from '@/context/BootstrapContext';
 import { toBackendAssetUrl } from '@/lib/api/assets';
@@ -31,7 +32,14 @@ const Footer: React.FC = () => {
           {/* Col 1 — Logo + footer text + social */}
           <Col lg={4}>
             <div className="mb-3">
-              <img src={footerLogo} alt="HomeSpace" style={{ height: 'auto', width: 'auto', maxWidth: '200px', maxHeight: '64px', objectFit: 'contain' }} />
+              <Image
+                src={footerLogo}
+                alt="HomeSpace"
+                width={200}
+                height={64}
+                sizes="200px"
+                style={{ width: 'auto', height: 'auto', maxWidth: '200px', maxHeight: '64px', objectFit: 'contain' }}
+              />
             </div>
             {contactText && (
               <p className="text-muted small mb-4" style={{ whiteSpace: 'pre-line' }}>{contactText}</p>

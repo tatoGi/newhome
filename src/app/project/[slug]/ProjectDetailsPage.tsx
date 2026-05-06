@@ -6,6 +6,7 @@ import { motion } from 'motion/react';
 import { ChevronRight, Calendar, MapPin, Tag } from 'lucide-react';
 import { toBackendAssetUrl } from '@/lib/api/assets';
 import { useFallbackLogo } from '@/context/BootstrapContext';
+import PageBlockRenderer from '@/components/PageBlockRenderer';
 
 interface ProjectProps {
   id: number;
@@ -20,11 +21,13 @@ interface ProjectProps {
 }
 
 export default function ProjectDetailsPage({ project }: { project: ProjectProps }) {
+
   const intro = project.blocks?.find((b: any) => b.type === 'post_intro');
   const fallbackLogo = useFallbackLogo();
 
   const title = intro?.data?.title || project.title;
   const desc = intro?.data?.post_text || project.desc;
+  const extraBlocks = (project.blocks ?? []).filter((b: any) => b.type !== 'post_intro');
 
   // Collect all images: intro block + feature images, convert to backend URLs, filter empties
   const rawImages = [
@@ -38,7 +41,7 @@ export default function ProjectDetailsPage({ project }: { project: ProjectProps 
 
   const details = [
     project.category ? { icon: <Tag size={20} />, label: 'კატეგორია', value: project.category } : null,
-    project.year     ? { icon: <Calendar size={20} />, label: 'წელი', value: project.year } : null,
+    project.year ? { icon: <Calendar size={20} />, label: 'წელი', value: project.year } : null,
     project.location ? { icon: <MapPin size={20} />, label: 'ლოკაცია', value: project.location } : null,
   ].filter(Boolean) as { icon: React.ReactNode; label: string; value: string }[];
 
@@ -132,6 +135,12 @@ export default function ProjectDetailsPage({ project }: { project: ProjectProps 
               </Col>
             )}
           </Row>
+
+          {extraBlocks.length > 0 && (
+            <div className="mt-5">
+              <PageBlockRenderer blocks={extraBlocks} pageTitle={title} pageDescription={desc} />
+            </div>
+          )}
         </motion.div>
       </Container>
     </div>

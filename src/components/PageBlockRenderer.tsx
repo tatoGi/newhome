@@ -90,6 +90,77 @@ function ProcessSteps({ blocks }: { blocks: Block[] }) {
   );
 }
 
+function extractChecklistItems(data: Record<string, any> = {}): string[] {
+  const items = data.items;
+  if (Array.isArray(items) && items.length > 0) {
+    return items
+      .map((item) => {
+        if (typeof item === 'string') return item.trim();
+        if (item && typeof item === 'object') {
+          return String(item.title ?? item.label ?? item.text ?? item.value ?? '').trim();
+        }
+        return '';
+      })
+      .filter(Boolean);
+  }
+
+  return [1, 2, 3, 4, 5, 6]
+    .map((index) => String(data[`item_${index}`] ?? data[`item_${index}_title`] ?? '').trim())
+    .filter(Boolean);
+}
+
+function ChecklistBlocks({ blocks }: { blocks: Block[] }) {
+  const checklistBlocks = blocks.filter((b) => b.type === 'checklist' || b.type === 'post_checklist');
+  if (checklistBlocks.length === 0) return null;
+
+  return (
+    <section className="py-4">
+      <Container>
+        {checklistBlocks.map((block, blockIndex) => {
+          const items = extractChecklistItems(block.data ?? {});
+          if (items.length === 0) return null;
+          const title = String(block.data?.title ?? '').trim();
+
+          return (
+            <div key={`checklist-${blockIndex}`} className="mb-4">
+              {title ? <h3 className="h4 fw-bold mb-3">{title}</h3> : null}
+              <ul className="ps-3 mb-0">
+                {items.map((item, itemIndex) => (
+                  <li key={`checklist-item-${itemIndex}`} className="mb-2 text-muted">{item}</li>
+                ))}
+              </ul>
+            </div>
+          );
+        })}
+      </Container>
+    </section>
+  );
+}
+
+function QuoteBlocks({ blocks }: { blocks: Block[] }) {
+  const quoteBlocks = blocks.filter((b) => b.type === 'quote' || b.type === 'post_quote');
+  if (quoteBlocks.length === 0) return null;
+
+  return (
+    <section className="py-4">
+      <Container>
+        {quoteBlocks.map((block, blockIndex) => {
+          const quote = String(block.data?.quote ?? block.data?.text ?? block.data?.content ?? '').trim();
+          const author = String(block.data?.author ?? block.data?.name ?? '').trim();
+          if (!quote) return null;
+
+          return (
+            <blockquote key={`quote-${blockIndex}`} className="border-start border-4 ps-3 py-2 mb-3 bg-light rounded">
+              <p className="mb-2 fst-italic">{quote}</p>
+              {author ? <footer className="text-muted small">- {author}</footer> : null}
+            </blockquote>
+          );
+        })}
+      </Container>
+    </section>
+  );
+}
+
 export default function PageBlockRenderer({ blocks, pageTitle, pageDescription }: Props) {
   const fallbackLogo = useFallbackLogo();
 
@@ -104,6 +175,8 @@ export default function PageBlockRenderer({ blocks, pageTitle, pageDescription }
   const hasCtaBanner = sorted.some((b) => b.type === 'cta_banner');
   const hasGallery = sorted.some((b) => b.type === 'photo_gallery');
   const hasProcessSteps = sorted.some((b) => b.type === 'process_steps');
+  const hasChecklist = sorted.some((b) => b.type === 'checklist' || b.type === 'post_checklist');
+  const hasQuote = sorted.some((b) => b.type === 'quote' || b.type === 'post_quote');
 
   return (
     <>
@@ -112,6 +185,8 @@ export default function PageBlockRenderer({ blocks, pageTitle, pageDescription }
       {hasImageText && <ImageTextSection blocks={sorted} pageTitle={pageTitle} pageDescription={pageDescription} />}
       {hasProcessSteps && <ProcessSteps blocks={sorted} />}
       {hasGallery && <PhotoGallery blocks={sorted} fallbackLogo={fallbackLogo} />}
+      {hasChecklist && <ChecklistBlocks blocks={sorted} />}
+      {hasQuote && <QuoteBlocks blocks={sorted} />}
       {hasCtaBanner && <CtaBanner blocks={sorted} />}
     </>
   );

@@ -41,7 +41,7 @@ export default function ServicesPage({ posts, pageTitle, pageDescription, blocks
       id: post.id,
       slug: post.slug,
       title: stripMarkdown(intro?.data?.title || post.title),
-      desc: post.excerpt,
+      desc: intro?.data?.post_text || post.excerpt,
       image: resolveImageOrFallback(rawImage, fallbackLogo),
     };
   });

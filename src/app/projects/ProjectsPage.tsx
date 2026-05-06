@@ -44,7 +44,7 @@ export default function ProjectsPage({ posts, pageTitle, pageDescription, blocks
       image: resolveImageOrFallback(rawImage, fallbackLogo),
       category: post.category || '',
       publishedAt: post.published_at,
-      excerpt: post.excerpt,
+      excerpt: intro?.data?.post_text || post.excerpt,
     };
   });
 

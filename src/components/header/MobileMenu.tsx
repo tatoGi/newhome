@@ -3,6 +3,7 @@
 import React from 'react';
 import { Nav, Offcanvas } from 'react-bootstrap';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ChevronDown, Heart, Search, User, LogOut } from 'lucide-react';
 import type { Language, MenuItem } from '@/lib/api/types';
 import { flagEmoji } from './headerUtils';
@@ -93,7 +94,14 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
     <Offcanvas show={show} onHide={onHide} placement="start" className="mobile-header-offcanvas">
       <Offcanvas.Header closeButton className="border-bottom">
         <span className="mobile-header-logo-link" aria-label="HomeSpace">
-          <img src={headerLogo} alt="HomeSpace" className="mobile-header-logo" />
+          <Image
+            src={headerLogo}
+            alt="HomeSpace"
+            width={118}
+            height={58}
+            sizes="118px"
+            className="mobile-header-logo"
+          />
         </span>
       </Offcanvas.Header>
       <Offcanvas.Body className="px-0 py-4">

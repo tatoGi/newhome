@@ -121,7 +121,14 @@ export const api = {
      */
     async getProject(slug: string, locale?: string): Promise<PostResponse> {
         const query = locale ? `?locale=${locale}` : '';
-        return fetchApi<PostResponse>(`/projects/${slug}${query}`);
+        try {
+            return await fetchApi<PostResponse>(`/projects/${slug}${query}`);
+        } catch (error) {
+            if (error instanceof Error && !error.message.includes('Not Found')) {
+                throw error;
+            }
+            return fetchApi<PostResponse>(`/project/${slug}${query}`);
+        }
     },
 
     /**
@@ -129,7 +136,14 @@ export const api = {
      */
     async getService(slug: string, locale?: string): Promise<PostResponse> {
         const query = locale ? `?locale=${locale}` : '';
-        return fetchApi<PostResponse>(`/services/${slug}${query}`);
+        try {
+            return await fetchApi<PostResponse>(`/services/${slug}${query}`);
+        } catch (error) {
+            if (error instanceof Error && !error.message.includes('Not Found')) {
+                throw error;
+            }
+            return fetchApi<PostResponse>(`/service/${slug}${query}`);
+        }
     },
 
     /**
