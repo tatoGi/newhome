@@ -201,7 +201,22 @@ body {
   height: 60vh;
   min-height: 400px;
   overflow: hidden;
+  position: relative;
   background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 45%, #f8fafc 100%);
+}
+
+.hero-slide-image-container::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.18) 0%,
+    rgba(0, 0, 0, 0.36) 45%,
+    rgba(0, 0, 0, 0.58) 100%
+  );
+  pointer-events: none;
+  z-index: 1;
 }
 
 .hero-slider .carousel-item {
@@ -213,6 +228,7 @@ body {
 .hero-slide-image {
   display: block;
   object-fit: cover;
+  object-position: center 38%;
   width: 100%;
   height: 100%;
   filter: brightness(0.6);
@@ -241,10 +257,12 @@ body {
   align-items: center;
   text-align: center;
   padding: 0 5%;
+  z-index: 2;
 }
 
 .hero-slide-content {
-  max-width: 800px;
+  width: min(92vw, 760px);
+  max-width: 760px;
 }
 
 .hero-slider .carousel-control-prev,
@@ -312,13 +330,15 @@ body {
 
 /* Slide title */
 .hero-slide-title {
-  font-size: clamp(1.6rem, 4vw, 2.8rem);
+  font-size: clamp(1.5rem, 3.2vw, 2.7rem);
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.22;
   margin-bottom: 14px;
   color: #fff;
   text-shadow: 0 2px 16px rgba(0, 0, 0, 0.35);
   letter-spacing: -0.02em;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 /* Slide description */
@@ -327,8 +347,12 @@ body {
   line-height: 1.65;
   margin-bottom: 28px;
   color: rgba(255, 255, 255, 0.82);
-  max-width: 560px;
+  max-width: min(92vw, 620px);
   text-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 /* Slide CTA button */
@@ -375,7 +399,8 @@ body {
   }
 
   .hero-slide-title {
-    font-size: 1.5rem;
+    font-size: 1.35rem;
+    margin-bottom: 10px;
   }
 
   .hero-slide-tag {
@@ -389,8 +414,9 @@ body {
   }
 
   .hero-slide-desc {
-    font-size: 0.9rem;
-    margin-bottom: 20px;
+    font-size: 0.86rem;
+    margin-bottom: 16px;
+    -webkit-line-clamp: 2;
   }
 
   .hero-slide-btn {
@@ -425,11 +451,18 @@ body {
   }
 
   .hero-slide-title {
-    font-size: 1.25rem;
+    font-size: 1.1rem;
+    line-height: 1.25;
   }
 
   .hero-slide-desc {
-    font-size: 0.82rem;
+    font-size: 0.78rem;
+    max-width: 100%;
+  }
+
+  .hero-slide-overlay {
+    justify-content: flex-end;
+    padding: 0 1rem 1.35rem;
   }
 
   .hero-slider .carousel-control-prev,

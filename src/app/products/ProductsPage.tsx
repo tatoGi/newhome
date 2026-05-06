@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Container, Row, Col, Form, Accordion, Breadcrumb } from 'react-bootstrap';
 import { Check } from 'lucide-react';
 import Link from 'next/link';
@@ -29,9 +29,13 @@ interface ProductListItem {
   image: string;
   category: string;
   blocks?: Block[];
-  material?: string;
+  brand: string;
+  materials: string[];
   sale?: boolean;
   featured?: boolean;
+  stock: number;
+  isOrdered: boolean;
+  isRented: boolean;
   colors: string[]; // Changed from optional to required
   content?: string;
 }
@@ -69,6 +73,35 @@ const buildInfoItems = (block: Block): Array<{ title: string; description: strin
     .filter((item) => item.title || item.description);
 };
 
+const extractMaterialsFromBlocks = (blocks?: Block[]): string[] => {
+  if (!Array.isArray(blocks)) {
+    return [];
+  }
+
+  const keys = ['material', 'materials', 'main_material', 'frame_material', 'upholstery_material'];
+  const values = new Set<string>();
+
+  for (const block of blocks) {
+    const data = block?.data ?? {};
+    for (const key of keys) {
+      const raw = data[key];
+      if (typeof raw === 'string' && raw.trim() !== '') {
+        values.add(raw.trim());
+      }
+      if (Array.isArray(raw)) {
+        raw.forEach((item) => {
+          const normalized = String(item ?? '').trim();
+          if (normalized !== '') {
+            values.add(normalized);
+          }
+        });
+      }
+    }
+  }
+
+  return Array.from(values);
+};
+
 export default function ProductsPage({
   initialCategory,
   products: initialProducts,
@@ -78,9 +111,13 @@ export default function ProductsPage({
   blocks,
 }: ProductsPageProps) {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [selectedMaterials, setSelectedMaterials] = useState<string[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [showSaleOnly, setShowSaleOnly] = useState(false);
+  const [showFeaturedOnly, setShowFeaturedOnly] = useState(false);
+  const [inStockOnly, setInStockOnly] = useState(false);
+  const [hideOrderedAndRented, setHideOrderedAndRented] = useState(true);
   const [sort, setSort] = useState('Default');
   const fallbackLogo = useFallbackLogo();
 
@@ -100,11 +137,39 @@ export default function ProductsPage({
       category: product.category || 'პროდუქცია',
       slug: product.slug || `product-${product.id}`, // Fallback slug if empty
       blocks: product.blocks,
+      brand: String(product.brand || '').trim(),
+      materials: extractMaterialsFromBlocks(product.blocks),
+      stock: Number(product.stock ?? 0),
+      isOrdered: Boolean(product.is_ordered),
+      isRented: Boolean(product.is_rented),
       colors: product.colors && product.colors.length > 0 ? product.colors : [], // Always return array
     };
   }) ?? [];
 
   const sourceProducts: ProductListItem[] = cmsProducts;
+
+  const priceBounds = useMemo(() => {
+    const prices = sourceProducts
+      .map((p) => Number(p.price))
+      .filter((price) => Number.isFinite(price) && price >= 0);
+
+    if (prices.length === 0) {
+      return { min: 0, max: 0 };
+    }
+
+    return {
+      min: Math.floor(Math.min(...prices)),
+      max: Math.ceil(Math.max(...prices)),
+    };
+  }, [sourceProducts]);
+
+  const [minPrice, setMinPrice] = useState<number>(priceBounds.min);
+  const [maxPrice, setMaxPrice] = useState<number>(priceBounds.max);
+
+  useEffect(() => {
+    setMinPrice(priceBounds.min);
+    setMaxPrice(priceBounds.max);
+  }, [priceBounds.min, priceBounds.max]);
   const categories = Array.from(
     sourceProducts.reduce((acc, p) => {
       const cat = p.category?.trim();
@@ -126,6 +191,28 @@ export default function ProductsPage({
     }, new Map<string, number>())
   ).map(([color, count]) => ({ color, count }));
 
+  const brands = Array.from(
+    sourceProducts.reduce((acc, p) => {
+      const brand = p.brand.trim();
+      if (brand) {
+        acc.set(brand, (acc.get(brand) ?? 0) + 1);
+      }
+      return acc;
+    }, new Map<string, number>())
+  ).map(([name, count]) => ({ name, count }));
+
+  const materials = Array.from(
+    sourceProducts.reduce((acc, p) => {
+      p.materials.forEach((material) => {
+        const normalized = material.trim();
+        if (normalized) {
+          acc.set(normalized, (acc.get(normalized) ?? 0) + 1);
+        }
+      });
+      return acc;
+    }, new Map<string, number>())
+  ).map(([name, count]) => ({ name, count }));
+
   const toggleItem = <T,>(arr: T[], item: T) =>
     arr.includes(item) ? arr.filter((x) => x !== item) : [...arr, item];
 
@@ -136,12 +223,17 @@ export default function ProductsPage({
         if (map[initialCategory] && p.category !== map[initialCategory]) return false;
       }
       if (selectedCategories.length > 0 && !selectedCategories.includes(p.category)) return false;
-      if (selectedMaterials.length > 0 && (!p.material || !selectedMaterials.includes(p.material))) return false;
+      if (selectedBrands.length > 0 && !selectedBrands.includes(p.brand)) return false;
+      if (selectedMaterials.length > 0 && !selectedMaterials.some((material) => p.materials.includes(material))) return false;
       if (showSaleOnly && !p.sale) return false;
+      if (showFeaturedOnly && !p.featured) return false;
+      if (inStockOnly && p.stock <= 0) return false;
+      if (hideOrderedAndRented && (p.isOrdered || p.isRented)) return false;
       if (selectedColors.length > 0) {
         if (!p.colors) return false;
         if (!selectedColors.some((c) => p.colors?.includes(c))) return false;
       }
+      if (p.price < minPrice || p.price > maxPrice) return false;
       return true;
     })
     .sort((a, b) => {
@@ -233,22 +325,75 @@ export default function ProductsPage({
                     onChange={(e) => setShowSaleOnly(e.target.checked)}
                     className="mb-3 fw-bold"
                   />
+                  <Form.Check
+                    type="switch"
+                    id="featured-switch"
+                    label="VIP (გამორჩეული)"
+                    checked={showFeaturedOnly}
+                    onChange={(e) => setShowFeaturedOnly(e.target.checked)}
+                    className="mb-3 fw-bold"
+                  />
+                  <Form.Check
+                    type="switch"
+                    id="stock-switch"
+                    label="მხოლოდ მარაგში"
+                    checked={inStockOnly}
+                    onChange={(e) => setInStockOnly(e.target.checked)}
+                    className="mb-3 fw-bold"
+                  />
+                  <Form.Check
+                    type="switch"
+                    id="status-switch"
+                    label="გამორთე შეკვეთილი/გაქირავებული"
+                    checked={hideOrderedAndRented}
+                    onChange={(e) => setHideOrderedAndRented(e.target.checked)}
+                    className="mb-1 fw-bold"
+                  />
                 </Accordion.Body>
               </Accordion.Item>
 
               <Accordion.Item eventKey="1" className="bg-transparent">
                 <Accordion.Header>ფასი</Accordion.Header>
                 <Accordion.Body className="pt-0 pb-4 px-0">
-                  <Form.Range className="mb-4 custom-range" />
+                  <Form.Range
+                    className="mb-4 custom-range"
+                    min={priceBounds.min}
+                    max={priceBounds.max}
+                    value={maxPrice}
+                    onChange={(event) => {
+                      const value = Number(event.target.value);
+                      setMaxPrice(Math.max(value, minPrice));
+                    }}
+                  />
                   <div className="d-flex align-items-center justify-content-between gap-2">
                     <div className="position-relative flex-grow-1">
                       <span className="position-absolute" style={{ left: '12px', top: '8px', color: '#555', fontSize: '0.9rem' }}>₾</span>
-                      <input type="text" className="article-price-input ps-4 w-100" defaultValue="0" />
+                      <input
+                        type="number"
+                        className="article-price-input ps-4 w-100"
+                        min={priceBounds.min}
+                        max={priceBounds.max}
+                        value={minPrice}
+                        onChange={(event) => {
+                          const value = Number(event.target.value || priceBounds.min);
+                          setMinPrice(Math.min(Math.max(value, priceBounds.min), maxPrice));
+                        }}
+                      />
                     </div>
                     <span className="text-muted fw-bold mx-1">-</span>
                     <div className="position-relative flex-grow-1">
                       <span className="position-absolute" style={{ left: '12px', top: '8px', color: '#555', fontSize: '0.9rem' }}>₾</span>
-                      <input type="text" className="article-price-input ps-4 w-100" defaultValue="8000" />
+                      <input
+                        type="number"
+                        className="article-price-input ps-4 w-100"
+                        min={priceBounds.min}
+                        max={priceBounds.max}
+                        value={maxPrice}
+                        onChange={(event) => {
+                          const value = Number(event.target.value || priceBounds.max);
+                          setMaxPrice(Math.max(Math.min(value, priceBounds.max), minPrice));
+                        }}
+                      />
                     </div>
                   </div>
                 </Accordion.Body>
@@ -272,6 +417,44 @@ export default function ProductsPage({
               </Accordion.Item>
 
               <Accordion.Item eventKey="3" className="bg-transparent">
+                <Accordion.Header>ბრენდი</Accordion.Header>
+                <Accordion.Body className="pt-0 pb-4 px-0">
+                  {brands.map((brand, idx) => (
+                    <Form.Check
+                      key={idx}
+                      type="checkbox"
+                      id={`brand-${idx}`}
+                      label={brand.count > 1 ? `${brand.name} (${brand.count})` : brand.name}
+                      className="mb-3 d-flex align-items-center"
+                      checked={selectedBrands.includes(brand.name)}
+                      onChange={() => setSelectedBrands((prev) => toggleItem(prev, brand.name))}
+                    />
+                  ))}
+                </Accordion.Body>
+              </Accordion.Item>
+
+              <Accordion.Item eventKey="4" className="bg-transparent">
+                <Accordion.Header>მასალა</Accordion.Header>
+                <Accordion.Body className="pt-0 pb-4 px-0">
+                  {materials.length === 0 ? (
+                    <div className="text-muted small">მასალის მონაცემი არ არის შევსებული.</div>
+                  ) : (
+                    materials.map((material, idx) => (
+                      <Form.Check
+                        key={idx}
+                        type="checkbox"
+                        id={`material-${idx}`}
+                        label={material.count > 1 ? `${material.name} (${material.count})` : material.name}
+                        className="mb-3 d-flex align-items-center"
+                        checked={selectedMaterials.includes(material.name)}
+                        onChange={() => setSelectedMaterials((prev) => toggleItem(prev, material.name))}
+                      />
+                    ))
+                  )}
+                </Accordion.Body>
+              </Accordion.Item>
+
+              <Accordion.Item eventKey="5" className="bg-transparent">
                 <Accordion.Header>ფერი</Accordion.Header>
                 <Accordion.Body className="pt-0 pb-4 px-0">
                   <div className="d-flex flex-wrap gap-2">

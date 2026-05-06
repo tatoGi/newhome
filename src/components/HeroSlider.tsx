@@ -59,46 +59,45 @@ const HeroSlider: React.FC<{ data?: { slides?: HeroSlide[] } }> = ({ data }) => 
         {displaySlides.map((slide, index) => {
           const slideImage = resolveImageOrFallback(slide.image, fallbackLogo);
           return (
-          <Carousel.Item key={slide.id ?? index}>
-            <div className="hero-slide-image-container" style={{ position: 'relative', minHeight: '440px' }}>
-              <Image
-                src={slideImage}
-                alt={slide.title || 'Banner'}
-                fill
-                priority={index === 0}
-                loading={index === 0 ? 'eager' : 'lazy'}
-                sizes="100vw"
-                unoptimized={isBackendAssetUrl(slideImage)}
-                className="hero-slide-image"
-                style={{ objectFit: 'cover' }}
-              />
-            </div>
+            <Carousel.Item key={slide.id ?? index}>
+              <div className="hero-slide-image-container" style={{ position: 'relative', minHeight: '440px' }}>
+                <Image
+                  src={slideImage}
+                  alt={slide.title || 'Banner'}
+                  fill
+                  priority={index === 0}
+                  loading={index === 0 ? 'eager' : 'lazy'}
+                  sizes="100vw"
+                  unoptimized={isBackendAssetUrl(slideImage)}
+                  className="hero-slide-image"
+                />
+              </div>
 
-            <Carousel.Caption className="hero-slide-overlay">
-              <Container>
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.65, ease: [0.25, 0.46, 0.45, 0.94] }}
-                  className="hero-slide-content d-flex flex-column align-items-center text-center mx-auto"
-                >
-                  {slide.tag ? (
-                    <span className="hero-slide-tag">{slide.tag}</span>
-                  ) : null}
-                  {slide.title ? (
-                    <h2 className="hero-slide-title">{slide.title}</h2>
-                  ) : null}
-                  {slide.desc ? (
-                    <p className="hero-slide-desc">{slide.desc.replace(/<[^>]*>/g, '').trim()}</p>
-                  ) : null}
-                  <Button as={Link as any} href={slide.link || '/products'} variant="primary" className="hero-slide-btn rounded-pill">
-                    {getUiText(locale, 'hero.discover_more')}
-                  </Button>
-                </motion.div>
-              </Container>
-            </Carousel.Caption>
-          </Carousel.Item>
+              <Carousel.Caption className="hero-slide-overlay">
+                <Container>
+                  <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.65, ease: [0.25, 0.46, 0.45, 0.94] }}
+                    className="hero-slide-content d-flex flex-column align-items-center text-center mx-auto"
+                  >
+                    {slide.tag ? (
+                      <span className="hero-slide-tag">{slide.tag}</span>
+                    ) : null}
+                    {slide.title ? (
+                      <h2 className="hero-slide-title">{slide.title}</h2>
+                    ) : null}
+                    {slide.desc ? (
+                      <p className="hero-slide-desc">{slide.desc.replace(/<[^>]*>/g, '').trim()}</p>
+                    ) : null}
+                    <Button as={Link as any} href={slide.link || '/products'} variant="primary" className="hero-slide-btn rounded-pill">
+                      {getUiText(locale, 'hero.discover_more')}
+                    </Button>
+                  </motion.div>
+                </Container>
+              </Carousel.Caption>
+            </Carousel.Item>
           );
         })}
       </Carousel>

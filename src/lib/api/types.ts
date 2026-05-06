@@ -163,6 +163,9 @@ export interface ProductRelation {
     on_sale: boolean;
     is_featured?: boolean;
     brand: string;
+    stock?: number;
+    is_ordered?: boolean;
+    is_rented?: boolean;
     feature_image: string | null;
     category: string;
     colors: string[]; // Changed from optional to required
