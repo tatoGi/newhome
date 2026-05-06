@@ -3,7 +3,7 @@
 import { Container, Row, Col } from 'react-bootstrap';
 import Link from 'next/link';
 import { motion } from 'motion/react';
-import { ChevronRight, Phone } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { resolveImageOrFallback } from '@/lib/api/assets';
 import { useFallbackLogo } from '@/context/BootstrapContext';
 import PageBlockRenderer from '@/components/PageBlockRenderer';
@@ -38,9 +38,13 @@ function extractChecklistItems(data: Record<string, any> = {}): string[] {
     .filter(Boolean);
 }
 
+const stripHtml = (value: unknown): string =>
+  String(value ?? '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+
 export default function ServiceDetailsPage({ service, phone }: { service: ServiceProps; phone?: string | null }) {
   const fallbackLogo = useFallbackLogo();
   const intro = service.blocks?.find((b: any) => b.type === 'post_intro');
+  const hasContentImage = Boolean(intro?.data?.post_image || service.coverImage || service.image);
   const heroImage = resolveImageOrFallback(
     intro?.data?.post_image || service.coverImage || service.image || '',
     fallbackLogo
@@ -54,6 +58,13 @@ export default function ServiceDetailsPage({ service, phone }: { service: Servic
   const quoteBlocks = extraBlocks.filter((b: any) => b.type === 'quote' || b.type === 'post_quote');
   const layoutBlocks = extraBlocks.filter(
     (b: any) => b.type !== 'checklist' && b.type !== 'post_checklist' && b.type !== 'quote' && b.type !== 'post_quote'
+  );
+  const fullDescText = stripHtml(service.fullDesc);
+  const descText = stripHtml(desc);
+  const shouldShowFullDesc = Boolean(
+    fullDescText &&
+    fullDescText !== descText &&
+    fullDescText !== stripHtml(title)
   );
 
   return (
@@ -138,44 +149,35 @@ export default function ServiceDetailsPage({ service, phone }: { service: Servic
             </div>
           )}
 
-          <Row className="gy-5">
-            <Col lg={7}>
-              {service.fullDesc ? (
+          <Row className="gy-5 align-items-start">
+            <Col lg={hasContentImage ? 7 : 12}>
+              {desc ? (
+                <div
+                  className="cms-content text-muted lh-lg fs-5 mb-4"
+                  dangerouslySetInnerHTML={{ __html: desc }}
+                />
+              ) : null}
+
+              {shouldShowFullDesc ? (
                 <div
                   className="cms-content text-muted lh-lg fs-5"
                   dangerouslySetInnerHTML={{ __html: service.fullDesc }}
                 />
-              ) : desc ? (
-                <div
-                  className="cms-content text-muted lh-lg fs-5"
-                  dangerouslySetInnerHTML={{ __html: desc }}
-                />
               ) : null}
             </Col>
 
-            <Col lg={5}>
-              <div className="bg-primary text-white p-4 p-xl-5 rounded h-100 d-flex flex-column justify-content-center position-relative overflow-hidden">
-                <div className="position-relative" style={{ zIndex: 1 }}>
-                  <h3 className="fw-bold mb-4">გაქვთ შეკითხვები?</h3>
-                  <p className="mb-4 opacity-75 lh-lg">
-                    ჩვენი გუნდი მზად არის გაგიწიოთ კონსულტაცია და შეგირჩიოთ საუკეთესო ვარიანტი.
-                  </p>
-                  {phone && (
-                    <div className="d-flex align-items-center gap-3 mb-4 p-3 rounded" style={{ background: 'rgba(255,255,255,0.12)' }}>
-                      <Phone className="opacity-75" />
-                      <span className="fs-4 fw-medium">{phone}</span>
-                    </div>
-                  )}
-                  <Link href="/contact" className="btn btn-light btn-lg w-100 fw-bold text-primary text-uppercase mt-2">
-                    დაგვიკავშირდით
-                  </Link>
-                </div>
-                <div className="position-absolute end-0 bottom-0 rounded-circle bg-white opacity-10"
-                  style={{ width: 250, height: 250, marginRight: -100, marginBottom: -100 }} />
-                <div className="position-absolute start-0 top-0 rounded-circle bg-white opacity-10"
-                  style={{ width: 150, height: 150, marginLeft: -50, marginTop: -50 }} />
-              </div>
-            </Col>
+            {hasContentImage && (
+              <Col lg={5}>
+                <img
+                  src={heroImage}
+                  alt={title}
+                  title={title}
+                  className="img-fluid rounded shadow-sm w-100"
+                  style={{ maxHeight: 420, objectFit: 'cover' }}
+                  referrerPolicy="no-referrer"
+                />
+              </Col>
+            )}
           </Row>
         </div>
       </Container>
