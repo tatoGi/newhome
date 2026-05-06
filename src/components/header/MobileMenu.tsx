@@ -92,7 +92,9 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
   return (
     <Offcanvas show={show} onHide={onHide} placement="start" className="mobile-header-offcanvas">
       <Offcanvas.Header closeButton className="border-bottom">
-        <img src={headerLogo} alt="HomeSpace" className="mobile-header-logo" />
+        <span className="mobile-header-logo-link" aria-label="HomeSpace">
+          <img src={headerLogo} alt="HomeSpace" className="mobile-header-logo" />
+        </span>
       </Offcanvas.Header>
       <Offcanvas.Body className="px-0 py-4">
         <div className="px-3 mb-4">

@@ -147,7 +147,7 @@ const Header: React.FC = () => {
         <div className="border-bottom py-2 py-md-3">
           <Container>
             <div className="d-flex justify-content-between align-items-center gap-2">
-              <Link href="/" className="text-decoration-none flex-shrink-0">
+              <Link href="/" className="site-header-logo-link text-decoration-none flex-shrink-0" aria-label="HomeSpace">
                 <img src={headerLogo} alt="HomeSpace" className="site-header-logo" />
               </Link>
 
