@@ -48,6 +48,16 @@ export default function LeafletContactMap({ address = '', title = 'Location' }: 
   const normalizedAddress = stripHtml(address);
 
   useEffect(() => {
+    const stylesheetId = 'leaflet-runtime-css';
+
+    if (!document.getElementById(stylesheetId)) {
+      const link = document.createElement('link');
+      link.id = stylesheetId;
+      link.rel = 'stylesheet';
+      link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+      document.head.appendChild(link);
+    }
+
     let isCancelled = false;
 
     const initMap = async () => {

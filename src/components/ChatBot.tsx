@@ -10,8 +10,8 @@ interface Message {
   sender: 'user' | 'bot';
 }
 
-export default function ChatBot() {
-  const [isOpen, setIsOpen] = useState(false);
+export default function ChatBot({ initialOpen = false }: { initialOpen?: boolean }) {
+  const [isOpen, setIsOpen] = useState(initialOpen);
   const [isMinimized, setIsMinimized] = useState(false);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([

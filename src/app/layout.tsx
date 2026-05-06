@@ -3,13 +3,12 @@ import { Noto_Serif_Georgian } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
 import Script from 'next/script';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import 'leaflet/dist/leaflet.css';
 import './globals.css';
 import '../components/header/header.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Providers from '@/components/Providers';
-import ChatBot from '@/components/ChatBot';
+import ChatBotLoader from '@/components/ChatBotLoader';
 import { api } from '@/lib/api/client';
 import { getServerLocale } from '@/lib/locale';
 import { toBackendAssetUrl } from '@/lib/api/assets';
@@ -160,7 +159,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             <main className="flex-grow-1">{children}</main>
             <Footer />
           </div>
-          <ChatBot />
+          <ChatBotLoader />
         </Providers>
         <Analytics />
       </body>
