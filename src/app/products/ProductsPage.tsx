@@ -165,11 +165,33 @@ export default function ProductsPage({
 
   const [minPrice, setMinPrice] = useState<number>(priceBounds.min);
   const [maxPrice, setMaxPrice] = useState<number>(priceBounds.max);
+  const [minPriceInput, setMinPriceInput] = useState<string>(String(priceBounds.min));
+  const [maxPriceInput, setMaxPriceInput] = useState<string>(String(priceBounds.max));
 
   useEffect(() => {
     setMinPrice(priceBounds.min);
     setMaxPrice(priceBounds.max);
+    setMinPriceInput(String(priceBounds.min));
+    setMaxPriceInput(String(priceBounds.max));
   }, [priceBounds.min, priceBounds.max]);
+
+  const commitMinPrice = () => {
+    const raw = minPriceInput.trim();
+    const parsed = Number(raw === '' ? priceBounds.min : raw);
+    const safe = Number.isFinite(parsed) ? parsed : priceBounds.min;
+    const normalized = Math.min(Math.max(safe, priceBounds.min), maxPrice);
+    setMinPrice(normalized);
+    setMinPriceInput(String(normalized));
+  };
+
+  const commitMaxPrice = () => {
+    const raw = maxPriceInput.trim();
+    const parsed = Number(raw === '' ? priceBounds.max : raw);
+    const safe = Number.isFinite(parsed) ? parsed : priceBounds.max;
+    const normalized = Math.max(Math.min(safe, priceBounds.max), minPrice);
+    setMaxPrice(normalized);
+    setMaxPriceInput(String(normalized));
+  };
   const categories = Array.from(
     sourceProducts.reduce((acc, p) => {
       const cat = p.category?.trim();
@@ -362,7 +384,9 @@ export default function ProductsPage({
                     value={maxPrice}
                     onChange={(event) => {
                       const value = Number(event.target.value);
-                      setMaxPrice(Math.max(value, minPrice));
+                      const normalized = Math.max(value, minPrice);
+                      setMaxPrice(normalized);
+                      setMaxPriceInput(String(normalized));
                     }}
                   />
                   <div className="d-flex align-items-center justify-content-between gap-2">
@@ -373,10 +397,14 @@ export default function ProductsPage({
                         className="article-price-input ps-4 w-100"
                         min={priceBounds.min}
                         max={priceBounds.max}
-                        value={minPrice}
-                        onChange={(event) => {
-                          const value = Number(event.target.value || priceBounds.min);
-                          setMinPrice(Math.min(Math.max(value, priceBounds.min), maxPrice));
+                        value={minPriceInput}
+                        onChange={(event) => setMinPriceInput(event.target.value)}
+                        onBlur={commitMinPrice}
+                        onKeyDown={(event) => {
+                          if (event.key === 'Enter') {
+                            event.preventDefault();
+                            commitMinPrice();
+                          }
                         }}
                       />
                     </div>
@@ -388,10 +416,14 @@ export default function ProductsPage({
                         className="article-price-input ps-4 w-100"
                         min={priceBounds.min}
                         max={priceBounds.max}
-                        value={maxPrice}
-                        onChange={(event) => {
-                          const value = Number(event.target.value || priceBounds.max);
-                          setMaxPrice(Math.max(Math.min(value, priceBounds.max), minPrice));
+                        value={maxPriceInput}
+                        onChange={(event) => setMaxPriceInput(event.target.value)}
+                        onBlur={commitMaxPrice}
+                        onKeyDown={(event) => {
+                          if (event.key === 'Enter') {
+                            event.preventDefault();
+                            commitMaxPrice();
+                          }
                         }}
                       />
                     </div>
