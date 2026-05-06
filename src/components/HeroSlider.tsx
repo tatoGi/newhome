@@ -64,6 +64,7 @@ const HeroSlider: React.FC<{ data?: { slides?: HeroSlide[] } }> = ({ data }) => 
                 <Image
                   src={slideImage}
                   alt={slide.title || 'Banner'}
+                  title={slide.title || 'Banner'}
                   fill
                   priority={index === 0}
                   fetchPriority={index === 0 ? 'high' : 'auto'}
@@ -86,7 +87,9 @@ const HeroSlider: React.FC<{ data?: { slides?: HeroSlide[] } }> = ({ data }) => 
                     {slide.tag ? (
                       <span className="hero-slide-tag">{slide.tag}</span>
                     ) : null}
-                    {slide.title ? (
+                    {slide.title && index === 0 ? (
+                      <h1 className="hero-slide-title">{slide.title}</h1>
+                    ) : slide.title ? (
                       <h2 className="hero-slide-title">{slide.title}</h2>
                     ) : null}
                     {slide.desc ? (

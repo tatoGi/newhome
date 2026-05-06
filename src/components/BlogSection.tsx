@@ -75,6 +75,7 @@ const BlogSection: React.FC<BlogSectionProps> = ({ blogSection }) => {
                                         <Image
                                             src={post.image}
                                             alt={post.title}
+                                            title={post.title}
                                             fill
                                             sizes="(max-width: 767px) 100vw, 33vw"
                                             className="blog-card-img"

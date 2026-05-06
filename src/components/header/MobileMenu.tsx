@@ -97,6 +97,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
           <Image
             src={headerLogo}
             alt="HomeSpace"
+            title="HomeSpace"
             width={118}
             height={58}
             sizes="118px"

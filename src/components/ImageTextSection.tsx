@@ -49,6 +49,7 @@ export default function ImageTextSection({ blocks, pageTitle, pageDescription }:
               <Image
                 src={image}
                 alt={title}
+                title={title}
                 width={1200}
                 height={800}
                 sizes="(max-width: 992px) 100vw, 50vw"

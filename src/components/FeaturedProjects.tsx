@@ -94,6 +94,7 @@ const FeaturedProjects: React.FC<FeaturedProjectsProps> = ({ projects: propProje
                                         <Image
                                             src={project.image}
                                             alt={project.title}
+                                            title={project.title}
                                             fill
                                             sizes={index === 0 ? '(max-width: 992px) 100vw, 1140px' : '(max-width: 992px) 100vw, 540px'}
                                             quality={70}

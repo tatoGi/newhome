@@ -35,6 +35,7 @@ const Footer: React.FC = () => {
               <Image
                 src={footerLogo}
                 alt="HomeSpace"
+                title="HomeSpace"
                 width={200}
                 height={64}
                 sizes="200px"

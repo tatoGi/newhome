@@ -93,6 +93,7 @@ const Reels: React.FC<{ data?: any }> = ({ data }) => {
                                             <Image
                                                 src={reelImg}
                                                 alt={reel.title}
+                                                title={reel.title}
                                                 width={90}
                                                 height={90}
                                                 sizes="90px"
@@ -138,6 +139,7 @@ const Reels: React.FC<{ data?: any }> = ({ data }) => {
                                             <Image
                                                 src={reelImg}
                                                 alt={reel.title}
+                                                title={reel.title}
                                                 width={900}
                                                 height={1400}
                                                 sizes="(max-width: 576px) 92vw, (max-width: 992px) 80vw, 450px"

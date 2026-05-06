@@ -152,6 +152,7 @@ const Header: React.FC = () => {
                 <Image
                   src={headerLogo}
                   alt="HomeSpace"
+                  title="HomeSpace"
                   width={168}
                   height={82}
                   sizes="(max-width: 767px) 120px, (max-width: 1199px) 150px, 168px"

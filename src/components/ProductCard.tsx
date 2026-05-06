@@ -65,6 +65,7 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
           <Image
             src={productImage}
             alt={product.name}
+            title={product.name}
             fill
             sizes="(max-width: 576px) 100vw, (max-width: 992px) 50vw, (max-width: 1400px) 33vw, 25vw"
             className="article-product-img"

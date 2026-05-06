@@ -67,6 +67,7 @@ const CategoryGrid: React.FC<{ data?: any; products?: ApiProduct[]; textBlock?: 
                                         <Image
                                             src={cat.image}
                                             alt={cat.name}
+                                            title={cat.name}
                                             fill
                                             className="object-fit-cover transition-transform"
                                             sizes="(max-width: 768px) 50vw, 25vw"

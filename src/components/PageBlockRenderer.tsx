@@ -44,7 +44,7 @@ function PhotoGallery({ blocks, fallbackLogo }: { blocks: Block[]; fallbackLogo:
         <Row className="gy-3">
           {images.map((src, i) => (
             <Col key={i} xs={6} md={4} lg={3}>
-              <img src={src} alt={`gallery-${i}`} className="img-fluid rounded shadow-sm w-100" style={{ height: '200px', objectFit: 'cover' }} referrerPolicy="no-referrer" />
+              <img src={src} alt={`gallery-${i}`} title={`gallery-${i}`} className="img-fluid rounded shadow-sm w-100" style={{ height: '200px', objectFit: 'cover' }} referrerPolicy="no-referrer" />
             </Col>
           ))}
         </Row>
