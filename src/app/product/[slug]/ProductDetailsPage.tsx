@@ -61,6 +61,11 @@ export default function ProductDetailsPage({
   const [activeColor, setActiveColor] = useState(0);
   const [showSlider, setShowSlider] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const specifications = product.specifications ?? {};
+  const materialSpec = specifications['მასალა'] || specifications['Material'] || '';
+  const sizeSpec = specifications['ზომა'] || specifications['Size'] || '';
+  const heightSpec = specifications['სიმაღლე'] || specifications['Height'] || '';
+  const colorSpec = specifications['ფერები'] || specifications['Colors'] || '';
 
   const shareUrl = `https://homespace.ge/product/${product.slug}`;
   const encodedUrl = encodeURIComponent(shareUrl);
@@ -246,6 +251,30 @@ export default function ProductDetailsPage({
                       <div className="d-flex gap-2">
                         <span className="text-muted" style={{ width: '160px' }}>ბრენდი:</span>
                         <span className="fw-medium">{product.brand}</span>
+                      </div>
+                    )}
+                    {materialSpec && (
+                      <div className="d-flex gap-2">
+                        <span className="text-muted" style={{ width: '160px' }}>მასალა:</span>
+                        <span className="fw-medium">{materialSpec}</span>
+                      </div>
+                    )}
+                    {sizeSpec && (
+                      <div className="d-flex gap-2">
+                        <span className="text-muted" style={{ width: '160px' }}>ზომა:</span>
+                        <span className="fw-medium">{sizeSpec}</span>
+                      </div>
+                    )}
+                    {heightSpec && (
+                      <div className="d-flex gap-2">
+                        <span className="text-muted" style={{ width: '160px' }}>სიმაღლე:</span>
+                        <span className="fw-medium">{heightSpec}</span>
+                      </div>
+                    )}
+                    {colorSpec && (
+                      <div className="d-flex gap-2">
+                        <span className="text-muted" style={{ width: '160px' }}>ფერები:</span>
+                        <span className="fw-medium">{colorSpec}</span>
                       </div>
                     )}
                     <div className="d-flex gap-2">

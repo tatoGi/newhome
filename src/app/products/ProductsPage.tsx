@@ -31,6 +31,7 @@ interface ProductListItem {
   blocks?: Block[];
   brand: string;
   materials: string[];
+  dimensions: string[];
   sale?: boolean;
   featured?: boolean;
   stock: number;
@@ -102,6 +103,40 @@ const extractMaterialsFromBlocks = (blocks?: Block[]): string[] => {
   return Array.from(values);
 };
 
+const extractSpecsFromBlocks = (blocks?: Block[]): { materials: string[]; dimensions: string[] } => {
+  if (!Array.isArray(blocks)) {
+    return { materials: [], dimensions: [] };
+  }
+
+  const materials = new Set<string>(extractMaterialsFromBlocks(blocks));
+  const dimensions = new Set<string>();
+  const specsBlock = blocks.find((block) => block.type === 'product_specs');
+  const items = specsBlock?.data?.items;
+
+  if (Array.isArray(items)) {
+    items.forEach((item) => {
+      if (!item || typeof item !== 'object') return;
+      const record = item as Record<string, unknown>;
+      const label = String(record.label ?? '').trim().toLowerCase();
+      const value = String(record.value ?? '').trim();
+      if (value === '') return;
+
+      if (label.includes('მასალა') || label.includes('material')) {
+        materials.add(value);
+      }
+
+      if (label.includes('ზომა') || label.includes('სიმაღლე') || label.includes('size') || label.includes('height')) {
+        dimensions.add(value);
+      }
+    });
+  }
+
+  return {
+    materials: Array.from(materials),
+    dimensions: Array.from(dimensions),
+  };
+};
+
 export default function ProductsPage({
   initialCategory,
   products: initialProducts,
@@ -113,6 +148,7 @@ export default function ProductsPage({
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [selectedMaterials, setSelectedMaterials] = useState<string[]>([]);
+  const [selectedDimensions, setSelectedDimensions] = useState<string[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [showSaleOnly, setShowSaleOnly] = useState(false);
   const [showFeaturedOnly, setShowFeaturedOnly] = useState(false);
@@ -124,6 +160,7 @@ export default function ProductsPage({
   const products = initialProducts || [];
   const cmsProducts: ProductListItem[] = products?.map((product) => {
     const galleryImages = extractProductGalleryImages(product.blocks);
+    const specs = extractSpecsFromBlocks(product.blocks);
 
     return {
       id: product.id,
@@ -138,7 +175,8 @@ export default function ProductsPage({
       slug: product.slug || `product-${product.id}`, // Fallback slug if empty
       blocks: product.blocks,
       brand: String(product.brand || '').trim(),
-      materials: extractMaterialsFromBlocks(product.blocks),
+      materials: specs.materials,
+      dimensions: specs.dimensions,
       stock: Number(product.stock ?? 0),
       isOrdered: Boolean(product.is_ordered),
       isRented: Boolean(product.is_rented),
@@ -235,6 +273,18 @@ export default function ProductsPage({
     }, new Map<string, number>())
   ).map(([name, count]) => ({ name, count }));
 
+  const dimensions = Array.from(
+    sourceProducts.reduce((acc, p) => {
+      p.dimensions.forEach((dimension) => {
+        const normalized = dimension.trim();
+        if (normalized) {
+          acc.set(normalized, (acc.get(normalized) ?? 0) + 1);
+        }
+      });
+      return acc;
+    }, new Map<string, number>())
+  ).map(([name, count]) => ({ name, count }));
+
   const toggleItem = <T,>(arr: T[], item: T) =>
     arr.includes(item) ? arr.filter((x) => x !== item) : [...arr, item];
 
@@ -247,6 +297,7 @@ export default function ProductsPage({
       if (selectedCategories.length > 0 && !selectedCategories.includes(p.category)) return false;
       if (selectedBrands.length > 0 && !selectedBrands.includes(p.brand)) return false;
       if (selectedMaterials.length > 0 && !selectedMaterials.some((material) => p.materials.includes(material))) return false;
+      if (selectedDimensions.length > 0 && !selectedDimensions.some((dimension) => p.dimensions.includes(dimension))) return false;
       if (showSaleOnly && !p.sale) return false;
       if (showFeaturedOnly && !p.featured) return false;
       if (inStockOnly && p.stock <= 0) return false;
@@ -487,6 +538,27 @@ export default function ProductsPage({
               </Accordion.Item>
 
               <Accordion.Item eventKey="5" className="bg-transparent">
+                <Accordion.Header>ზომები</Accordion.Header>
+                <Accordion.Body className="pt-0 pb-4 px-0">
+                  {dimensions.length === 0 ? (
+                    <div className="text-muted small">ზომის მონაცემი არ არის შევსებული.</div>
+                  ) : (
+                    dimensions.map((dimension, idx) => (
+                      <Form.Check
+                        key={idx}
+                        type="checkbox"
+                        id={`dimension-${idx}`}
+                        label={dimension.count > 1 ? `${dimension.name} (${dimension.count})` : dimension.name}
+                        className="mb-3 d-flex align-items-center"
+                        checked={selectedDimensions.includes(dimension.name)}
+                        onChange={() => setSelectedDimensions((prev) => toggleItem(prev, dimension.name))}
+                      />
+                    ))
+                  )}
+                </Accordion.Body>
+              </Accordion.Item>
+
+              <Accordion.Item eventKey="6" className="bg-transparent">
                 <Accordion.Header>ფერი</Accordion.Header>
                 <Accordion.Body className="pt-0 pb-4 px-0">
                   <div className="d-flex flex-wrap gap-2">

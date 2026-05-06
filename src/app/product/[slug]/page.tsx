@@ -14,6 +14,29 @@ const extractProductGalleryImages = (blocks: Array<{ type?: string; data?: Recor
       return Array.isArray(images) ? images.map((image) => String(image ?? '').trim()).filter(Boolean) : [];
     });
 
+const extractProductSpecifications = (blocks: Array<{ type?: string; data?: Record<string, unknown> }> = []): Record<string, string> => {
+  const specsBlock = blocks.find((block) => block.type === 'product_specs');
+  const items = specsBlock?.data?.items;
+  if (!Array.isArray(items)) {
+    return {};
+  }
+
+  const result: Record<string, string> = {};
+  items.forEach((item) => {
+    if (!item || typeof item !== 'object') {
+      return;
+    }
+
+    const label = String((item as Record<string, unknown>).label ?? '').trim();
+    const value = String((item as Record<string, unknown>).value ?? '').trim();
+    if (label !== '' && value !== '') {
+      result[label] = value;
+    }
+  });
+
+  return result;
+};
+
 export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
   try {
     const data = await api.getProducts();
@@ -77,6 +100,7 @@ export default async function Page({ params, searchParams }: {
     .map((image) => toBackendAssetUrl(image))
     .filter((image, index, array): image is string => Boolean(image) && array.indexOf(image) === index);
   const images = resolvedImages.length > 0 ? resolvedImages : [fallbackLogo];
+  const specifications = extractProductSpecifications(data.product.blocks || []);
 
   const product = {
     id: data.product.id,
@@ -93,6 +117,7 @@ export default async function Page({ params, searchParams }: {
     images,
     category: data.product.category || '',
     colors: data.product.colors || [],
+    specifications,
   };
 
   // Fetch related products from the same category
