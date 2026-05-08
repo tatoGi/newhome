@@ -25,11 +25,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/w
 export async function fetchApi<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${BASE_URL}${endpoint}`;
 
-    // Allow callers to override `next` revalidation; fall back to env-based default
-    const defaultNext = process.env.NODE_ENV === 'development'
-        ? { revalidate: 0 }
-        : { revalidate: 60 };
-    const nextOption = (options as { next?: { revalidate?: number } }).next ?? defaultNext;
+    const nextOption = (options as { next?: { revalidate?: number } }).next;
 
     const response = await fetch(url, {
         ...options,
@@ -38,7 +34,7 @@ export async function fetchApi<T>(endpoint: string, options: RequestInit = {}): 
             'Content-Type': 'application/json',
             ...options.headers,
         },
-        next: nextOption,
+        ...(nextOption ? { next: nextOption } : { cache: 'no-store' }),
     } as RequestInit);
 
     if (!response.ok) {
