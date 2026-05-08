@@ -1,6 +1,10 @@
 import type { NextConfig } from 'next';
 import path from 'path';
 
+const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/web';
+const backendBaseUrl = (process.env.NEXT_PUBLIC_BACKEND_URL || '').replace(/\/$/, '') ||
+  apiBaseUrl.replace(/\/api\/web\/?$/, '');
+
 const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve(__dirname),
@@ -39,6 +43,14 @@ const nextConfig: NextConfig = {
             value: 'public, max-age=31536000, immutable',
           },
         ],
+      },
+    ];
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/storage/:path*',
+        destination: `${backendBaseUrl}/storage/:path*`,
       },
     ];
   },
