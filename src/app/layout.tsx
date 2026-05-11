@@ -77,10 +77,6 @@ export async function generateMetadata(): Promise<Metadata> {
       description: 'თანამედროვე ავეჯის და განათების ონლაინ მაღაზია.',
       images: [`${SITE_URL}/og-image.jpg`],
     },
-    alternates: {
-      canonical: SITE_URL,
-      languages: { ka: SITE_URL },
-    },
     robots: {
       index: true,
       follow: true,
