@@ -293,3 +293,11 @@ export interface ContactSubmissionResponse {
     success: boolean;
     message: string;
 }
+
+export interface CallRequestPayload {
+    name: string;
+    phone: string;
+    locale?: string;
+    page_slug?: string;
+    page_url?: string;
+}

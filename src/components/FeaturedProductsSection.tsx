@@ -8,6 +8,7 @@ import ProductCard from '@/components/ProductCard';
 import { ProductRelation } from '@/lib/api/types';
 import { useBootstrap, useFallbackLogo } from '@/context/BootstrapContext';
 import { resolveImageOrFallback } from '@/lib/api/assets';
+import { getUiText } from '@/lib/i18n/ui';
 
 function resolveProductImage(p: ProductRelation, fallbackLogo: string): string {
   const galleryBlock = p.blocks?.find((b) => b.type === 'product_gallery');
@@ -18,15 +19,21 @@ function resolveProductImage(p: ProductRelation, fallbackLogo: string): string {
 
 interface FeaturedProductsSectionProps {
   products?: ProductRelation[];
+  title?: string;
+  subtitle?: string;
 }
 
-export default function FeaturedProductsSection({ products }: FeaturedProductsSectionProps) {
-  const { routeMap } = useBootstrap();
+export default function FeaturedProductsSection({ products, title, subtitle }: FeaturedProductsSectionProps) {
+  const { routeMap, locale } = useBootstrap();
   const fallbackLogo = useFallbackLogo();
   const productsPage = routeMap?.find((r) => r.template === 'products' || r.template === 'shop');
   const allProductsHref = productsPage ? `/${productsPage.slug}` : '/products';
 
   if (!products || products.length === 0) return null;
+
+  const resolvedTitle = title || getUiText(locale, 'featured_products.title');
+  const resolvedSubtitle = subtitle || getUiText(locale, 'featured_products.subtitle');
+  const viewAllLabel = getUiText(locale, 'featured_products.view_all');
 
   const items = products.map((p) => ({
     id: p.id,
@@ -42,7 +49,7 @@ export default function FeaturedProductsSection({ products }: FeaturedProductsSe
   }));
 
   return (
-    <section className="py-5">
+    <section className="py-5 bg-light">
       <Container>
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -52,11 +59,11 @@ export default function FeaturedProductsSection({ products }: FeaturedProductsSe
           className="d-flex justify-content-between align-items-end mb-4"
         >
           <div>
-            <h2 className="fw-bold mb-2">რჩეული პროდუქცია</h2>
-            <p className="text-muted mb-0">აღმოაჩინეთ ჩვენი ყველაზე პოპულარული მოდელები</p>
+            <h2 className="fw-bold mb-2">{resolvedTitle}</h2>
+            <p className="text-muted mb-0">{resolvedSubtitle}</p>
           </div>
           <Button as={Link as any} href={allProductsHref} variant="link" className="text-primary text-decoration-none d-flex align-items-center gap-2">
-            ყველას ნახვა <ArrowRight size={18} />
+            {viewAllLabel} <ArrowRight size={18} />
           </Button>
         </motion.div>
         <Row className="gy-4">

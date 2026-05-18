@@ -15,8 +15,8 @@ interface BlogSectionProps {
 }
 
 const BlogSection: React.FC<BlogSectionProps> = ({ blogSection }) => {
-    const sectionTitle = blogSection?.title || 'სიახლეები და ბლოგი';
-    const sectionSubtitle = blogSection?.subtitle || 'მიიღეთ რჩევები ინტერიერის გასაუმჯობესებლად';
+    const sectionTitle = blogSection?.title || '';
+    const sectionSubtitle = blogSection?.subtitle || '';
     const fallbackLogo = useFallbackLogo();
 
     const posts = (blogSection?.posts ?? []).map((p) => {
@@ -44,8 +44,8 @@ const BlogSection: React.FC<BlogSectionProps> = ({ blogSection }) => {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                     >
-                        <h2 className="fw-bold display-6 mb-2">{sectionTitle}</h2>
-                        <p className="text-muted mb-0">{sectionSubtitle}</p>
+                        {sectionTitle ? <h2 className="fw-bold display-6 mb-2">{sectionTitle}</h2> : null}
+                        {sectionSubtitle ? <p className="text-muted mb-0">{sectionSubtitle}</p> : null}
                     </motion.div>
                     <motion.div
                         initial={{ opacity: 0, x: 20 }}

@@ -42,20 +42,30 @@ export default function HomePage({ data }: HomePageProps) {
 
       <Reels data={{ reels: data?.relations?.reels || [] }} />
 
+      <FeaturesSection blocks={blocks} />
+
+      <FeaturedProductsSection
+        products={data?.relations?.products}
+        title={(() => {
+          const b = blocks.find((b) => b.type === 'featured_products' || b.type === 'products_section');
+          return b ? String(b.data?.title ?? b.data?.section_title ?? '') : '';
+        })()}
+        subtitle={(() => {
+          const b = blocks.find((b) => b.type === 'featured_products' || b.type === 'products_section');
+          return b ? String(b.data?.subtitle ?? b.data?.section_subtitle ?? '') : '';
+        })()}
+      />
+
       <FeaturedProjects
         projects={data?.relations?.posts?.filter((p) => p.category === 'project')}
         projectSection={data?.project_section}
       />
 
-      <FeaturesSection blocks={blocks} />
-
-      <FeaturedProductsSection products={data?.relations?.products} />
-
+      <BlogSection blogSection={data?.blog_section} />
       <ImageTextSection blocks={blocks} pageTitle={data?.page?.title} pageDescription={data?.page?.description} />
 
       <CtaBanner blocks={blocks} />
 
-      <BlogSection blogSection={data?.blog_section} />
     </div>
   );
 }

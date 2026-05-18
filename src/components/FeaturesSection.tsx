@@ -11,12 +11,6 @@ const ICONS = [
   <Clock size={40} className="text-primary mb-3" />,
 ];
 
-const FALLBACK = [
-  { title: 'სწრაფი მიწოდება', desc: 'მიიღეთ თქვენი შეკვეთა უმოკლეს დროში მთელი საქართველოს მასშტაბით.' },
-  { title: 'ხარისხის გარანტია', desc: 'ჩვენ გთავაზობთ მხოლოდ უმაღლესი ხარისხის სერტიფიცირებულ პროდუქციას.' },
-  { title: '24/7 მხარდაჭერა', desc: 'ჩვენი გუნდი მზად არის დაგეხმაროთ ნებისმიერ დროს.' },
-];
-
 interface FeaturesSectionProps {
   blocks: Block[];
 }
@@ -24,7 +18,6 @@ interface FeaturesSectionProps {
 export default function FeaturesSection({ blocks }: FeaturesSectionProps) {
   const gridBlocks = blocks.filter((b) => b.type === 'items_grid');
 
-  // page_services block has a repeater field 'items' with {title, description}
   const repeaterItems: Array<{ title: string; desc: string }> = gridBlocks.flatMap((b) => {
     const raw = b.data.items;
     if (Array.isArray(raw) && raw.length > 0) {
@@ -33,16 +26,15 @@ export default function FeaturesSection({ blocks }: FeaturesSectionProps) {
         desc: String(item?.description ?? item?.subtitle ?? ''),
       }));
     }
-    // fallback: single block with title/subtitle directly
     const title = String(b.data.section_title ?? b.data.title ?? '');
     const desc = String(b.data.section_subtitle ?? b.data.subtitle ?? '');
     if (title) return [{ title, desc }];
     return [];
   });
 
-  const items = repeaterItems.length > 0
-    ? repeaterItems.map((item, i) => ({ icon: ICONS[i % ICONS.length], ...item }))
-    : FALLBACK.map((f, i) => ({ icon: ICONS[i], ...f }));
+  if (repeaterItems.length === 0) return null;
+
+  const items = repeaterItems.map((item, i) => ({ icon: ICONS[i % ICONS.length], ...item }));
 
   return (
     <section className="py-5 bg-light">

@@ -51,11 +51,11 @@ const FeaturedProjects: React.FC<FeaturedProjectsProps> = ({ projects: propProje
         return null;
     }
 
-    const sectionTitle = projectSection?.title || 'რჩეული პროექტები';
-    const sectionSubtitle = projectSection?.subtitle || 'ჩვენი დასრულებული სამუშაოები და შთაგონება';
+    const sectionTitle = projectSection?.title || '';
+    const sectionSubtitle = projectSection?.subtitle || '';
 
     return (
-        <section className="py-5 overflow-hidden">
+        <section className="py-5 overflow-hidden bg-light">
             <Container>
                 <div className="d-flex justify-content-between align-items-end mb-5">
                     <motion.div
@@ -63,8 +63,8 @@ const FeaturedProjects: React.FC<FeaturedProjectsProps> = ({ projects: propProje
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                     >
-                        <h2 className="fw-bold display-6 mb-2">{sectionTitle}</h2>
-                        <p className="text-muted mb-0">{sectionSubtitle}</p>
+                        {sectionTitle ? <h2 className="fw-bold display-6 mb-2">{sectionTitle}</h2> : null}
+                        {sectionSubtitle ? <p className="text-muted mb-0">{sectionSubtitle}</p> : null}
                     </motion.div>
                     <motion.div
                         initial={{ opacity: 0, x: 20 }}

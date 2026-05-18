@@ -14,6 +14,7 @@ import HeaderActions from '@/components/header/HeaderActions';
 import DesktopNavigation from '@/components/header/DesktopNavigation';
 import MobileMenu from '@/components/header/MobileMenu';
 import CartDrawer from '@/components/header/CartDrawer';
+import CallRequestModal from '@/components/CallRequestModal';
 
 const Header: React.FC = () => {
   const { cart, wishlist } = useApp();
@@ -22,6 +23,7 @@ const Header: React.FC = () => {
   const router = useRouter();
   const [showCart, setShowCart] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const [showCallRequest, setShowCallRequest] = useState(false);
   const [activeDesktopMenu, setActiveDesktopMenu] = useState<string | null>(null);
   const [openMobileMenus, setOpenMobileMenus] = useState<Record<string, boolean>>({});
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
@@ -198,6 +200,7 @@ const Header: React.FC = () => {
                 onOpenCart={() => setShowCart(true)}
                 onOpenMenu={() => setShowMenu(true)}
                 onOpenAuth={() => openAuthModal('login')}
+                onOpenCallRequest={() => setShowCallRequest(true)}
                 onCloseAccountDropdown={() => setShowAccountDropdown(false)}
               />
             </div>
@@ -246,6 +249,7 @@ const Header: React.FC = () => {
       />
 
       <CartDrawer show={showCart} onHide={() => setShowCart(false)} />
+      <CallRequestModal show={showCallRequest} onHide={() => setShowCallRequest(false)} />
     </>
   );
 };

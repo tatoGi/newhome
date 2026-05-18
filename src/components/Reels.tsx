@@ -8,64 +8,13 @@ import { Play } from 'lucide-react';
 import { resolveImageOrFallback } from '@/lib/api/assets';
 import { useFallbackLogo } from '@/context/BootstrapContext';
 
-interface Reel {
-    id: number;
-    title: string;
-    image: string;
-    category: 'sale' | 'project' | 'new';
-    content: string;
-}
-
-const reelsData: Reel[] = [
-    {
-        id: 1,
-        title: "Sale -20%",
-        image: "https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?auto=format&fit=crop&w=100&h=100&q=75",
-        category: 'sale',
-        content: "ექსკლუზიური ფასდაკლება სკანდინავიურ ავეჯზე! მხოლოდ ამ კვირაში."
-    },
-    {
-        id: 2,
-        title: "Eco Villa",
-        image: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=100&h=100&q=80",
-        category: 'project',
-        content: "ჩვენი ახალი პროექტი საგურამოში - ეკო მეგობრული დიზაინი."
-    },
-    {
-        id: 3,
-        title: "New Light",
-        image: "https://images.unsplash.com/photo-1540932239986-30128078f3c5?auto=format&fit=crop&w=100&h=100&q=75",
-        category: 'new',
-        content: "ახალი კოლექცია იტალიიდან - განათება თქვენი სიმშვიდისთვის."
-    },
-    {
-        id: 4,
-        title: "Modern Loft",
-        image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=100&h=100&q=75",
-        category: 'project',
-        content: "ლოფტის სტილის აპარტამენტის სრული რემონტი და დიზაინი."
-    },
-    {
-        id: 5,
-        title: "Smart Home",
-        image: "https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=100&h=100&q=75",
-        category: 'new',
-        content: "ინტეგრირებული სმარტ სისტემები თქვენს ყოველდღიურობაში."
-    },
-    {
-        id: 6,
-        title: "Night Sale",
-        image: "https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?auto=format&fit=crop&w=100&h=100&q=75",
-        category: 'sale',
-        content: "ღამის აქცია! -15% ყველა ტიპის ჭაღზე."
-    }
-];
-
 const Reels: React.FC<{ data?: any }> = ({ data }) => {
-    const displayReels = data?.reels && data.reels.length > 0 ? data.reels : reelsData;
+    const displayReels = Array.isArray(data?.reels) ? data.reels : [];
     const [show, setShow] = useState(false);
     const [activeIndex, setActiveIndex] = useState(0);
     const fallbackLogo = useFallbackLogo();
+
+    if (displayReels.length === 0) return null;
 
     const handleOpen = (index: number) => {
         setActiveIndex(index);
@@ -73,7 +22,7 @@ const Reels: React.FC<{ data?: any }> = ({ data }) => {
     };
 
     return (
-        <div className="py-4 bg-white border-bottom reels-section">
+        <div className="py-4 bg-light border-bottom reels-section">
             <div className="container overflow-auto hide-scrollbar">
                 <div className="d-flex gap-4 py-2" style={{ minWidth: 'max-content' }}>
                     {displayReels.map((reel: any, index: number) => (

@@ -2,5 +2,17 @@
   "hero.discover_more": "Discover more",
   "hero.previous_slide": "Previous slide",
   "hero.next_slide": "Next slide",
-  "hero.go_to_slide": "Go to slide"
+  "hero.go_to_slide": "Go to slide",
+  "featured_products.title": "Featured Products",
+  "featured_products.subtitle": "Discover our most popular models",
+  "featured_products.view_all": "View all",
+  "call_request.title": "Request a Call",
+  "call_request.button": "Request a Call",
+  "call_request.call_us": "Call us at",
+  "call_request.name_placeholder": "Your name",
+  "call_request.phone_placeholder": "Your phone number",
+  "call_request.submit": "Request a Call",
+  "call_request.sending": "Sending...",
+  "call_request.success": "Thanks! We will call you back shortly.",
+  "call_request.error": "Failed to send call request. Please try again."
 }

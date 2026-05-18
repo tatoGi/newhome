@@ -16,8 +16,7 @@ const nextConfig: NextConfig = {
     deviceSizes: [360, 414, 640, 768, 1024, 1200, 1366],
     imageSizes: [64, 96, 128, 256, 384],
     remotePatterns: [
-      { protocol: 'https', hostname: 'images.unsplash.com' },
-      { protocol: 'https', hostname: 'cms.homespace.ge', pathname: '/storage/**' },
+      { protocol: 'https', hostname: '**' },
       { protocol: 'http', hostname: '127.0.0.1', port: '8000', pathname: '/**' },
       { protocol: 'http', hostname: 'localhost', port: '8000', pathname: '/**' },
       { protocol: 'http', hostname: 'localhost', port: '8080', pathname: '/**' },

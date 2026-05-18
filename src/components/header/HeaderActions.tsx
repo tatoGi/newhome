@@ -3,10 +3,12 @@
 import React from 'react';
 import { Badge } from 'react-bootstrap';
 import Link from 'next/link';
-import { ChevronDown, Heart, Menu, ShoppingCart, User, LogOut } from 'lucide-react';
+import { ChevronDown, Heart, Menu, Phone, ShoppingCart, User, LogOut } from 'lucide-react';
 import type { Language } from '@/lib/api/types';
 import { flagEmoji } from './headerUtils';
 import { useAuth } from '@/context/AuthContext';
+import { useBootstrap } from '@/context/BootstrapContext';
+import { getUiText } from '@/lib/i18n/ui';
 
 interface HeaderActionsProps {
   languages: Language[];
@@ -25,11 +27,13 @@ interface HeaderActionsProps {
   onOpenCart: () => void;
   onOpenMenu: () => void;
   onOpenAuth: () => void;
+  onOpenCallRequest: () => void;
   onCloseAccountDropdown: () => void;
 }
 
 const HeaderActions: React.FC<HeaderActionsProps> = (props) => {
   const { logout } = useAuth();
+  const { locale } = useBootstrap();
   const {
     languages,
     currentLocale,
@@ -47,11 +51,29 @@ const HeaderActions: React.FC<HeaderActionsProps> = (props) => {
     onOpenCart,
     onOpenMenu,
     onOpenAuth,
+    onOpenCallRequest,
     onCloseAccountDropdown,
   } = props;
 
   return (
     <div className="d-flex align-items-center gap-2 gap-md-3 flex-shrink-0">
+      <button
+        type="button"
+        className="btn btn-accent btn-sm rounded-pill d-none d-md-inline-flex align-items-center gap-2 px-3 py-2 text-white fw-semibold"
+        onClick={onOpenCallRequest}
+        aria-label={getUiText(locale, 'call_request.button')}
+      >
+        <Phone size={16} />
+        <span>{getUiText(locale, 'call_request.button')}</span>
+      </button>
+      <button
+        type="button"
+        className="btn btn-link border-0 p-0 text-dark d-md-none"
+        onClick={onOpenCallRequest}
+        aria-label={getUiText(locale, 'call_request.button')}
+      >
+        <Phone size={20} />
+      </button>
       <div className="position-relative d-none d-lg-block">
         <button
           type="button"

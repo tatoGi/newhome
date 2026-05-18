@@ -8,12 +8,6 @@ interface CtaBannerProps {
   blocks: Block[];
 }
 
-const DEFAULTS = {
-  title: 'გსურთ ინდივიდუალური შეკვეთა?',
-  desc: 'დაგვიკავშირდით და დაგეხმარებით იდეალური სივრცის შექმნაში.',
-  link: '/contact',
-};
-
 const pickDefined = (...values: unknown[]): string => {
   const value = values.find((item) => item !== null && item !== undefined);
 
@@ -22,13 +16,11 @@ const pickDefined = (...values: unknown[]): string => {
 
 export default function CtaBanner({ blocks }: CtaBannerProps) {
   const block = blocks.find((b) => b.type === 'cta_banner');
-  const title = block
-    ? pickDefined(block.data?.title)
-    : DEFAULTS.title;
-  const desc = block
-    ? pickDefined(block.data?.description, block.data?.banner_desc)
-    : DEFAULTS.desc;
-  const href = String(block?.data?.cta_url ?? block?.data?.redairect_link ?? DEFAULTS.link);
+  if (!block) return null;
+
+  const title = pickDefined(block.data?.title);
+  const desc = pickDefined(block.data?.description, block.data?.banner_desc);
+  const href = String(block.data?.cta_url ?? block.data?.redairect_link ?? '/contact');
 
   return (
     <section className="py-5 mb-5">

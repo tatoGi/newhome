@@ -2,5 +2,17 @@
   "hero.discover_more": "აღმოაჩინე მეტი",
   "hero.previous_slide": "წინა სლაიდი",
   "hero.next_slide": "შემდეგი სლაიდი",
-  "hero.go_to_slide": "გადადით სლაიდზე"
+  "hero.go_to_slide": "გადადით სლაიდზე",
+  "featured_products.title": "რჩეული პროდუქცია",
+  "featured_products.subtitle": "აღმოაჩინეთ ჩვენი ყველაზე პოპულარული მოდელები",
+  "featured_products.view_all": "ყველას ნახვა",
+  "call_request.title": "ზარის მოთხოვნა",
+  "call_request.button": "ზარის მოთხოვნა",
+  "call_request.call_us": "დაგვირეკეთ ნომერზე",
+  "call_request.name_placeholder": "თქვენი სახელი",
+  "call_request.phone_placeholder": "თქვენი ნომერი",
+  "call_request.submit": "ზარის მოთხოვნა",
+  "call_request.sending": "იგზავნება...",
+  "call_request.success": "მადლობა! მალე დაგიკავშირდებით.",
+  "call_request.error": "ვერ მოხერხდა მოთხოვნის გაგზავნა. სცადეთ თავიდან."
 }

@@ -5,6 +5,7 @@
 import {
     AuthResponse,
     BootstrapResponse,
+    CallRequestPayload,
     ContactSubmissionPayload,
     ContactSubmissionResponse,
     CheckoutResultResponse,
@@ -357,6 +358,29 @@ export const api = {
                 : Object.values(data?.errors ?? {}).flat()[0];
 
             throw new Error(data?.message || validationMessage || 'Failed to send message.');
+        }
+
+        return data as ContactSubmissionResponse;
+    },
+
+    async submitCallRequest(payload: CallRequestPayload): Promise<ContactSubmissionResponse> {
+        const response = await fetch(`${BASE_URL}/call-requests`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        });
+
+        const data = await response.json().catch(() => null);
+
+        if (!response.ok) {
+            const validationMessage = Array.isArray(data?.errors)
+                ? data.errors[0]
+                : Object.values(data?.errors ?? {}).flat()[0];
+
+            throw new Error(data?.message || validationMessage || 'Failed to send call request.');
         }
 
         return data as ContactSubmissionResponse;

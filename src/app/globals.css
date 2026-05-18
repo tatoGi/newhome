@@ -4,6 +4,9 @@
   --primary-color: #0F2E47;
   --accent-color: #CC7A50;
   --light-bg: #f8f9fa;
+  --warm-bg: #FAF4ED;
+  --warm-bg-soft: #FDF8F3;
+  --warm-bg-strong: #F3E6D7;
   --white: #ffffff;
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -36,6 +39,31 @@ main {
 
 .bg-accent {
   background-color: var(--accent-color) !important;
+}
+
+.btn-accent {
+  background-color: var(--accent-color) !important;
+  border-color: var(--accent-color) !important;
+  color: #fff !important;
+}
+
+.btn-accent:hover,
+.btn-accent:focus {
+  background-color: #b96a45 !important;
+  border-color: #b96a45 !important;
+  color: #fff !important;
+}
+
+.bg-warm {
+  background-color: var(--warm-bg) !important;
+}
+
+.bg-warm-soft {
+  background-color: var(--warm-bg-soft) !important;
+}
+
+.bg-warm-strong {
+  background-color: var(--warm-bg-strong) !important;
 }
 
 .text-primary {
