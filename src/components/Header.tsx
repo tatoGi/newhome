@@ -68,11 +68,16 @@ const Header: React.FC = () => {
       }
 
       const rect = trigger.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      const margin = 12;
+      const left = Math.max(margin, Math.min(rect.left, viewportWidth - margin));
+      const maxWidth = Math.max(280, viewportWidth - left - margin);
+
       setDesktopDropdownStyle({
         position: 'fixed',
         top: rect.bottom + 8,
-        left: rect.left + rect.width / 2,
-        transform: 'translateX(-50%)',
+        left,
+        maxWidth,
       });
     };
 
@@ -153,9 +158,9 @@ const Header: React.FC = () => {
                   src={headerLogo}
                   alt="HomeSpace"
                   title="HomeSpace"
-                  width={168}
-                  height={82}
-                  sizes="(max-width: 767px) 120px, (max-width: 1199px) 150px, 168px"
+                  width={220}
+                  height={104}
+                  sizes="(max-width: 767px) 140px, (max-width: 1199px) 190px, 220px"
                   className="site-header-logo"
                   priority
                 />
@@ -211,6 +216,12 @@ const Header: React.FC = () => {
           </Container>
         </div>
       </header>
+
+      <div
+        className={`desktop-menu-backdrop${activeDesktopMenu ? ' is-visible' : ''}`}
+        onClick={() => setActiveDesktopMenu(null)}
+        aria-hidden="true"
+      />
 
       <MobileMenu
         show={showMenu}

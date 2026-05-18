@@ -25,6 +25,11 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+header.sticky-top,
+main {
+  background-color: rgba(var(--bs-white-rgb), var(--bs-bg-opacity)) !important;
+}
+
 .bg-primary {
   background-color: var(--primary-color) !important;
 }

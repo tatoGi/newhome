@@ -3,8 +3,8 @@
 }
 
 .site-header-logo-link {
-  width: 120px;
-  height: 64px;
+  width: 140px;
+  height: 72px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -22,15 +22,15 @@
 
 @media (min-width: 768px) {
   .site-header-logo-link {
-    width: 150px;
-    height: 76px;
+    width: 190px;
+    height: 92px;
   }
 }
 
 @media (min-width: 1200px) {
   .site-header-logo-link {
-    width: 168px;
-    height: 82px;
+    width: 220px;
+    height: 104px;
   }
 }
 
@@ -44,16 +44,36 @@
 
 .dropdown-menu-custom {
   display: block;
-  z-index: 1000;
-  max-width: min(92vw, 760px);
+  z-index: 1030;
+  max-width: 94vw;
+}
+
+.desktop-menu-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.32);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease;
+  z-index: 1010;
+}
+
+.desktop-menu-backdrop.is-visible {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .dropdown-menu-simple {
   min-width: 220px;
 }
 
-.dropdown-menu-mega {
-  min-width: min(720px, 82vw);
+.dropdown-menu-cascade {
+  padding: 0.5rem;
+  max-width: 94vw;
+  max-height: min(78vh, 640px);
+  overflow: auto;
 }
 
 .desktop-nav-trigger {
@@ -105,23 +125,61 @@
   min-width: 18px;
 }
 
-.mega-menu-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 0.75rem;
+.cascade-grid {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
 }
 
-.mega-menu-column {
-  min-width: 0;
-  padding: 0.35rem;
+.cascade-column {
+  min-width: 240px;
+  max-width: 280px;
+  display: flex;
+  flex-direction: column;
+  padding: 0.25rem 0.5rem;
+  border-right: 1px solid #f0f1f3;
 }
 
-.mega-menu-parent {
-  padding: 0.4rem 0.75rem;
+.cascade-column:last-child {
+  border-right: none;
 }
 
-.mega-menu-child {
+.cascade-item {
+  border-radius: 0.5rem;
+  transition: background-color 0.12s ease;
+}
+
+.cascade-item:hover,
+.cascade-item.is-active {
+  background-color: #f5f6f8;
+}
+
+.cascade-link {
+  padding: 0.55rem 0.85rem;
+  color: #222 !important;
   font-size: 0.95rem;
+  line-height: 1.3;
+}
+
+.cascade-item.is-active .cascade-link {
+  color: var(--primary-color, #0F2E47) !important;
+}
+
+.cascade-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cascade-chevron {
+  flex-shrink: 0;
+  opacity: 0.55;
+}
+
+.cascade-item.is-active .cascade-chevron {
+  opacity: 1;
+  color: var(--primary-color, #0F2E47);
 }
 
 .dropdown-item-custom:hover {
