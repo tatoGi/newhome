@@ -7,6 +7,7 @@
   --warm-bg: #FAF4ED;
   --warm-bg-soft: #FDF8F3;
   --warm-bg-strong: #F3E6D7;
+  --content-bg: #F2E6D2;
   --white: #ffffff;
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -23,14 +24,13 @@ body {
   font-weight: 400;
   font-style: normal;
   font-variation-settings: "wdth" 100;
-  background-color: var(--white);
+  background-color: var(--content-bg);
   color: #333;
   -webkit-font-smoothing: antialiased;
 }
 
-header.sticky-top,
 main {
-  background-color: rgba(var(--bs-white-rgb), var(--bs-bg-opacity)) !important;
+  background-color: var(--content-bg) !important;
 }
 
 .bg-primary {
