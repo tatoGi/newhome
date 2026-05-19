@@ -2,6 +2,14 @@
   max-width: 500px;
 }
 
+.site-header-cream {
+  background-color: var(--content-bg) !important;
+}
+
+.site-header-cream .border-bottom {
+  border-color: rgba(15, 46, 71, 0.08) !important;
+}
+
 .site-header-logo-link {
   width: 140px;
   height: 72px;
@@ -10,7 +18,7 @@
   justify-content: center;
   overflow: hidden;
   border-radius: 6px;
-  background: #fff;
+  background: var(--content-bg);
 }
 
 .site-header-logo {
@@ -36,10 +44,16 @@
 
 .site-header-search-input {
   border-radius: 8px 0 0 8px;
+  background-color: var(--warm-bg-strong);
+}
+
+.site-header-search-input:focus {
+  background-color: var(--warm-bg-strong);
 }
 
 .site-header-search-button {
   border-radius: 0 8px 8px 0;
+  background-color: var(--warm-bg-strong);
 }
 
 .dropdown-menu-custom {

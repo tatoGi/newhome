@@ -151,7 +151,7 @@ const Header: React.FC = () => {
 
   return (
     <>
-      <header ref={headerRef} className="sticky-top shadow-sm bg-white">
+      <header ref={headerRef} className="sticky-top shadow-sm site-header-cream">
         <div className="border-bottom py-2 py-md-3">
           <Container>
             <div className="d-flex justify-content-between align-items-center gap-2">
@@ -172,12 +172,12 @@ const Header: React.FC = () => {
                 <form className="input-group" onSubmit={handleSearchSubmit}>
                   <input
                     type="text"
-                    className="site-header-search-input form-control bg-light border-0 shadow-none px-3 py-2"
+                    className="site-header-search-input form-control border-0 shadow-none px-3 py-2"
                     placeholder="ძებნა..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
-                  <button type="submit" className="site-header-search-button btn bg-light border-0 px-3" aria-label="ძებნა">
+                  <button type="submit" className="site-header-search-button btn border-0 px-3" aria-label="ძებნა">
                     <Search size={18} className="text-muted" />
                   </button>
                 </form>
