@@ -272,7 +272,7 @@ main {
 .hero-slide-image {
   display: block;
   object-fit: cover;
-  object-position: center 38%;
+  object-position: center;
   width: 100%;
   height: 100%;
   filter: brightness(0.6);
@@ -281,6 +281,45 @@ main {
 
 .hero-slider-frame .hero-slide-image {
   transform: scale(1.08);
+}
+
+/* Contain fit style (perfect for logos and non-cover images) */
+.hero-slide-image-container.fit-contain {
+  background: #fcfbfa; /* Soft elegant cream background for the logo/image */
+}
+
+.hero-slide-image-container.fit-contain::after {
+  /* Subtle overlay so text is readable, but don't darken the clean beige/white logo background too much */
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.03) 0%,
+    rgba(0, 0, 0, 0.08) 50%,
+    rgba(0, 0, 0, 0.18) 100%
+  );
+}
+
+.hero-slide-image.fit-contain {
+  object-fit: contain !important;
+  filter: none !important; /* Keep original clean colors for logos */
+  padding: 3.5rem; /* Safe padding around logo */
+  transform: none !important; /* Disable Ken Burns scale effect for logo */
+}
+
+@media (max-width: 768px) {
+  .hero-slide-image.fit-contain {
+    padding: 2rem;
+  }
+}
+
+/* Adjust overlay text colors if contain fit is active so they pop on light cream backgrounds */
+.hero-slide-image-container.fit-contain ~ .hero-slide-overlay .hero-slide-title {
+  color: #2b251e !important;
+  text-shadow: 0 1px 12px rgba(255, 255, 255, 0.95), 0 2px 24px rgba(255, 255, 255, 0.7);
+}
+
+.hero-slide-image-container.fit-contain ~ .hero-slide-overlay .hero-slide-desc {
+  color: #4a4136 !important;
+  text-shadow: 0 1px 8px rgba(255, 255, 255, 0.95);
 }
 
 .hero-slide-fallback {

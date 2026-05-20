@@ -14,6 +14,7 @@ type HeroSlide = {
   tag?: string;
   image?: string | null;
   link?: string;
+  imageFit?: string;
 };
 
 const ChevronLeft = () => (
@@ -45,6 +46,7 @@ const HeroSlider: React.FC<{ data?: { slides?: HeroSlide[] } }> = ({ data }) => 
   const slideImage = resolveImageOrFallback(activeSlide.image, fallbackLogo);
   const title = activeSlide.title || '';
   const description = stripHtml(activeSlide.desc);
+  const imageFit = activeSlide.imageFit || 'cover';
 
   const goTo = (nextIndex: number) => {
     setActiveIndex((nextIndex + displaySlides.length) % displaySlides.length);
@@ -53,7 +55,7 @@ const HeroSlider: React.FC<{ data?: { slides?: HeroSlide[] } }> = ({ data }) => 
   return (
     <section className="hero-slider" aria-label="Hero slider">
       <div className="hero-slider-frame">
-        <div className="hero-slide-image-container">
+        <div className={`hero-slide-image-container fit-${imageFit}`}>
           <Image
             src={slideImage}
             alt={title || 'Banner'}
@@ -64,7 +66,7 @@ const HeroSlider: React.FC<{ data?: { slides?: HeroSlide[] } }> = ({ data }) => 
             loading="eager"
             sizes="100vw"
             quality={68}
-            className="hero-slide-image"
+            className={`hero-slide-image fit-${imageFit}`}
           />
         </div>
 

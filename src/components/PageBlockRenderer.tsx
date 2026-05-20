@@ -24,6 +24,7 @@ function buildHeroSlides(blocks: Block[], fallbackLogo: string) {
       desc: String(b.data.banner_description ?? b.data.banner_desc ?? b.data.description ?? b.description ?? ''),
       image: resolveImageOrFallback(b.data.banner_image ?? b.data.image, fallbackLogo),
       link: String(b.data.redirect_link ?? b.data.cta_primary_url ?? b.data.banner_link ?? b.data.link ?? '/products'),
+      imageFit: String(b.data.image_fit ?? 'cover'),
     }));
 }
 
