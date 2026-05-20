@@ -87,7 +87,7 @@ When adding new products/services/projects, **only edit `src/lib/data.ts`** — 
 
 ### Styling conventions
 
-- CSS custom properties in `globals.css`: `--primary-color: #0F2E47` (dark blue), `--accent-color: #CC7A50` (terracotta)
+- CSS custom properties in `globals.css`: `--primary-color: #123C30` (forest emerald green), `--accent-color: #D4AF37` (champagne gold)
 - Bootstrap classes override via `globals.css` (`.btn-primary`, `.bg-primary`, `.navbar`, etc.)
 - `article-*` classes implement Article.com-style product listing aesthetic
 - Font: `Noto Serif Georgian` loaded via `next/font/google` in `layout.tsx`; all UI text is in Georgian (ka)

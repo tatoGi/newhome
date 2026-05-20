@@ -62,7 +62,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
           display: 'flex',
           width: '100%',
           height: '100%',
-          backgroundColor: '#0F2E47',
+          backgroundColor: '#123C30',
           position: 'relative',
           fontFamily: 'sans-serif',
         }}
@@ -93,8 +93,8 @@ export default async function Image({ params }: { params: Promise<{ slug: string
             right: 0,
             height: imageData ? '200px' : '100%',
             background: imageData
-              ? 'linear-gradient(to top, rgba(15,46,71,0.95) 0%, rgba(15,46,71,0.6) 60%, transparent 100%)'
-              : '#0F2E47',
+              ? 'linear-gradient(to top, rgba(18,60,48,0.95) 0%, rgba(18,60,48,0.6) 60%, transparent 100%)'
+              : '#123C30',
             display: 'flex',
           }}
         />
@@ -114,7 +114,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
         >
           <div
             style={{
-              color: '#CC7A50',
+              color: '#D4AF37',
               fontSize: 22,
               fontWeight: 700,
               letterSpacing: 3,
@@ -144,7 +144,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
             left: 0,
             right: 0,
             height: 5,
-            backgroundColor: '#CC7A50',
+            backgroundColor: '#D4AF37',
             display: 'flex',
           }}
         />

@@ -7,7 +7,7 @@
 }
 
 .site-header-cream .border-bottom {
-  border-color: rgba(15, 46, 71, 0.08) !important;
+  border-color: rgba(18, 60, 48, 0.08) !important;
 }
 
 .site-header-logo-link {
@@ -43,17 +43,45 @@
 }
 
 .site-header-search-input {
-  border-radius: 8px 0 0 8px;
-  background-color: var(--warm-bg-strong);
+  border-radius: 12px 0 0 12px !important;
+  background-color: rgba(18, 60, 48, 0.035) !important;
+  border: 1px solid rgba(18, 60, 48, 0.08) !important;
+  border-right: none !important;
+  color: var(--primary-color) !important;
+  font-size: 0.92rem !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.site-header-search-input::placeholder {
+  color: rgba(18, 60, 48, 0.4) !important;
 }
 
 .site-header-search-input:focus {
-  background-color: var(--warm-bg-strong);
+  background-color: var(--white) !important;
+  border-color: rgba(18, 60, 48, 0.22) !important;
+  box-shadow: 0 6px 20px rgba(18, 60, 48, 0.04) !important;
 }
 
 .site-header-search-button {
-  border-radius: 0 8px 8px 0;
-  background-color: var(--warm-bg-strong);
+  border-radius: 0 12px 12px 0 !important;
+  background-color: rgba(18, 60, 48, 0.035) !important;
+  border: 1px solid rgba(18, 60, 48, 0.08) !important;
+  border-left: none !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.site-header-search-input:focus + .site-header-search-button {
+  background-color: var(--white) !important;
+  border-color: rgba(18, 60, 48, 0.22) !important;
+  box-shadow: 0 6px 20px rgba(18, 60, 48, 0.04) !important;
+}
+
+.site-header-search-button:hover {
+  background-color: rgba(18, 60, 48, 0.06) !important;
+}
+
+.site-header-search-button:hover .text-muted {
+  color: var(--accent-color) !important;
 }
 
 .dropdown-menu-custom {
@@ -176,7 +204,7 @@
 }
 
 .cascade-item.is-active .cascade-link {
-  color: var(--primary-color, #0F2E47) !important;
+  color: var(--primary-color, #123C30) !important;
 }
 
 .cascade-label {
@@ -193,7 +221,7 @@
 
 .cascade-item.is-active .cascade-chevron {
   opacity: 1;
-  color: var(--primary-color, #0F2E47);
+  color: var(--primary-color, #123C30);
 }
 
 .dropdown-item-custom:hover {
@@ -237,11 +265,11 @@
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  background: linear-gradient(135deg, var(--primary-color) 0%, #1f4f74 100%);
+  background: linear-gradient(135deg, var(--primary-color) 0%, #1E5444 100%);
   color: #fff;
   font-weight: 700;
   font-size: 0.95rem;
-  box-shadow: 0 10px 24px rgba(15, 46, 71, 0.16);
+  box-shadow: 0 10px 24px rgba(18, 60, 48, 0.16);
 }
 
 .account-avatar-badge-mobile {
