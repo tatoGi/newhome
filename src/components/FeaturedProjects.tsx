@@ -8,7 +8,7 @@ import { ArrowRight, MapPin } from 'lucide-react';
 import { slugify } from '@/lib/slugify';
 import { ProjectSection } from '@/lib/api/types';
 import { resolveImageOrFallback } from '@/lib/api/assets';
-import { useFallbackLogo } from '@/context/BootstrapContext';
+import { useFallbackLogo, useBootstrap } from '@/context/BootstrapContext';
 
 interface FeaturedProjectsProps {
     projects?: any[];
@@ -31,6 +31,7 @@ function resolvePostDisplay(post: any, fallbackLogo: string): { title: string; d
 }
 
 const FeaturedProjects: React.FC<FeaturedProjectsProps> = ({ projects: propProjects, projectSection }) => {
+    const { routeMap } = useBootstrap();
     const apiPosts = projectSection?.posts;
     const fallbackLogo = useFallbackLogo();
     const sortByNewest = (arr: any[]) => [...arr].sort((a, b) => (b.id ?? 0) - (a.id ?? 0));
@@ -54,6 +55,9 @@ const FeaturedProjects: React.FC<FeaturedProjectsProps> = ({ projects: propProje
     const sectionTitle = projectSection?.title || '';
     const sectionSubtitle = projectSection?.subtitle || '';
 
+    const projectsPage = routeMap?.find((r) => r.template === 'project' || r.template === 'projects');
+    const allProjectsHref = projectsPage ? `/${projectsPage.slug}` : '/projects';
+
     return (
         <section className="py-5 overflow-hidden bg-light">
             <Container>
@@ -71,7 +75,7 @@ const FeaturedProjects: React.FC<FeaturedProjectsProps> = ({ projects: propProje
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                     >
-                        <Button as={Link as any} href="/projects" variant="link" className="text-primary text-decoration-none d-flex align-items-center gap-2 px-0">
+                        <Button as={Link as any} href={allProjectsHref} variant="link" className="text-primary text-decoration-none d-flex align-items-center gap-2 px-0">
                             ყველა პროექტი <ArrowRight size={18} />
                         </Button>
                     </motion.div>

@@ -10,6 +10,7 @@ import { useApp } from '@/context/AppContext';
 import { useAuth } from '@/context/AuthContext';
 import { useBootstrap } from '@/context/BootstrapContext';
 import { toBackendAssetUrl } from '@/lib/api/assets';
+import { api } from '@/lib/api/client';
 import HeaderActions from '@/components/header/HeaderActions';
 import DesktopNavigation from '@/components/header/DesktopNavigation';
 import MobileMenu from '@/components/header/MobileMenu';
@@ -19,7 +20,7 @@ import CallRequestModal from '@/components/CallRequestModal';
 const Header: React.FC = () => {
   const { cart, wishlist } = useApp();
   const { user, openAuthModal } = useAuth();
-  const { navigation, languages, settings, locale: currentLocale, defaultLocale, refreshBootstrap } = useBootstrap();
+  const { navigation, languages, settings, locale: currentLocale, defaultLocale, refreshBootstrap, routeMap } = useBootstrap();
   const router = useRouter();
   const [showCart, setShowCart] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
@@ -107,8 +108,35 @@ const Header: React.FC = () => {
     }
   }, [currentLocale, refreshBootstrap]);
 
-  const changeLocale = (nextLocale: string) => {
+  const changeLocale = async (nextLocale: string) => {
     const url = new URL(window.location.href);
+    const pathname = url.pathname;
+
+    // Find if the current route is in the current locale's routeMap
+    const currentRoute = routeMap?.find(
+      (r) => r.url === pathname || `/${r.slug}` === pathname || (r.is_home && pathname === '/')
+    );
+
+    let nextPathname = pathname;
+
+    if (currentRoute) {
+      try {
+        // Fetch new bootstrap data for the target locale to get its routeMap
+        const nextBootstrap = await api.getBootstrap(nextLocale);
+        // Find matching route in target locale's routeMap by ID or template
+        const nextRoute = nextBootstrap.routeMap?.find(
+          (r) =>
+            (currentRoute.id && r.id === currentRoute.id) ||
+            (currentRoute.template && r.template === currentRoute.template)
+        );
+        if (nextRoute) {
+          nextPathname = nextRoute.url || `/${nextRoute.slug}`;
+        }
+      } catch (err) {
+        console.error('Failed to translate route slug:', err);
+      }
+    }
+
     const params = url.searchParams;
 
     if (nextLocale === defaultLocale) {
@@ -117,8 +145,8 @@ const Header: React.FC = () => {
       params.set('locale', nextLocale);
     }
 
-    void refreshBootstrap(nextLocale);
-    router.replace(`${url.pathname}${params.toString() ? `?${params.toString()}` : ''}`);
+    await refreshBootstrap(nextLocale);
+    router.replace(`${nextPathname}${params.toString() ? `?${params.toString()}` : ''}`);
     setShowLanguageDropdown(false);
   };
 

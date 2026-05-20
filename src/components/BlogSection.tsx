@@ -8,13 +8,14 @@ import { motion } from 'motion/react';
 import { Calendar, ArrowRight } from 'lucide-react';
 import { BlogSection as BlogSectionType } from '@/lib/api/types';
 import { resolveImageOrFallback } from '@/lib/api/assets';
-import { useFallbackLogo } from '@/context/BootstrapContext';
+import { useFallbackLogo, useBootstrap } from '@/context/BootstrapContext';
 
 interface BlogSectionProps {
     blogSection?: BlogSectionType | null;
 }
 
 const BlogSection: React.FC<BlogSectionProps> = ({ blogSection }) => {
+    const { routeMap } = useBootstrap();
     const sectionTitle = blogSection?.title || '';
     const sectionSubtitle = blogSection?.subtitle || '';
     const fallbackLogo = useFallbackLogo();
@@ -34,6 +35,9 @@ const BlogSection: React.FC<BlogSectionProps> = ({ blogSection }) => {
 
     if (posts.length === 0) return null;
 
+    const blogPage = routeMap?.find((r) => r.template === 'blog' || r.template === 'news');
+    const allBlogHref = blogPage ? `/${blogPage.slug}` : '/blog';
+
     return (
         <section className="py-5 bg-light">
             <Container>
@@ -52,7 +56,7 @@ const BlogSection: React.FC<BlogSectionProps> = ({ blogSection }) => {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                     >
-                        <Button as={Link as any} href="/blog" variant="link" className="text-primary text-decoration-none d-flex align-items-center gap-2 px-0">
+                        <Button as={Link as any} href={allBlogHref} variant="link" className="text-primary text-decoration-none d-flex align-items-center gap-2 px-0">
                             ყველა პოსტი <ArrowRight size={18} />
                         </Button>
                     </motion.div>
