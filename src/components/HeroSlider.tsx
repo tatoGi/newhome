@@ -57,7 +57,7 @@ const HeroSlider: React.FC<{ data?: { slides?: HeroSlide[] } }> = ({ data }) => 
   return (
     <section className="hero-slider" aria-label="Hero slider">
       <div className="hero-slider-frame">
-        <div className={`hero-slide-image-container fit-${imageFit}`}>
+        <div className={`hero-slide-image-container fit-${imageFit}${slideVideo ? ' has-video' : ''}`}>
           {slideVideo ? (
             <video
               key={slideVideo}
@@ -69,7 +69,7 @@ const HeroSlider: React.FC<{ data?: { slides?: HeroSlide[] } }> = ({ data }) => 
               playsInline
               preload="metadata"
               aria-label={title || 'Banner'}
-              className={`hero-slide-image fit-${imageFit}`}
+              className={`hero-slide-image hero-slide-video fit-${imageFit}`}
               style={{ width: '100%', height: '100%', objectFit: imageFit === 'contain' ? 'contain' : 'cover' }}
             />
           ) : (
