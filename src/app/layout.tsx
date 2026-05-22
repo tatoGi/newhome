@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Noto_Serif_Georgian } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
 import Script from 'next/script';
@@ -28,6 +28,12 @@ const defaultBootstrap = {
   navigation: { header: [], footer: [] },
   settings: { headerLogo: null, footerLogo: null, footerContactText: null, footerContactByLocale: null },
   routeMap: [],
+};
+
+export const viewport: Viewport = {
+  themeColor: '#123C30',
+  width: 'device-width',
+  initialScale: 1,
 };
 
 const SITE_URL = 'https://homespace.ge';
@@ -62,6 +68,12 @@ export async function generateMetadata(): Promise<Metadata> {
       icon: faviconUrl,
       shortcut: faviconUrl,
       apple: faviconUrl,
+    },
+    manifest: '/manifest.webmanifest',
+    appleWebApp: {
+      capable: true,
+      title: 'HomeSpace',
+      statusBarStyle: 'black-translucent',
     },
     openGraph: {
       type: 'website',

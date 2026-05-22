@@ -9,6 +9,7 @@ import { flagEmoji } from './headerUtils';
 import { useAuth } from '@/context/AuthContext';
 import { useBootstrap } from '@/context/BootstrapContext';
 import { getUiText } from '@/lib/i18n/ui';
+import PwaInstallButton from './PwaInstallButton';
 
 interface HeaderActionsProps {
   languages: Language[];
@@ -57,6 +58,7 @@ const HeaderActions: React.FC<HeaderActionsProps> = (props) => {
 
   return (
     <div className="d-flex align-items-center gap-2 gap-md-3 flex-shrink-0">
+      <PwaInstallButton variant="desktop" />
       <button
         type="button"
         className="btn btn-accent btn-sm rounded-pill d-none d-md-inline-flex align-items-center gap-2 px-3 py-2 text-white fw-semibold"
@@ -66,6 +68,7 @@ const HeaderActions: React.FC<HeaderActionsProps> = (props) => {
         <Phone size={16} />
         <span>{getUiText(locale, 'call_request.button')}</span>
       </button>
+      <PwaInstallButton variant="mobile" />
       <button
         type="button"
         className="btn btn-link border-0 p-0 text-dark d-md-none"

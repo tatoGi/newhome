@@ -90,6 +90,36 @@
   max-width: 94vw;
 }
 
+.pwa-install-btn {
+  background: linear-gradient(135deg, var(--primary-color, #123C30) 0%, #1d5a47 100%);
+  color: #fff !important;
+  border: none;
+  box-shadow: 0 2px 8px rgba(18, 60, 48, 0.15);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.pwa-install-btn:hover,
+.pwa-install-btn:focus {
+  color: #fff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(18, 60, 48, 0.25);
+}
+
+.pwa-install-icon-btn {
+  position: relative;
+}
+
+.pwa-install-icon-btn::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  background: var(--accent-color, #D4AF37);
+  border-radius: 50%;
+}
+
 .desktop-menu-backdrop {
   position: fixed;
   inset: 0;

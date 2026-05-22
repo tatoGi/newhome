@@ -4,6 +4,7 @@ import React from 'react';
 import { AppProvider } from '@/context/AppContext';
 import { AuthProvider } from '@/context/AuthContext';
 import { BootstrapProvider } from '@/context/BootstrapContext';
+import { PwaProvider } from '@/context/PwaContext';
 import { BootstrapResponse } from '@/lib/api/types';
 
 export default function Providers({
@@ -16,7 +17,9 @@ export default function Providers({
   return (
     <BootstrapProvider data={bootstrapData}>
       <AuthProvider>
-        <AppProvider>{children}</AppProvider>
+        <AppProvider>
+          <PwaProvider>{children}</PwaProvider>
+        </AppProvider>
       </AuthProvider>
     </BootstrapProvider>
   );
