@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Container, Row, Col, Button, Modal, Carousel, Tabs, Tab } from 'react-bootstrap';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -10,6 +10,7 @@ import { useAuth } from '@/context/AuthContext';
 import ProductCard from '@/components/ProductCard';
 import { isBackendAssetUrl } from '@/lib/api/assets';
 import PageBlockRenderer from '@/components/PageBlockRenderer';
+import { trackEvent } from '@/lib/pixel';
 import type { Block } from '@/lib/api/types';
 
 export interface ProductDetails {
@@ -67,6 +68,17 @@ export default function ProductDetailsPage({
   const heightSpec = specifications['სიმაღლე'] || specifications['Height'] || '';
   const colorSpec = specifications['ფერები'] || specifications['Colors'] || '';
 
+  useEffect(() => {
+    trackEvent('ViewContent', {
+      content_type: 'product',
+      content_ids: [String(product.id)],
+      content_name: product.name,
+      content_category: product.category,
+      value: product.price,
+      currency: 'GEL',
+    });
+  }, [product.id, product.name, product.price, product.category]);
+
   const shareUrl = `https://homespace.ge/product/${product.slug}`;
   const encodedUrl = encodeURIComponent(shareUrl);
   const encodedTitle = encodeURIComponent(product.name);
@@ -93,6 +105,15 @@ export default function ProductDetailsPage({
     for (let i = 0; i < quantity; i++) {
       addToCart({ id: product.id, slug: product.slug, name: product.name, price: product.price, image: product.images[0], category: product.category });
     }
+    trackEvent('AddToCart', {
+      content_type: 'product',
+      content_ids: [String(product.id)],
+      content_name: product.name,
+      content_category: product.category,
+      value: product.price * quantity,
+      currency: 'GEL',
+      contents: [{ id: String(product.id), quantity, item_price: product.price }],
+    });
   };
 
   return (

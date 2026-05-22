@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { Alert, Breadcrumb, Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
 import { Clock, Mail, MapPin, Phone } from 'lucide-react';
 import { api } from '@/lib/api/client';
+import { trackEvent } from '@/lib/pixel';
 import { Block } from '@/lib/api/types';
 import { resolveImageOrFallback } from '@/lib/api/assets';
 import { useFallbackLogo } from '@/context/BootstrapContext';
@@ -187,6 +188,7 @@ export default function ContactPage({ pageTitle, pageDescription, blocks }: Cont
         page_url: typeof window !== 'undefined' ? window.location.href : undefined,
       });
 
+      trackEvent('Contact', { content_name: 'contact_form', source: 'contact_page' });
       setSubmitSuccess(response.message || 'შეტყობინება წარმატებით გაიგზავნა.');
       setFormData({
         name: '',

@@ -6,6 +6,7 @@ import { Phone, X } from 'lucide-react';
 import { useBootstrap } from '@/context/BootstrapContext';
 import { api } from '@/lib/api/client';
 import { getUiText } from '@/lib/i18n/ui';
+import { trackEvent } from '@/lib/pixel';
 
 interface CallRequestModalProps {
     show: boolean;
@@ -63,6 +64,7 @@ const CallRequestModal: React.FC<CallRequestModalProps> = ({ show, onHide }) => 
                 page_url: typeof window !== 'undefined' ? window.location.href : undefined,
                 page_slug: typeof window !== 'undefined' ? window.location.pathname.replace(/^\//, '') || undefined : undefined,
             });
+            trackEvent('Lead', { content_name: 'call_request', source: 'call_request_modal' });
             setSuccess(true);
             setName('');
             setPhone('');

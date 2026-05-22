@@ -9,6 +9,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Providers from '@/components/Providers';
 import ChatBotLoader from '@/components/ChatBotLoader';
+import MetaPixel from '@/components/MetaPixel';
 import { api } from '@/lib/api/client';
 import { getServerLocale } from '@/lib/locale';
 import { toBackendAssetUrl } from '@/lib/api/assets';
@@ -157,6 +158,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           </div>
           <ChatBotLoader />
         </Providers>
+        <MetaPixel />
         <Analytics />
       </body>
     </html>
