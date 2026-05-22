@@ -13,6 +13,7 @@ type HeroSlide = {
   desc?: string;
   tag?: string;
   image?: string | null;
+  video?: string | null;
   link?: string;
   imageFit?: string;
 };
@@ -44,6 +45,7 @@ const HeroSlider: React.FC<{ data?: { slides?: HeroSlide[] } }> = ({ data }) => 
   const hasMultipleSlides = displaySlides.length > 1;
   const activeSlide = displaySlides[Math.min(activeIndex, displaySlides.length - 1)] ?? displaySlides[0];
   const slideImage = resolveImageOrFallback(activeSlide.image, fallbackLogo);
+  const slideVideo = (activeSlide.video || '').trim();
   const title = activeSlide.title || '';
   const description = stripHtml(activeSlide.desc);
   const imageFit = activeSlide.imageFit || 'cover';
@@ -56,18 +58,34 @@ const HeroSlider: React.FC<{ data?: { slides?: HeroSlide[] } }> = ({ data }) => 
     <section className="hero-slider" aria-label="Hero slider">
       <div className="hero-slider-frame">
         <div className={`hero-slide-image-container fit-${imageFit}`}>
-          <Image
-            src={slideImage}
-            alt={title || 'Banner'}
-            title={title || 'Banner'}
-            fill
-            priority
-            fetchPriority="high"
-            loading="eager"
-            sizes="100vw"
-            quality={68}
-            className={`hero-slide-image fit-${imageFit}`}
-          />
+          {slideVideo ? (
+            <video
+              key={slideVideo}
+              src={slideVideo}
+              poster={slideImage || undefined}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              aria-label={title || 'Banner'}
+              className={`hero-slide-image fit-${imageFit}`}
+              style={{ width: '100%', height: '100%', objectFit: imageFit === 'contain' ? 'contain' : 'cover' }}
+            />
+          ) : (
+            <Image
+              src={slideImage}
+              alt={title || 'Banner'}
+              title={title || 'Banner'}
+              fill
+              priority
+              fetchPriority="high"
+              loading="eager"
+              sizes="100vw"
+              quality={68}
+              className={`hero-slide-image fit-${imageFit}`}
+            />
+          )}
         </div>
 
         <div className="hero-slide-overlay">
