@@ -20,18 +20,15 @@ const BlogSection: React.FC<BlogSectionProps> = ({ blogSection }) => {
     const sectionSubtitle = blogSection?.subtitle || '';
     const fallbackLogo = useFallbackLogo();
 
-    const posts = (blogSection?.posts ?? []).map((p) => {
-        const intro = (p as any).blocks?.find((b: any) => b.type === 'post_intro');
-        return {
-            id: p.id,
-            slug: p.slug,
-            title: intro?.data?.title || p.title,
-            excerpt: intro?.data?.post_text || p.excerpt || '',
-            image: resolveImageOrFallback(intro?.data?.post_image || p.feature_image || '', fallbackLogo),
-            date: p.published_at || '',
-            category: p.category || '',
-        };
-    });
+    const posts = (blogSection?.posts ?? []).map((p) => ({
+        id: p.id,
+        slug: p.slug,
+        title: p.title,
+        excerpt: p.excerpt || '',
+        image: resolveImageOrFallback(p.feature_image || '', fallbackLogo),
+        date: p.published_at || '',
+        category: p.category || '',
+    }));
 
     if (posts.length === 0) return null;
 

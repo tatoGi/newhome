@@ -34,17 +34,13 @@ export default function ServicesPage({ posts, pageTitle, pageDescription, blocks
   );
   const heroImage = resolveImageOrFallback(heroBlock?.data?.banner_image ?? heroBlock?.data?.image, fallbackLogo);
 
-  const services = (posts ?? []).map((post) => {
-    const intro = post.blocks?.find((b) => b.type === 'post_intro');
-    const rawImage = intro?.data?.post_image || post.feature_image || '';
-    return {
-      id: post.id,
-      slug: post.slug,
-      title: stripMarkdown(intro?.data?.title || post.title),
-      desc: intro?.data?.post_text || post.excerpt,
-      image: resolveImageOrFallback(rawImage, fallbackLogo),
-    };
-  });
+  const services = (posts ?? []).map((post) => ({
+    id: post.id,
+    slug: post.slug,
+    title: stripMarkdown(post.title),
+    desc: post.excerpt ?? '',
+    image: resolveImageOrFallback(post.feature_image || '', fallbackLogo),
+  }));
 
   return (
     <Container className="py-5">

@@ -34,19 +34,15 @@ export default function ProjectsPage({ posts, pageTitle, pageDescription, blocks
   );
   const heroImage = resolveImageOrFallback(heroBlock?.data?.banner_image ?? heroBlock?.data?.image, fallbackLogo);
 
-  const allItems = (posts ?? []).map((post) => {
-    const intro = post.blocks?.find((b) => b.type === 'post_intro');
-    const rawImage = intro?.data?.post_image || post.feature_image || '';
-    return {
-      id: post.id,
-      slug: post.slug,
-      title: stripMarkdown(intro?.data?.title || post.title),
-      image: resolveImageOrFallback(rawImage, fallbackLogo),
-      category: post.category || '',
-      publishedAt: post.published_at,
-      excerpt: intro?.data?.post_text || post.excerpt,
-    };
-  });
+  const allItems = (posts ?? []).map((post) => ({
+    id: post.id,
+    slug: post.slug,
+    title: stripMarkdown(post.title),
+    image: resolveImageOrFallback(post.feature_image || '', fallbackLogo),
+    category: post.category || '',
+    publishedAt: post.published_at,
+    excerpt: post.excerpt ?? '',
+  }));
 
   const categories = ['ყველა', ...Array.from(new Set(allItems.map((p) => p.category).filter(Boolean)))];
   const [activeCategory, setActiveCategory] = useState('ყველა');

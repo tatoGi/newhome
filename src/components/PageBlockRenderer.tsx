@@ -143,7 +143,7 @@ function QuoteBlocks({ blocks }: { blocks: Block[] }) {
   if (quoteBlocks.length === 0) return null;
 
   return (
-    <section className="py-4">
+    <section className="py-5">
       <Container>
         {quoteBlocks.map((block, blockIndex) => {
           const quote = String(block.data?.quote ?? block.data?.text ?? block.data?.content ?? '').trim();
@@ -151,10 +151,81 @@ function QuoteBlocks({ blocks }: { blocks: Block[] }) {
           if (!quote) return null;
 
           return (
-            <blockquote key={`quote-${blockIndex}`} className="border-start border-4 ps-3 py-2 mb-3 bg-light rounded">
-              <p className="mb-2 fst-italic">{quote}</p>
-              {author ? <footer className="text-muted small">- {author}</footer> : null}
-            </blockquote>
+            <figure
+              key={`quote-${blockIndex}`}
+              className="position-relative mx-auto my-4 px-4 px-md-5 py-4 py-md-5 rounded-4 shadow-sm bg-white"
+              style={{ maxWidth: 820, borderLeft: '6px solid var(--bs-primary)' }}
+            >
+              <span
+                aria-hidden="true"
+                className="position-absolute lh-1 text-primary opacity-25"
+                style={{ top: '-12px', left: '20px', fontSize: '5rem', fontFamily: 'Georgia, serif' }}
+              >
+                &ldquo;
+              </span>
+              <blockquote className="mb-0">
+                <div
+                  className="cms-content fst-italic text-dark lh-lg fs-4 mb-0"
+                  dangerouslySetInnerHTML={{ __html: quote }}
+                />
+              </blockquote>
+              {author && (
+                <figcaption className="mt-3 d-flex align-items-center gap-2 text-muted small fw-semibold text-uppercase">
+                  <span className="d-inline-block bg-primary" style={{ width: 28, height: 2 }} />
+                  {author}
+                </figcaption>
+              )}
+            </figure>
+          );
+        })}
+      </Container>
+    </section>
+  );
+}
+
+function PostIntroBlocks({ blocks, fallbackLogo }: { blocks: Block[]; fallbackLogo: string }) {
+  const introBlocks = blocks.filter((b) => b.type === 'post_intro');
+  if (introBlocks.length === 0) return null;
+
+  return (
+    <section className="py-4">
+      <Container>
+        {introBlocks.map((block, blockIndex) => {
+          const category = String(block.data?.category ?? '').trim();
+          const readTime = String(block.data?.read_time ?? '').trim();
+          const introText = String(block.data?.intro_text ?? block.data?.post_text ?? '').trim();
+          const rawImage = String(block.data?.intro_image ?? block.data?.post_image ?? '').trim();
+          const introImage = rawImage ? resolveImageOrFallback(rawImage, fallbackLogo) : '';
+
+          if (!category && !readTime && !introText && !introImage) return null;
+
+          return (
+            <div key={`post-intro-${blockIndex}`} className="mb-4">
+              {(category || readTime) && (
+                <div className="d-flex gap-3 mb-3 small text-muted align-items-center">
+                  {category && <span className="badge bg-primary-subtle text-primary px-3 py-2">{category}</span>}
+                  {readTime && <span className="d-inline-flex align-items-center">{readTime}</span>}
+                </div>
+              )}
+              <Row className="gy-4 align-items-start">
+                <Col lg={introImage ? 7 : 12}>
+                  {introText && (
+                    <div className="cms-content text-muted lh-lg fs-5" dangerouslySetInnerHTML={{ __html: introText }} />
+                  )}
+                </Col>
+                {introImage && (
+                  <Col lg={5}>
+                    <img
+                      src={introImage}
+                      alt=""
+                      className="img-fluid rounded shadow-sm w-100"
+                      style={{ maxHeight: 420, objectFit: 'cover' }}
+                      referrerPolicy="no-referrer"
+                    />
+                  </Col>
+                )}
+              </Row>
+            </div>
           );
         })}
       </Container>
@@ -178,10 +249,12 @@ export default function PageBlockRenderer({ blocks, pageTitle, pageDescription }
   const hasProcessSteps = sorted.some((b) => b.type === 'process_steps');
   const hasChecklist = sorted.some((b) => b.type === 'checklist' || b.type === 'post_checklist');
   const hasQuote = sorted.some((b) => b.type === 'quote' || b.type === 'post_quote');
+  const hasPostIntro = sorted.some((b) => b.type === 'post_intro');
 
   return (
     <>
       {hasHero && <HeroSlider data={{ slides: heroSlides }} />}
+      {hasPostIntro && <PostIntroBlocks blocks={sorted} fallbackLogo={fallbackLogo} />}
       {hasItemsGrid && <FeaturesSection blocks={sorted} />}
       {hasImageText && <ImageTextSection blocks={sorted} pageTitle={pageTitle} pageDescription={pageDescription} />}
       {hasProcessSteps && <ProcessSteps blocks={sorted} />}

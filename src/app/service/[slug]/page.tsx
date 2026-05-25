@@ -83,7 +83,6 @@ export default async function Page({ params, searchParams }: PageProps) {
     image: data.post.feature_image || '',
     blocks: data.post.blocks || [],
   };
-
   let phone: string | null = null;
   try {
     const bootstrap = await api.getBootstrap();

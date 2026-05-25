@@ -21,13 +21,10 @@ function stripMarkdown(text: string): string {
 }
 
 function resolvePostDisplay(post: any, fallbackLogo: string): { title: string; desc: string; image: string; location: string } {
-    const introBlock = post.blocks?.find((b: any) => b.type === 'post_intro');
-    const rawTitle = introBlock?.data?.title || post.title || '';
-    const title = stripMarkdown(String(rawTitle));
-    const desc = String(introBlock?.data?.post_text || post.excerpt || '').replace(/<[^>]*>/g, '');
-    const rawImage = introBlock?.data?.post_image || post.feature_image || '';
-    const location = String(introBlock?.data?.location || introBlock?.data?.post_location || '');
-    return { title, desc, image: resolveImageOrFallback(rawImage, fallbackLogo), location };
+    const title = stripMarkdown(String(post.title || ''));
+    const desc = String(post.excerpt || '').replace(/<[^>]*>/g, '');
+    const image = resolveImageOrFallback(post.feature_image || '', fallbackLogo);
+    return { title, desc, image, location: '' };
 }
 
 const FeaturedProjects: React.FC<FeaturedProjectsProps> = ({ projects: propProjects, projectSection }) => {

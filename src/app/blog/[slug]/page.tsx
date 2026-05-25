@@ -8,6 +8,7 @@ import { resolveImageOrFallback, toBackendAssetUrl } from '@/lib/api/assets';
 import { getServerFallbackLogo } from '@/lib/api/serverFallback';
 import { getServerLocale } from '@/lib/locale';
 import { buildPageMetadata } from '@/lib/metadata';
+import PageBlockRenderer from '@/components/PageBlockRenderer';
 
 export async function generateStaticParams() {
     try {
@@ -68,12 +69,9 @@ export default async function Page({ params }: {
 
     const dateStr = post.published_at ? String(post.published_at) : '';
 
-    const introBlock = (post.blocks ?? []).find((b: any) => b.type === 'post_intro');
-    const resolvedContent: string = post.content || introBlock?.data?.post_text || '';
-    const resolvedImage: string = resolveImageOrFallback(
-        post.feature_image || introBlock?.data?.post_image,
-        fallbackLogo,
-    );
+    const resolvedContent: string = post.content || '';
+    const resolvedImage: string = resolveImageOrFallback(post.feature_image, fallbackLogo);
+    const postBlocks = post.blocks ?? [];
 
     return (
         <div className="py-5 bg-white min-vh-100">
@@ -119,7 +117,15 @@ export default async function Page({ params }: {
                                 className="blog-content"
                                 dangerouslySetInnerHTML={{ __html: resolvedContent }}
                             />
-                        ) : (
+                        ) : null}
+
+                        {postBlocks.length > 0 && (
+                            <div className="mt-4">
+                                <PageBlockRenderer blocks={postBlocks} pageTitle={post.title} pageDescription={post.excerpt ?? undefined} />
+                            </div>
+                        )}
+
+                        {!resolvedContent && postBlocks.length === 0 && (
                             <p className="text-muted">კონტენტი ჯერ არ არის დამატებული.</p>
                         )}
 

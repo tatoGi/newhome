@@ -11,11 +11,10 @@ import { slugify } from '@/lib/slugify';
 import { stripMarkdown } from '@/lib/stripMarkdown';
 
 function resolvePostDisplay(p: PostRelation, fallbackLogo: string) {
-  const intro = p.blocks?.find((b) => b.type === 'post_intro');
   return {
-    title: stripMarkdown(intro?.data?.title || p.title),
-    excerpt: stripMarkdown(intro?.data?.post_text || p.excerpt || ''),
-    image: resolveImageOrFallback(intro?.data?.post_image || p.feature_image, fallbackLogo),
+    title: stripMarkdown(p.title),
+    excerpt: stripMarkdown(p.excerpt || ''),
+    image: resolveImageOrFallback(p.feature_image, fallbackLogo),
   };
 }
 

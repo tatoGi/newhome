@@ -21,20 +21,13 @@ interface ProjectProps {
 }
 
 export default function ProjectDetailsPage({ project }: { project: ProjectProps }) {
-
-  const intro = project.blocks?.find((b: any) => b.type === 'post_intro');
   const fallbackLogo = useFallbackLogo();
 
-  const title = intro?.data?.title || project.title;
-  const desc = intro?.data?.post_text || project.desc;
-  const extraBlocks = (project.blocks ?? []).filter((b: any) => b.type !== 'post_intro');
+  const title = project.title;
+  const desc = project.desc;
+  const postBlocks = project.blocks ?? [];
 
-  // Collect all images: intro block + feature images, convert to backend URLs, filter empties
-  const rawImages = [
-    intro?.data?.post_image,
-    ...(project.images ?? []),
-  ];
-  const resolvedImages = rawImages
+  const resolvedImages = (project.images ?? [])
     .map((img) => toBackendAssetUrl(img || ''))
     .filter(Boolean) as string[];
   const images = resolvedImages.length > 0 ? resolvedImages : [fallbackLogo];
@@ -136,9 +129,9 @@ export default function ProjectDetailsPage({ project }: { project: ProjectProps 
             )}
           </Row>
 
-          {extraBlocks.length > 0 && (
+          {postBlocks.length > 0 && (
             <div className="mt-5">
-              <PageBlockRenderer blocks={extraBlocks} pageTitle={title} pageDescription={desc} />
+              <PageBlockRenderer blocks={postBlocks} pageTitle={title} pageDescription={desc} />
             </div>
           )}
         </motion.div>
