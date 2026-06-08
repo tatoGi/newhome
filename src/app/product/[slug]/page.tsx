@@ -10,7 +10,8 @@ const extractProductGalleryImages = (blocks: Array<{ type?: string; data?: Recor
   blocks
     .filter((block) => block.type === 'product_gallery')
     .flatMap((block) => {
-      const images = block.data?.product_images;
+      // field key in CmsBlockRegistry is 'images'; 'product_images' kept as legacy fallback
+      const images = block.data?.images ?? block.data?.product_images;
       return Array.isArray(images) ? images.map((image) => String(image ?? '').trim()).filter(Boolean) : [];
     });
 
