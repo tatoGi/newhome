@@ -133,7 +133,7 @@ export default async function Page({ params, searchParams }: {
       .slice(0, 4)
       .map((p) => {
         const galleryBlock = p.blocks?.find((b) => b.type === 'product_gallery');
-        const galleryImages: unknown[] = galleryBlock?.data?.product_images ?? [];
+        const galleryImages: unknown[] = galleryBlock?.data?.images ?? galleryBlock?.data?.product_images ?? [];
         const firstGallery = Array.isArray(galleryImages) && galleryImages.length > 0 ? String(galleryImages[0]) : '';
         return {
           id: p.id,
