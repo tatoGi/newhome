@@ -74,13 +74,26 @@ export const PwaProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     displayModeQuery.addEventListener?.('change', handleDisplayChange);
 
     if ('serviceWorker' in navigator) {
-      const registerSw = () => {
+      if (process.env.NODE_ENV === 'production') {
+        const registerSw = () => {
+          navigator.serviceWorker
+            .register('/sw.js', { scope: '/' })
+            .catch((err) => console.warn('SW registration failed:', err));
+        };
+        if (document.readyState === 'complete') registerSw();
+        else window.addEventListener('load', registerSw, { once: true });
+      } else {
+        // dev: ნებისმიერი ადრე დარეგისტრირებული SW და მისი ქეში სტატიკურ
+        // chunk-ებს აჭედებს (cacheFirst) და ძველ bundle-ს ემსახურება — ვშლით,
+        // რომ HMR-მა და ახალმა კოდმა იმუშაოს.
         navigator.serviceWorker
-          .register('/sw.js', { scope: '/' })
-          .catch((err) => console.warn('SW registration failed:', err));
-      };
-      if (document.readyState === 'complete') registerSw();
-      else window.addEventListener('load', registerSw, { once: true });
+          .getRegistrations()
+          .then((regs) => regs.forEach((reg) => reg.unregister()))
+          .catch(() => {});
+        if (typeof caches !== 'undefined') {
+          caches.keys().then((keys) => keys.forEach((key) => caches.delete(key))).catch(() => {});
+        }
+      }
     }
 
     return () => {

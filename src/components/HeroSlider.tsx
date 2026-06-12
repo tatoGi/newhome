@@ -82,7 +82,7 @@ const HeroSlider: React.FC<{ data?: { slides?: HeroSlide[] } }> = ({ data }) => 
               fetchPriority="high"
               loading="eager"
               sizes="100vw"
-              quality={68}
+              quality={70}
               className={`hero-slide-image fit-${imageFit}`}
             />
           )}

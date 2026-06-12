@@ -2,15 +2,53 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { MessageCircle, X, Send, Bot, Minus } from 'lucide-react';
+import { MessageCircle, X, Send, Bot, Minus, Mic, Volume2, VolumeX, Sparkles } from 'lucide-react';
+import { BACKEND_BASE_URL } from '@/lib/api/assets';
+
+interface ChatSource {
+  title: string | null;
+  url: string | null;
+}
 
 interface Message {
   id: number;
   text: string;
   sender: 'user' | 'bot';
+  sources?: ChatSource[];
+  /** კითხვა, რომელზეც escalation-ის ხელახლა გაგზავნაა შესაძლებელი */
+  escalateFor?: string;
 }
 
+interface AiChatResponse {
+  answer: string;
+  provider: string | null;
+  reason?: string;
+  sources?: ChatSource[];
+}
+
+const AI_CHAT_URL = `${BACKEND_BASE_URL}/api/ai-chat`;
 const WHATSAPP_NUMBER = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '995557422942').replace(/\D+/g, '');
+const GREETING_ID = 1;
+
+function getSessionId(): string {
+  if (typeof window === 'undefined') return '';
+  let id = sessionStorage.getItem('aic-session');
+  if (!id) {
+    id = typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
+    sessionStorage.setItem('aic-session', id);
+  }
+  return id;
+}
+
+function speak(text: string) {
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'ka-GE';
+  const ka = speechSynthesis.getVoices().find((v) => v.lang.startsWith('ka'));
+  if (ka) u.voice = ka;
+  speechSynthesis.speak(u);
+}
 
 function WhatsAppIcon({ size = 18 }: { size?: number }) {
   return (
@@ -26,13 +64,16 @@ export default function ChatBot({ initialOpen = false }: { initialOpen?: boolean
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([
     {
-      id: 1,
-      text: 'მოგესალმებით HomeSpace-ში! მე ვარ თქვენი ასისტენტი. რით შემიძლია დაგეხმაროთ?',
+      id: GREETING_ID,
+      text: 'მოგესალმებით HomeSpace-ში! მკითხეთ პროდუქტებზე, ფასებზე ან საიტის ნებისმიერ ინფორმაციაზე — ტექსტით ან ხმით 🎙',
       sender: 'bot',
     },
   ]);
   const [isTyping, setIsTyping] = useState(false);
+  const [ttsEnabled, setTtsEnabled] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const recorderRef = useRef<MediaRecorder | null>(null);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -40,60 +81,120 @@ export default function ChatBot({ initialOpen = false }: { initialOpen?: boolean
     }
   }, [messages, isTyping]);
 
-  const handleSend = async () => {
-    const text = input.trim();
+  const addBotMessage = (msg: Omit<Message, 'id' | 'sender'>) => {
+    setMessages((prev) => [...prev, { id: Date.now() + Math.random(), sender: 'bot', ...msg }]);
+  };
+
+  const send = async (text: string, escalate = false, voice = false) => {
     if (!text || isTyping) return;
 
-    const userMsg: Message = { id: Date.now(), text, sender: 'user' };
-    const allMessages = [...messages, userMsg];
-    setMessages(allMessages);
-    setInput('');
+    setMessages((prev) => {
+      const next = escalate
+        ? // escalation — კითხვა ეკრანზე უკვე ჩანს, ხელახლა აღარ ვამატებთ
+          prev.map((m) => (m.escalateFor === text ? { ...m, escalateFor: undefined } : m))
+        : [...prev, { id: Date.now(), text, sender: 'user' as const }];
+      return next;
+    });
     setIsTyping(true);
 
-    // Build Gemini-format history (skip the initial bot greeting)
-    const history = allMessages
-      .filter((m) => !(m.id === 1 && m.sender === 'bot'))
-      .map((m) => ({
-        role: m.sender === 'user' ? 'user' : 'assistant',
-        content: m.text,
-      }));
-
-    const botId = Date.now() + 1;
-    setMessages((prev) => [...prev, { id: botId, text: '', sender: 'bot' }]);
+    // history — მისალმების გარეშე, ბოლო 16 სვლა
+    const history = messages
+      .filter((m) => m.id !== GREETING_ID && m.text)
+      .map((m) => ({ role: m.sender === 'user' ? 'user' : 'assistant', content: m.text }))
+      .slice(-16);
 
     try {
-      const res = await fetch('/api/chat', {
+      const res = await fetch(AI_CHAT_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: history }),
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          message: text,
+          history,
+          session_id: getSessionId(),
+          escalate,
+          voice,
+        }),
       });
 
-      if (!res.body) throw new Error('No response body');
-
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let botText = '';
-
+      const data = (await res.json()) as AiChatResponse;
       setIsTyping(false);
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        botText += decoder.decode(value, { stream: true });
-        setMessages((prev) =>
-          prev.map((m) => (m.id === botId ? { ...m, text: botText } : m))
-        );
+      if (!res.ok || !data.answer) {
+        addBotMessage({ text: 'სამწუხაროდ, ამ წუთას პასუხის გაცემა ვერ ხერხდება. სცადეთ ცოტა ხანში.' });
+        return;
       }
+
+      addBotMessage({
+        text: data.answer,
+        sources: (data.sources ?? []).filter((s) => s.url).slice(0, 3),
+        // „უკეთესი პასუხის" ღილაკი — მხოლოდ უფასო ჯაჭვის პასუხზე
+        escalateFor: data.provider && data.reason === 'default' ? text : undefined,
+      });
+
+      if (ttsEnabled) speak(data.answer);
     } catch {
       setIsTyping(false);
-      setMessages((prev) =>
-        prev.map((m) =>
-          m.id === botId
-            ? { ...m, text: 'ბოდიში, შეცდომა მოხდა. სცადეთ მოგვიანებით.' }
-            : m
-        )
-      );
+      addBotMessage({ text: 'შეცდომა — სცადეთ ხელახლა.' });
     }
+  };
+
+  const handleSend = () => {
+    const text = input.trim();
+    if (!text) return;
+    setInput('');
+    send(text);
+  };
+
+  // ── ხმოვანი ჩაწერა (Groq Whisper Laravel-ის გავლით) ──────────────
+  const toggleRecording = async () => {
+    if (isRecording) {
+      recorderRef.current?.stop();
+      return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const chunks: Blob[] = [];
+      const recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+      recorderRef.current = recorder;
+
+      recorder.ondataavailable = (e) => chunks.push(e.data);
+      recorder.onstop = async () => {
+        setIsRecording(false);
+        stream.getTracks().forEach((t) => t.stop());
+
+        const fd = new FormData();
+        fd.append('audio', new Blob(chunks, { type: 'audio/webm' }), 'audio.webm');
+
+        setIsTyping(true);
+        try {
+          const res = await fetch(`${AI_CHAT_URL}/transcribe`, { method: 'POST', body: fd });
+          const data = (await res.json()) as { text: string | null; error?: string };
+          setIsTyping(false);
+
+          if (data.text) {
+            send(data.text, false, true);
+          } else {
+            addBotMessage({ text: data.error || 'ხმის ამოცნობა ვერ მოხერხდა.' });
+          }
+        } catch {
+          setIsTyping(false);
+          addBotMessage({ text: 'ხმის ამოცნობა ვერ მოხერხდა.' });
+        }
+      };
+
+      recorder.start();
+      setIsRecording(true);
+    } catch {
+      addBotMessage({ text: 'მიკროფონზე წვდომა ვერ მოხერხდა — შეამოწმეთ ბრაუზერის ნებართვა.' });
+    }
+  };
+
+  const toggleTts = () => {
+    setTtsEnabled((v) => {
+      if (v && typeof window !== 'undefined' && 'speechSynthesis' in window) speechSynthesis.cancel();
+      return !v;
+    });
   };
 
   const openWhatsApp = () => {
@@ -196,6 +297,21 @@ export default function ChatBot({ initialOpen = false }: { initialOpen?: boolean
               </div>
               <div style={{ display: 'flex', gap: 4 }}>
                 <button
+                  onClick={toggleTts}
+                  aria-pressed={ttsEnabled}
+                  title="პასუხების გახმოვანება"
+                  style={{
+                    background: ttsEnabled ? 'rgba(255,255,255,0.25)' : 'none',
+                    border: 'none',
+                    borderRadius: 6,
+                    color: '#fff',
+                    cursor: 'pointer',
+                    padding: 4,
+                  }}
+                >
+                  {ttsEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
+                </button>
+                <button
                   onClick={() => setIsMinimized((v) => !v)}
                   style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', padding: 4 }}
                 >
@@ -245,7 +361,41 @@ export default function ChatBot({ initialOpen = false }: { initialOpen?: boolean
                           whiteSpace: 'pre-wrap',
                         }}
                       >
-                        {msg.text || (msg.sender === 'bot' && isTyping === false ? '…' : '')}
+                        {msg.text}
+                        {msg.sources && msg.sources.length > 0 && (
+                          <div style={{ fontSize: 12, marginTop: 6 }}>
+                            იხილეთ:{' '}
+                            {msg.sources.map((s, i) => (
+                              <React.Fragment key={`${s.url}-${i}`}>
+                                {i > 0 && ' · '}
+                                <a href={s.url ?? '#'} style={{ color: '#0d6efd' }}>
+                                  {s.title || 'ბმული'}
+                                </a>
+                              </React.Fragment>
+                            ))}
+                          </div>
+                        )}
+                        {msg.escalateFor && (
+                          <button
+                            onClick={() => send(msg.escalateFor!, true)}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 5,
+                              marginTop: 8,
+                              fontSize: 12,
+                              border: '1px solid #0d6efd',
+                              color: '#0d6efd',
+                              background: 'transparent',
+                              borderRadius: 8,
+                              padding: '4px 10px',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            <Sparkles size={13} />
+                            უკეთესი პასუხი მინდა
+                          </button>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -317,13 +467,35 @@ export default function ChatBot({ initialOpen = false }: { initialOpen?: boolean
                     alignItems: 'center',
                   }}
                 >
+                  <button
+                    onClick={toggleRecording}
+                    aria-label="ხმით კითხვა"
+                    title="ხმით კითხვა"
+                    style={{
+                      width: 36,
+                      height: 36,
+                      borderRadius: '50%',
+                      background: 'none',
+                      border: 'none',
+                      color: isRecording ? '#c0392b' : '#6c757d',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                      animation: isRecording ? 'aic-pulse 1.2s infinite' : undefined,
+                    }}
+                  >
+                    <Mic size={18} />
+                  </button>
                   <input
                     type="text"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                    placeholder="ჩაწერეთ შეტყობინება..."
+                    placeholder={isRecording ? 'ვისმენ…' : 'დაწერეთ კითხვა…'}
                     disabled={isTyping}
+                    maxLength={2000}
                     style={{
                       flex: 1,
                       border: '1px solid #dee2e6',
@@ -337,6 +509,7 @@ export default function ChatBot({ initialOpen = false }: { initialOpen?: boolean
                   <button
                     onClick={handleSend}
                     disabled={isTyping || !input.trim()}
+                    aria-label="გაგზავნა"
                     style={{
                       width: 36,
                       height: 36,
@@ -355,6 +528,7 @@ export default function ChatBot({ initialOpen = false }: { initialOpen?: boolean
                     <Send size={15} />
                   </button>
                 </div>
+                <style>{'@keyframes aic-pulse { 50% { opacity: .4; } }'}</style>
               </>
             )}
           </motion.div>

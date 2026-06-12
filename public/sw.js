@@ -1,5 +1,5 @@
 // HomeSpace PWA Service Worker
-const VERSION = 'v1.0.0';
+const VERSION = 'v1.0.1';
 const STATIC_CACHE = `homespace-static-${VERSION}`;
 const RUNTIME_CACHE = `homespace-runtime-${VERSION}`;
 const IMAGE_CACHE = `homespace-images-${VERSION}`;
