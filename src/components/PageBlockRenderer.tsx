@@ -1,13 +1,18 @@
 'use client';
 
+import React from 'react';
 import { Block } from '@/lib/api/types';
 import HeroSlider from '@/components/HeroSlider';
 import FeaturesSection from '@/components/FeaturesSection';
 import ImageTextSection from '@/components/ImageTextSection';
+import TextContentSection from '@/components/TextContentSection';
 import CtaBanner from '@/components/CtaBanner';
 import { resolveImageOrFallback } from '@/lib/api/assets';
 import { useFallbackLogo } from '@/context/BootstrapContext';
 import { Container, Row, Col } from 'react-bootstrap';
+
+const HERO_TYPES = ['main_banner', 'page_hero', 'banner'];
+const isHeroBlock = (b: Block) => HERO_TYPES.includes(b.type);
 
 interface Props {
   blocks: Block[];
@@ -233,35 +238,77 @@ function PostIntroBlocks({ blocks, fallbackLogo }: { blocks: Block[]; fallbackLo
   );
 }
 
+/**
+ * Render a single content block by type. Each block is passed to its matching
+ * component as a one-element array so multiples render independently and in
+ * their true sort_order position.
+ */
+function renderContentBlock(
+  block: Block,
+  key: string,
+  fallbackLogo: string,
+  pageTitle?: string,
+  pageDescription?: string,
+): React.ReactNode {
+  const one = [block];
+
+  switch (block.type) {
+    case 'post_intro':
+      return <PostIntroBlocks key={key} blocks={one} fallbackLogo={fallbackLogo} />;
+    case 'page_text_content':
+      return <TextContentSection key={key} blocks={one} />;
+    case 'items_grid':
+      return <FeaturesSection key={key} blocks={one} />;
+    case 'image_text':
+      return <ImageTextSection key={key} blocks={one} pageTitle={pageTitle} pageDescription={pageDescription} />;
+    case 'process_steps':
+      return <ProcessSteps key={key} blocks={one} />;
+    case 'photo_gallery':
+      return <PhotoGallery key={key} blocks={one} fallbackLogo={fallbackLogo} />;
+    case 'checklist':
+    case 'post_checklist':
+      return <ChecklistBlocks key={key} blocks={one} />;
+    case 'quote':
+    case 'post_quote':
+      return <QuoteBlocks key={key} blocks={one} />;
+    case 'cta_banner':
+      return <CtaBanner key={key} blocks={one} />;
+    default:
+      return null;
+  }
+}
+
 export default function PageBlockRenderer({ blocks, pageTitle, pageDescription }: Props) {
   const fallbackLogo = useFallbackLogo();
 
   if (!blocks || blocks.length === 0) return null;
 
   const sorted = [...blocks].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
-  const heroSlides = buildHeroSlides(sorted, fallbackLogo);
 
-  const hasHero = heroSlides.length > 0;
-  const hasItemsGrid = sorted.some((b) => b.type === 'items_grid');
-  const hasImageText = sorted.some((b) => b.type === 'image_text');
-  const hasCtaBanner = sorted.some((b) => b.type === 'cta_banner');
-  const hasGallery = sorted.some((b) => b.type === 'photo_gallery');
-  const hasProcessSteps = sorted.some((b) => b.type === 'process_steps');
-  const hasChecklist = sorted.some((b) => b.type === 'checklist' || b.type === 'post_checklist');
-  const hasQuote = sorted.some((b) => b.type === 'quote' || b.type === 'post_quote');
-  const hasPostIntro = sorted.some((b) => b.type === 'post_intro');
+  // Hero/banner blocks are grouped into a single slider at the top.
+  const heroSlides = buildHeroSlides(sorted, fallbackLogo);
+  const contentBlocks = sorted.filter((b) => !isHeroBlock(b));
+
+  let firstImageTextSeen = false;
 
   return (
     <>
-      {hasHero && <HeroSlider data={{ slides: heroSlides }} />}
-      {hasPostIntro && <PostIntroBlocks blocks={sorted} fallbackLogo={fallbackLogo} />}
-      {hasItemsGrid && <FeaturesSection blocks={sorted} />}
-      {hasImageText && <ImageTextSection blocks={sorted} pageTitle={pageTitle} pageDescription={pageDescription} />}
-      {hasProcessSteps && <ProcessSteps blocks={sorted} />}
-      {hasGallery && <PhotoGallery blocks={sorted} fallbackLogo={fallbackLogo} />}
-      {hasChecklist && <ChecklistBlocks blocks={sorted} />}
-      {hasQuote && <QuoteBlocks blocks={sorted} />}
-      {hasCtaBanner && <CtaBanner blocks={sorted} />}
+      {heroSlides.length > 0 && <HeroSlider data={{ slides: heroSlides }} />}
+      {contentBlocks.map((block, index) => {
+        // Only the first image_text falls back to the page title/description.
+        const isFirstImageText = block.type === 'image_text' && !firstImageTextSeen;
+        if (block.type === 'image_text') {
+          firstImageTextSeen = true;
+        }
+
+        return renderContentBlock(
+          block,
+          `${block.type}-${index}`,
+          fallbackLogo,
+          isFirstImageText ? pageTitle : undefined,
+          isFirstImageText ? pageDescription : undefined,
+        );
+      })}
     </>
   );
 }

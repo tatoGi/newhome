@@ -12,7 +12,7 @@ import { getUiText } from '@/lib/i18n/ui';
 
 function resolveProductImage(p: ProductRelation, fallbackLogo: string): string {
   const galleryBlock = p.blocks?.find((b) => b.type === 'product_gallery');
-  const images: unknown[] = galleryBlock?.data?.product_images ?? [];
+  const images: unknown[] = galleryBlock?.data?.images ?? galleryBlock?.data?.product_images ?? [];
   const first = Array.isArray(images) && images.length > 0 ? String(images[0]) : '';
   return resolveImageOrFallback(first || p.feature_image || '', fallbackLogo);
 }
@@ -56,14 +56,21 @@ export default function FeaturedProductsSection({ products, title, subtitle }: F
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="d-flex justify-content-between align-items-end mb-4"
+          className="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-end gap-3 mb-5"
         >
           <div>
-            <h2 className="fw-bold mb-2">{resolvedTitle}</h2>
-            <p className="text-muted mb-0">{resolvedSubtitle}</p>
+            <span className="text-uppercase fw-bold text-accent mb-2 d-inline-block small" style={{ letterSpacing: '0.15em', fontSize: '0.72rem' }}>
+              {locale === 'ka' ? 'რჩეული კოლექცია' : 'FEATURED COLLECTION'}
+            </span>
+            <h2 className="fw-bold mb-2 text-primary display-6" style={{ fontFamily: '"Noto Serif Georgian", serif' }}>{resolvedTitle}</h2>
+            <p className="text-muted mb-0 fs-6" style={{ maxWidth: '600px' }}>{resolvedSubtitle}</p>
           </div>
-          <Button as={Link as any} href={allProductsHref} variant="link" className="text-primary text-decoration-none d-flex align-items-center gap-2">
-            {viewAllLabel} <ArrowRight size={18} />
+          <Button
+            as={Link as any}
+            href={allProductsHref}
+            className="btn-outline-primary-custom d-inline-flex align-items-center justify-content-center gap-2 px-3 px-md-4 py-2 rounded-pill fw-semibold text-decoration-none align-self-start align-self-sm-auto text-nowrap small"
+          >
+            {viewAllLabel} <ArrowRight size={16} className="arrow-icon" />
           </Button>
         </motion.div>
         <Row className="gy-4">
@@ -73,7 +80,7 @@ export default function FeaturedProductsSection({ products, title, subtitle }: F
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.15 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
                 className="h-100"
               >
                 <ProductCard product={product as any} />

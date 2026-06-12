@@ -17,7 +17,7 @@ function firstProductImage(
   const fromBlocks = blocks
     .filter((b) => b.type === 'product_gallery')
     .flatMap((b) => {
-      const imgs = (b.data as Record<string, unknown>)?.product_images;
+      const imgs = (b.data as Record<string, unknown>)?.images ?? (b.data as Record<string, unknown>)?.product_images;
       return Array.isArray(imgs) ? (imgs as unknown[]).map(String).filter(Boolean) : [];
     })[0];
   return toBackendAssetUrl(featureImage) ||

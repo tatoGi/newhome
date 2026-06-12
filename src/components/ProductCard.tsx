@@ -56,11 +56,11 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
 
   return (
     <div
-      className="article-product-card d-flex flex-column h-100 position-relative"
+      className={`premium-product-card d-flex flex-column h-100 position-relative ${product.featured ? 'has-vip' : ''}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="position-relative mb-2 overflow-hidden article-img-container" style={{ backgroundColor: '#f5f5f5' }}>
+      <div className="premium-img-container mb-2">
         <Link href={`/product/${productSlug}`} className="d-block w-100 h-100 position-relative z-1">
           <Image
             src={productImage}
@@ -68,49 +68,39 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
             title={product.name}
             fill
             sizes="(max-width: 576px) 100vw, (max-width: 992px) 50vw, (max-width: 1400px) 33vw, 25vw"
-            className="article-product-img"
+            className="premium-product-img"
             style={{ objectFit: 'cover' }}
           />
         </Link>
 
         {product.sale && (
-          <span className="position-absolute top-0 start-0 m-2 badge bg-danger text-white rounded-0 px-2 py-1 fs-6 z-2">
+          <span className="premium-badge-sale">
             SALE
           </span>
         )}
 
         {product.featured && (
-          <span
-            className="position-absolute top-0 end-0 m-2 z-2 d-flex align-items-center gap-1 px-2 py-1 fw-bold text-white"
-            style={{
-              background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-              fontSize: '0.7rem',
-              letterSpacing: '0.06em',
-              borderRadius: '4px',
-              boxShadow: '0 2px 6px rgba(217,119,6,0.4)',
-            }}
-          >
+          <span className="premium-badge-vip">
             ★ VIP
           </span>
         )}
 
         <button
-          className="btn btn-light position-absolute top-0 end-0 m-2 rounded-circle border-0 d-flex align-items-center justify-content-center article-wishlist-btn"
+          className="premium-wishlist-btn"
           onClick={handleWishlist}
           aria-label={isInWishlist(product.id) ? 'სურვილებიდან წაშლა' : 'სურვილებში დამატება'}
-          style={{
-            width: '36px',
-            height: '36px',
-            opacity: isHovered || isInWishlist(product.id) ? 1 : 0,
-            transition: 'all 0.2s',
-            zIndex: 3,
-            backgroundColor: '#ffffff',
-            marginTop: product.featured ? '2rem' : undefined,
-          }}
         >
           <Heart size={18} fill={isInWishlist(product.id) ? '#D9534F' : 'none'} color={isInWishlist(product.id) ? '#D9534F' : '#333'} />
         </button>
 
+        <button
+          className="premium-cart-overlay btn"
+          onClick={handleAddToCart}
+          aria-label="კალათაში დამატება"
+        >
+          <ShoppingCart size={16} />
+          <span>კალათაში დამატება</span>
+        </button>
       </div>
 
       <div className="d-flex flex-column flex-grow-1 px-1 mt-1">
@@ -119,8 +109,8 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
             {product.colors.map((color, idx) => (
               <button
                 key={idx}
-                className={`article-swatch rounded-circle p-0 ${activeColor === idx ? 'active' : ''}`}
-                style={{ width: '24px', height: '24px', backgroundColor: color }}
+                className={`premium-swatch ${activeColor === idx ? 'active' : ''}`}
+                style={{ backgroundColor: color }}
                 onClick={(e) => { e.preventDefault(); setActiveColor(idx); }}
                 aria-label={`ფერი ${idx + 1}`}
               />
@@ -128,7 +118,7 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
           </div>
         )}
 
-        <Link href={`/product/${productSlug}`} className="fw-bold text-dark article-title mb-1 text-decoration-none">
+        <Link href={`/product/${productSlug}`} className="premium-title mb-1 text-decoration-none">
           {product.name}
         </Link>
 
@@ -149,15 +139,15 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
         )}
 
         <div className="mt-auto d-flex justify-content-between align-items-center gap-3">
-          <div className="d-flex gap-2 align-items-center">
-            <span className="fw-bold" style={{ color: '#D9534F', fontSize: '1.05rem' }}>{product.price} ₾</span>
+          <div className="d-flex align-items-baseline gap-2">
+            <span className="premium-price">{product.price} ₾</span>
             {product.oldPrice && (
-              <span className="text-muted text-decoration-line-through small">{product.oldPrice} ₾</span>
+              <span className="premium-old-price text-decoration-line-through">{product.oldPrice} ₾</span>
             )}
           </div>
           <button
             type="button"
-            className="btn article-cart-inline-btn"
+            className="btn premium-cart-inline-btn"
             onClick={handleAddToCart}
             aria-label="კალათაში დამატება"
           >

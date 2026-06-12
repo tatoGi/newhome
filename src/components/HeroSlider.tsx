@@ -46,6 +46,8 @@ const HeroSlider: React.FC<{ data?: { slides?: HeroSlide[] } }> = ({ data }) => 
   const activeSlide = displaySlides[Math.min(activeIndex, displaySlides.length - 1)] ?? displaySlides[0];
   const slideImage = resolveImageOrFallback(activeSlide.image, fallbackLogo);
   const slideVideo = (activeSlide.video || '').trim();
+  // Avoid flashing the fallback logo as a video poster before the video loads.
+  const posterImage = slideImage && slideImage !== fallbackLogo ? slideImage : undefined;
   const title = activeSlide.title || '';
   const description = stripHtml(activeSlide.desc);
   const imageFit = activeSlide.imageFit || 'cover';
@@ -54,20 +56,34 @@ const HeroSlider: React.FC<{ data?: { slides?: HeroSlide[] } }> = ({ data }) => 
     setActiveIndex((nextIndex + displaySlides.length) % displaySlides.length);
   };
 
+  // Touch swipe navigation for mobile.
+  const touchStartX = React.useRef<number | null>(null);
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.changedTouches[0]?.clientX ?? null;
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null || !hasMultipleSlides) return;
+    const delta = (e.changedTouches[0]?.clientX ?? 0) - touchStartX.current;
+    if (Math.abs(delta) > 40) {
+      goTo(delta < 0 ? activeIndex + 1 : activeIndex - 1);
+    }
+    touchStartX.current = null;
+  };
+
   return (
     <section className="hero-slider" aria-label="Hero slider">
-      <div className="hero-slider-frame">
+      <div className="hero-slider-frame" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
         <div className={`hero-slide-image-container fit-${imageFit}${slideVideo ? ' has-video' : ''}`}>
           {slideVideo ? (
             <video
               key={slideVideo}
               src={slideVideo}
-              poster={slideImage || undefined}
+              poster={posterImage}
               autoPlay
               muted
               loop
               playsInline
-              preload="metadata"
+              preload="auto"
               aria-label={title || 'Banner'}
               className={`hero-slide-image hero-slide-video fit-${imageFit}`}
               style={{ width: '100%', height: '100%', objectFit: imageFit === 'contain' ? 'contain' : 'cover' }}
