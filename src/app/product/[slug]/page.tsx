@@ -58,9 +58,11 @@ export async function generateMetadata({ params, searchParams }: {
     const data = await api.getProduct(slug, locale);
     const p = data.product;
 
-    // Build a direct OG image URL from the product's feature image or first gallery image
+    // Build a direct OG image URL: feature_image → gallery → block gallery images
+    const galleryBlockImages = extractProductGalleryImages(p.blocks || []);
     const ogImage = toBackendAssetUrl(p.feature_image)
       || (Array.isArray(p.gallery) ? toBackendAssetUrl(p.gallery.find(Boolean)) : null)
+      || toBackendAssetUrl(galleryBlockImages[0])
       || null;
 
     return buildPageMetadata({
