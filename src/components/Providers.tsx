@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { AppProgressBar as ProgressBar } from 'next-nprogress-bar';
 import { AppProvider } from '@/context/AppContext';
 import { AuthProvider } from '@/context/AuthContext';
 import { BootstrapProvider } from '@/context/BootstrapContext';
@@ -18,7 +19,15 @@ export default function Providers({
     <BootstrapProvider data={bootstrapData}>
       <AuthProvider>
         <AppProvider>
-          <PwaProvider>{children}</PwaProvider>
+          <PwaProvider>
+            {children}
+            <ProgressBar
+              height="3px"
+              color="var(--accent-color)"
+              options={{ showSpinner: false }}
+              shallowRouting
+            />
+          </PwaProvider>
         </AppProvider>
       </AuthProvider>
     </BootstrapProvider>
