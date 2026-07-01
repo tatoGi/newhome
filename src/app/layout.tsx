@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Noto_Serif_Georgian } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
-import Script from 'next/script';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './globals.css';
 import '../components/header/header.css';
@@ -10,6 +9,7 @@ import Footer from '@/components/Footer';
 import Providers from '@/components/Providers';
 import ChatBotLoader from '@/components/ChatBotLoader';
 import MetaPixel from '@/components/MetaPixel';
+import GoogleAnalytics from '@/components/GoogleAnalytics';
 import { api } from '@/lib/api/client';
 import { getServerLocale } from '@/lib/locale';
 import { toBackendAssetUrl } from '@/lib/api/assets';
@@ -38,8 +38,6 @@ export const viewport: Viewport = {
 
 const SITE_URL = 'https://homespace.ge';
 const SITE_NAME = 'HomeSpace.ge';
-const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID || '';
-const ENABLE_GTM = process.env.NEXT_PUBLIC_ENABLE_GTM === 'true' && GTM_ID !== '';
 
 export async function generateMetadata(): Promise<Metadata> {
   const serverLocale = await getServerLocale();
@@ -133,35 +131,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang={bootstrapData.locale} className={notoSerifGeorgian.variable} suppressHydrationWarning>
       <head>
+        <GoogleAnalytics />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
         />
       </head>
       <body suppressHydrationWarning>
-        {ENABLE_GTM && (
-          <Script
-            id="gtm-loader"
-            strategy="lazyOnload"
-            dangerouslySetInnerHTML={{
-              __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','${GTM_ID}');`,
-            }}
-          />
-        )}
-        {ENABLE_GTM && (
-          <noscript>
-            <iframe
-              src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
-              height="0"
-              width="0"
-              style={{ display: 'none', visibility: 'hidden' }}
-            />
-          </noscript>
-        )}
         <Providers bootstrapData={bootstrapData as any}>
           <div className="d-flex flex-column min-vh-100">
             <Header />
