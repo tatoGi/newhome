@@ -33,12 +33,14 @@ function buildSecurityHeaders(): { key: string; value: string }[] {
   ].filter(Boolean).join(' ');
 
   const imgSrc = ["'self'", 'data:', 'blob:', 'https:', backendOrigin].filter(Boolean).join(' ');
+  const mediaSrc = ["'self'", 'blob:', 'https://cms.homespace.ge', backendOrigin].filter(Boolean).join(' ');
 
   const contentSecurityPolicy = [
     "default-src 'self'",
     "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://connect.facebook.net https://va.vercel-scripts.com",
     "style-src 'self' 'unsafe-inline'",
     `img-src ${imgSrc}`,
+    `media-src ${mediaSrc}`,
     "font-src 'self' data:",
     `connect-src ${connectSrc}`,
     "frame-src 'self' https://www.facebook.com",
